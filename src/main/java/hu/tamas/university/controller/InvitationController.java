@@ -2,8 +2,10 @@ package hu.tamas.university.controller;
 
 import hu.tamas.university.dto.InvitationDto;
 import hu.tamas.university.entity.Invitation;
+import hu.tamas.university.entity.ParticipateInEvent;
 import hu.tamas.university.repository.EventRepository;
 import hu.tamas.university.repository.InvitationRepository;
+import hu.tamas.university.repository.ParticipateInEventRepository;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -26,12 +28,14 @@ public class InvitationController {
 	private final InvitationRepository invitationRepository;
 	private final UserRepository userRepository;
 	private final EventRepository eventRepository;
+	private final ParticipateInEventRepository participateInEventRepository;
 
 	@Autowired
-	public InvitationController(InvitationRepository invitationRepository, UserRepository userRepository, EventRepository eventRepository) {
+	public InvitationController(InvitationRepository invitationRepository, UserRepository userRepository, EventRepository eventRepository, ParticipateInEventRepository participateInEventRepository) {
 		this.invitationRepository = invitationRepository;
 		this.userRepository = userRepository;
 		this.eventRepository = eventRepository;
+		this.participateInEventRepository = participateInEventRepository;
 	}
 
 	@GetMapping("/{id}")
@@ -74,6 +78,14 @@ public class InvitationController {
 
 		invitationRepository.save(invitation);
 
+		if (isAccepted == 1) {
+			ParticipateInEvent participateInEvent = new ParticipateInEvent();
+			participateInEvent.setEvent(invitation.getEvent());
+			participateInEvent.setUser(invitation.getUser());
+
+			participateInEventRepository.save(participateInEvent);
+		}
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Access-Control-Allow-Origin", "*");
 
@@ -84,7 +96,7 @@ public class InvitationController {
 	public @ResponseBody
 	ResponseEntity<String> isAlreadyInvited(@PathVariable int eventId, @PathVariable String userEmail) {
 		boolean isAlreadySent = invitationRepository.findAll().stream().anyMatch(invitation -> invitation.getEvent().getId() == eventId &&
-				invitation.getUser().getEmail().equals(userEmail));
+				invitation.getUser().getEmail().equals(userEmail) && invitation.getDecisionDate() == null);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Access-Control-Allow-Origin", "*");
