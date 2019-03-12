@@ -34,6 +34,7 @@ public class EventController {
 	private final ParticipateInEventRepository participateInEventRepository;
 	private final InvitationRepository invitationRepository;
 	private final UserService userService;
+	private final HttpHeaders headers = new HttpHeaders();
 
 	@Autowired
 	public EventController(EventRepository eventRepository, EventTypeRepository eventTypeRepository, AddressRepository addressRepository, UserRepository userRepository, ParticipateInEventRepository participateInEventRepository, InvitationRepository invitationRepository, UserService userService) {
@@ -44,6 +45,7 @@ public class EventController {
 		this.participateInEventRepository = participateInEventRepository;
 		this.invitationRepository = invitationRepository;
 		this.userService = userService;
+		headers.add("Access-Control-Allow-Origin", "*");
 	}
 
 	@GetMapping("/{id}")
@@ -51,19 +53,13 @@ public class EventController {
 	ResponseEntity<EventDto> getEventById(@PathVariable int id) {
 		Event event = eventRepository.findEventById(id);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
 		return new ResponseEntity<>(EventDto.fromEntity(event), headers, HttpStatus.OK);
 	}
 
 	@GetMapping("/type/{type}")
 	public @ResponseBody
-	ResponseEntity<List<EventDto>> getEventByType(@PathVariable String type) {
+	ResponseEntity<List<EventDto>> getEventsByType(@PathVariable String type) {
 		List<Event> events = eventRepository.findAllByEventTypeType(type);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
 
 		List<EventDto> eventDtos = events.stream().map(EventDto::fromEntity).collect(Collectors.toList());
 
@@ -76,9 +72,6 @@ public class EventController {
 		Event event = eventRepository.findEventById(id);
 		List<UserDto> userDtos = event.getUsers().stream().map(UserDto::fromEntity).collect(Collectors.toList());
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
 		return new ResponseEntity<>(userDtos, headers, HttpStatus.OK);
 	}
 
@@ -86,9 +79,6 @@ public class EventController {
 	public @ResponseBody
 	ResponseEntity<List<PostDto>> getAllPost(@PathVariable int id) {
 		Event event = eventRepository.findEventById(id);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
 		List<PostDto> postDtos = event.getPosts().stream().map(PostDto::fromEntity).collect(Collectors.toList());
 
 		return new ResponseEntity<>(postDtos, headers, HttpStatus.OK);
@@ -129,9 +119,6 @@ public class EventController {
 
 		participateInEventRepository.save(participateInEvent);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
 		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
 	}
 
@@ -140,23 +127,31 @@ public class EventController {
 	ResponseEntity<List<EventDto>> getAllEvent() {
 		List<EventDto> events = eventRepository.findAll().stream().map(EventDto::fromEntity).collect(Collectors.toList());
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
 		return new ResponseEntity<>(events, headers, HttpStatus.OK);
 	}
 
 	@GetMapping("/{eventId}/add-user/{userEmail}")
 	public @ResponseBody
 	ResponseEntity<String> addUserToEvent(@PathVariable int eventId, @PathVariable String userEmail) {
+		Event event = eventRepository.findEventById(eventId);
+		User user = userRepository.findByEmail(userEmail);
+
+		if (event.getUsers().size() >= event.getMaxParticipant()) {
+			return new ResponseEntity<>("{\"result\":\"no more place\"}", headers, HttpStatus.OK);
+		}
+
+		List<ParticipateInEvent> alreadyParticipateInEvent = participateInEventRepository.findByEventAndUser(event,
+				user);
+
+		if (alreadyParticipateInEvent.size() != 0) {
+			return new ResponseEntity<>("{\"result\":\"already added\"}", headers, HttpStatus.OK);
+		}
+
 		ParticipateInEvent participateInEvent = new ParticipateInEvent();
-		participateInEvent.setEvent(eventRepository.findEventById(eventId));
-		participateInEvent.setUser(userRepository.findByEmail(userEmail));
+		participateInEvent.setEvent(event);
+		participateInEvent.setUser(user);
 
 		ParticipateInEvent result = participateInEventRepository.save(participateInEvent);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
 
 		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
 	}
@@ -167,18 +162,12 @@ public class EventController {
 		Event event = eventRepository.findEventById(eventId);
 		boolean result = event.getUsers().stream().anyMatch(user -> user.getEmail().equals(userEmail));
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
 		return new ResponseEntity<>("{\"result\":\"" + result + "\"}", headers, HttpStatus.OK);
 	}
 
 	@GetMapping("/{eventId}/delete")
 	public @ResponseBody
 	ResponseEntity<String> deleteEvent(@PathVariable int eventId) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
 		Event event = eventRepository.findEventById(eventId);
 
 		if (event == null) {
