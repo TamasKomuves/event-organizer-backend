@@ -1,5 +1,8 @@
 package hu.tamas.university.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 
 @Entity
@@ -15,6 +18,7 @@ public class AnswersToPoll {
 	private User user;
 
 	@ManyToOne
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name = "poll_answer_id")
 	private PollAnswer pollAnswer;
 

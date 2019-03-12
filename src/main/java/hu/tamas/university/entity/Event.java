@@ -46,10 +46,10 @@ public class Event {
 	@JoinColumn(name = "organizer_email")
 	private User organizer;
 
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private List<Post> posts;
 
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "participate_in_event", joinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_email", referencedColumnName = "email"))
 	private List<User> users;
 

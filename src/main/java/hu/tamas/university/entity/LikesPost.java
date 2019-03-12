@@ -1,5 +1,8 @@
 package hu.tamas.university.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 
 @Entity
@@ -15,6 +18,7 @@ public class LikesPost {
 	private User user;
 
 	@ManyToOne
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name = "post_id")
 	private Post post;
 

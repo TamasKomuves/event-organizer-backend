@@ -1,5 +1,7 @@
 package hu.tamas.university.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -16,11 +18,11 @@ public class Post {
 	private int id;
 
 	@ManyToOne
-	@JoinColumn(name="event_id")
+	@JoinColumn(name = "event_id")
 	private Event event;
 
 	@ManyToOne
-	@JoinColumn(name="poster_email")
+	@JoinColumn(name = "poster_email")
 	private User poster;
 
 	@Column(name = "post_date")
@@ -30,12 +32,12 @@ public class Post {
 	@Column(name = "text")
 	private String text;
 
-	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private List<Comment> comments;
 
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "likes_post", joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_email", referencedColumnName = "email"))
-	List<User> likers;
+	private List<User> likers;
 
 	public int getId() {
 		return id;

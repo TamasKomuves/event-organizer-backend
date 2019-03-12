@@ -7,6 +7,7 @@ import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.ParticipateInEvent;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.*;
+import hu.tamas.university.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,14 +31,18 @@ public class EventController {
 	private final AddressRepository addressRepository;
 	private final UserRepository userRepository;
 	private final ParticipateInEventRepository participateInEventRepository;
+	private final InvitationRepository invitationRepository;
+	private final UserService userService;
 
 	@Autowired
-	public EventController(EventRepository eventRepository, EventTypeRepository eventTypeRepository, AddressRepository addressRepository, UserRepository userRepository, ParticipateInEventRepository participateInEventRepository) {
+	public EventController(EventRepository eventRepository, EventTypeRepository eventTypeRepository, AddressRepository addressRepository, UserRepository userRepository, ParticipateInEventRepository participateInEventRepository, InvitationRepository invitationRepository, UserService userService) {
 		this.eventRepository = eventRepository;
 		this.eventTypeRepository = eventTypeRepository;
 		this.addressRepository = addressRepository;
 		this.userRepository = userRepository;
 		this.participateInEventRepository = participateInEventRepository;
+		this.invitationRepository = invitationRepository;
+		this.userService = userService;
 	}
 
 	@GetMapping("/{id}")
@@ -157,5 +162,28 @@ public class EventController {
 		headers.add("Access-Control-Allow-Origin", "*");
 
 		return new ResponseEntity<>("{\"result\":\"" + result + "\"}", headers, HttpStatus.OK);
+	}
+
+	@GetMapping("/{eventId}/delete")
+	public @ResponseBody
+	ResponseEntity<String> deleteEvent(@PathVariable int eventId) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Access-Control-Allow-Origin", "*");
+
+		Event event = eventRepository.findEventById(eventId);
+
+		if (event == null) {
+			return new ResponseEntity<>("{\"result\":\"no such event\"}", headers, HttpStatus.OK);
+		}
+
+		if (!event.getOrganizer().getEmail().equals(userService.getCurrentUser().getEmail())) {
+			return new ResponseEntity<>("{\"result\":\"no permission\"}", headers, HttpStatus.OK);
+		}
+
+		invitationRepository.findAll().stream().filter(invitation -> invitation.getEvent().getId() == event.getId())
+				.collect(Collectors.toList()).forEach(invitationRepository::delete);
+		eventRepository.deleteById(eventId);
+
+		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
 	}
 }
