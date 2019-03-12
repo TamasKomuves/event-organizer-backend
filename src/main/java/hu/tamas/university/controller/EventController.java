@@ -4,6 +4,7 @@ import hu.tamas.university.dto.EventDto;
 import hu.tamas.university.dto.PostDto;
 import hu.tamas.university.dto.UserDto;
 import hu.tamas.university.entity.Event;
+import hu.tamas.university.entity.EventType;
 import hu.tamas.university.entity.ParticipateInEvent;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.*;
@@ -100,6 +101,14 @@ public class EventController {
 	                                 @PathVariable int total_cost, @PathVariable Date event_date,
 	                                 @PathVariable int address_id, @PathVariable String event_type_type,
 	                                 @PathVariable String organizer_email) {
+		EventType eventType = eventTypeRepository.findEventTypeByType(event_type_type.toLowerCase());
+
+		if (eventType == null) {
+			eventType = new EventType();
+			eventType.setType(event_type_type.toLowerCase());
+			eventType = eventTypeRepository.save(eventType);
+		}
+
 		User user = userRepository.findByEmail(organizer_email);
 		Event event = new Event();
 		event.setName(name);
@@ -109,7 +118,7 @@ public class EventController {
 		event.setTotalCost(total_cost);
 		event.setEventDate(event_date);
 		event.setAddress(addressRepository.findAddressById(address_id));
-		event.setEventType(eventTypeRepository.findEventTypeByType(event_type_type));
+		event.setEventType(eventType);
 		event.setOrganizer(user);
 
 		event = eventRepository.save(event);
