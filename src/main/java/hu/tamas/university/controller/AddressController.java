@@ -39,18 +39,19 @@ public class AddressController {
 	public @ResponseBody
 	ResponseEntity<String> saveAddress(@PathVariable String country, @PathVariable String city,
 	                                   @PathVariable String street, @PathVariable String streetNumber) {
-
 		Address address = new Address();
 		address.setCountry(country);
 		address.setCity(city);
 		address.setStreet(street);
 		address.setStreetNumber(streetNumber);
 
-		addressRepository.save(address);
+		address = addressRepository.save(address);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Access-Control-Allow-Origin", "*");
 
-		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+		return new ResponseEntity<>("{\"result\":\"success\", " +
+				"\"addressId\":\"" + address.getId() + "\"}", headers,
+				HttpStatus.OK);
 	}
 }
