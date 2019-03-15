@@ -3,7 +3,7 @@ package hu.tamas.university.entity;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -31,8 +31,7 @@ public class Event {
 	private int totalCost;
 
 	@Column(name = "event_date")
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date eventDate;
+	private Timestamp eventDate;
 
 	@ManyToOne
 	@JoinColumn(name = "address_id")
@@ -101,11 +100,11 @@ public class Event {
 		this.totalCost = totalCost;
 	}
 
-	public Date getEventDate() {
+	public Timestamp getEventDate() {
 		return eventDate;
 	}
 
-	public void setEventDate(Date eventDate) {
+	public void setEventDate(Timestamp eventDate) {
 		this.eventDate = eventDate;
 	}
 

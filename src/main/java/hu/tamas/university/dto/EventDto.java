@@ -5,7 +5,7 @@ import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.EventType;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class EventDto {
 
@@ -29,7 +29,7 @@ public class EventDto {
 
 	@JsonProperty("eventDate")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date eventDate;
+	private Timestamp eventDate;
 
 	@JsonProperty("addressId")
 	private int addressId;
@@ -132,11 +132,11 @@ public class EventDto {
 		this.organizerEmail = organizerEmail;
 	}
 
-	public Date getEventDate() {
+	public Timestamp getEventDate() {
 		return eventDate;
 	}
 
-	public void setEventDate(Date eventDate) {
+	public void setEventDate(Timestamp eventDate) {
 		this.eventDate = eventDate;
 	}
 }

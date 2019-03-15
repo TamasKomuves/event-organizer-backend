@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,7 +88,7 @@ public class EventController {
 	public @ResponseBody
 	ResponseEntity<String> saveEvent(@PathVariable String name, @PathVariable String description,
 	                                 @PathVariable int max_participant, @PathVariable String visibility,
-	                                 @PathVariable int total_cost, @PathVariable Date event_date,
+	                                 @PathVariable int total_cost, @PathVariable Timestamp event_date,
 	                                 @PathVariable int address_id, @PathVariable String event_type_type,
 	                                 @PathVariable String organizer_email) {
 		EventType eventType = eventTypeRepository.findEventTypeByType(event_type_type.toLowerCase());
