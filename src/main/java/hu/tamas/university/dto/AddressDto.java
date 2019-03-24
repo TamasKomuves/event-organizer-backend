@@ -25,7 +25,7 @@ public class AddressDto {
 
 		dto.setId(address.getId());
 		dto.setCountry(address.getCountry());
-		dto.setCountry(address.getCity());
+		dto.setCity(address.getCity());
 		dto.setStreet(address.getStreet());
 		dto.setStreetNumber(address.getStreetNumber());
 
