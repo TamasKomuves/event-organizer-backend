@@ -3,10 +3,7 @@ package hu.tamas.university.controller;
 import hu.tamas.university.dto.EventDto;
 import hu.tamas.university.dto.PostDto;
 import hu.tamas.university.dto.UserDto;
-import hu.tamas.university.entity.Event;
-import hu.tamas.university.entity.EventType;
-import hu.tamas.university.entity.ParticipateInEvent;
-import hu.tamas.university.entity.User;
+import hu.tamas.university.entity.*;
 import hu.tamas.university.repository.*;
 import hu.tamas.university.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +23,8 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/events")
 public class EventController {
+
+	private final String PRIVATE_VISIBILITY = "private";
 
 	private final EventRepository eventRepository;
 	private final EventTypeRepository eventTypeRepository;
@@ -56,12 +55,29 @@ public class EventController {
 		return new ResponseEntity<>(EventDto.fromEntity(event), headers, HttpStatus.OK);
 	}
 
+	@GetMapping("")
+	public @ResponseBody
+	ResponseEntity<List<EventDto>> getAllEvent() {
+		List<Event> events = eventRepository.findAll();
+		List<EventDto> eventDtos = convertEventsToEventDtos(events);
+
+		return new ResponseEntity<>(eventDtos, headers, HttpStatus.OK);
+	}
+
+	private List<EventDto> convertEventsToEventDtos(List<Event> events) {
+		return events.stream().filter(this::isCurrentUserHasRightToGetEvent)
+				.map(EventDto::fromEntity).collect(Collectors.toList());
+	}
+
+	private boolean isCurrentUserHasRightToGetEvent(Event event) {
+		return !event.getVisibility().equals(PRIVATE_VISIBILITY) || event.getUsers().contains(userService.getCurrentUser());
+	}
+
 	@GetMapping("/type/{type}")
 	public @ResponseBody
 	ResponseEntity<List<EventDto>> getEventsByType(@PathVariable String type) {
 		List<Event> events = eventRepository.findAllByEventTypeType(type);
-
-		List<EventDto> eventDtos = events.stream().map(EventDto::fromEntity).collect(Collectors.toList());
+		List<EventDto> eventDtos = convertEventsToEventDtos(events);
 
 		return new ResponseEntity<>(eventDtos, headers, HttpStatus.OK);
 	}
@@ -122,38 +138,50 @@ public class EventController {
 		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
 	}
 
-	@GetMapping("")
-	public @ResponseBody
-	ResponseEntity<List<EventDto>> getAllEvent() {
-		List<EventDto> events = eventRepository.findAll().stream().map(EventDto::fromEntity).collect(Collectors.toList());
-
-		return new ResponseEntity<>(events, headers, HttpStatus.OK);
-	}
-
 	@GetMapping("/{eventId}/add-user/{userEmail}")
 	public @ResponseBody
 	ResponseEntity<String> addUserToEvent(@PathVariable int eventId, @PathVariable String userEmail) {
 		Event event = eventRepository.findEventById(eventId);
-		User user = userRepository.findByEmail(userEmail);
 
-		if (event.getUsers().size() >= event.getMaxParticipant()) {
+		if (!isEventHasMorePlace(event)) {
 			return new ResponseEntity<>("{\"result\":\"no more place\"}", headers, HttpStatus.OK);
 		}
 
+		User user = userRepository.findByEmail(userEmail);
 		List<ParticipateInEvent> alreadyParticipateInEvent = participateInEventRepository.findByEventAndUser(event,
 				user);
 
-		if (alreadyParticipateInEvent.size() != 0) {
+		if (!alreadyParticipateInEvent.isEmpty()) {
 			return new ResponseEntity<>("{\"result\":\"already added\"}", headers, HttpStatus.OK);
 		}
 
+		ParticipateInEvent participateInEvent = createParticipateInEvent(event, user);
+		participateInEventRepository.save(participateInEvent);
+
+		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+	}
+
+	private boolean isEventHasMorePlace(Event event) {
+		List<Invitation> invitations = invitationRepository.findByEvent(event).stream()
+				.filter(invitation -> invitation.getDecisionDate() == null).collect(Collectors.toList());
+
+		return invitations.size() + event.getUsers().size() < event.getMaxParticipant();
+	}
+
+	private ParticipateInEvent createParticipateInEvent(Event event, User user) {
 		ParticipateInEvent participateInEvent = new ParticipateInEvent();
 		participateInEvent.setEvent(event);
 		participateInEvent.setUser(user);
+		return participateInEvent;
+	}
 
-		ParticipateInEvent result = participateInEventRepository.save(participateInEvent);
+	@GetMapping("/{eventId}/has-more-place")
+	public @ResponseBody
+	ResponseEntity<String> eventHasMorePlace(@PathVariable int eventId) {
+		Event event = eventRepository.findEventById(eventId);
+		boolean result = isEventHasMorePlace(event);
 
-		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+		return new ResponseEntity<>("{\"result\":\"" + result + "\"}", headers, HttpStatus.OK);
 	}
 
 	@GetMapping("/{eventId}/is-participate/{userEmail}")

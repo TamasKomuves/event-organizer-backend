@@ -1,8 +1,10 @@
 package hu.tamas.university.controller;
 
 import hu.tamas.university.dto.InvitationDto;
+import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.Invitation;
 import hu.tamas.university.entity.ParticipateInEvent;
+import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.EventRepository;
 import hu.tamas.university.repository.InvitationRepository;
 import hu.tamas.university.repository.ParticipateInEventRepository;
@@ -53,25 +55,58 @@ public class InvitationController {
 	public @ResponseBody
 	ResponseEntity<String> createInvitation(@PathVariable int eventId,
 	                                        @PathVariable String userEmail, @PathVariable int isUserRequested) {
-		Invitation invitation = new Invitation();
-		invitation.setEvent(eventRepository.findEventById(eventId));
-		invitation.setUser(userRepository.findByEmail(userEmail));
-		invitation.setUserRequested(isUserRequested);
-		invitation.setAccepted(0);
-		invitation.setSentDate(new Timestamp(System.currentTimeMillis()));
-
-		invitationRepository.save(invitation);
+		Event event = eventRepository.findEventById(eventId);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Access-Control-Allow-Origin", "*");
 
+		if (!isEventHasMorePlace(event)) {
+			return new ResponseEntity<>("{\"result\":\"no more place\"}", headers, HttpStatus.OK);
+		}
+
+		User user = userRepository.findByEmail(userEmail);
+
+		List<ParticipateInEvent> alreadyParticipateInEvent = participateInEventRepository.findByEventAndUser(event,
+				user);
+
+		if (!alreadyParticipateInEvent.isEmpty()) {
+			return new ResponseEntity<>("{\"result\":\"already participate\"}", headers, HttpStatus.OK);
+		}
+
+		List<Invitation> alreadyInvited = invitationRepository.findByEventAndUser(event, user);
+
+		if (!alreadyInvited.isEmpty()) {
+			return new ResponseEntity<>("{\"result\":\"already invited\"}", headers, HttpStatus.OK);
+		}
+
+		Invitation invitation = createInvitation(event, user, isUserRequested);
+
+		invitationRepository.save(invitation);
+
 		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+	}
+
+	private boolean isEventHasMorePlace(Event event) {
+		List<Invitation> invitations = invitationRepository.findByEvent(event).stream()
+				.filter(invitation -> invitation.getDecisionDate() == null).collect(Collectors.toList());
+
+		return invitations.size() + event.getUsers().size() < event.getMaxParticipant();
+	}
+
+	private Invitation createInvitation(Event event, User user, int isUserRequested) {
+		Invitation invitation = new Invitation();
+		invitation.setEvent(event);
+		invitation.setUser(user);
+		invitation.setUserRequested(isUserRequested);
+		invitation.setAccepted(0);
+		invitation.setSentDate(new Timestamp(System.currentTimeMillis()));
+		return invitation;
 	}
 
 	@GetMapping("/{id}/answer/{isAccepted}")
 	public @ResponseBody
 	ResponseEntity<String> answerToInvitation(@PathVariable int id,
-	                                        @PathVariable int isAccepted) {
+	                                          @PathVariable int isAccepted) {
 		Invitation invitation = invitationRepository.findInvitationById(id);
 		invitation.setAccepted(isAccepted);
 		invitation.setDecisionDate(new Timestamp(System.currentTimeMillis()));
