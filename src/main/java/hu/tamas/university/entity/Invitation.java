@@ -15,12 +15,10 @@ public class Invitation {
 	private int id;
 
 	@ManyToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name = "event_id")
 	private Event event;
 
 	@ManyToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name = "user_email")
 	private User user;
 

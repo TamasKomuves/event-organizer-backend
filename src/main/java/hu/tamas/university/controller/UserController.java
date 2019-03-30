@@ -2,8 +2,10 @@ package hu.tamas.university.controller;
 
 import hu.tamas.university.dto.UserDto;
 import hu.tamas.university.entity.Address;
+import hu.tamas.university.entity.Invitation;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.AddressRepository;
+import hu.tamas.university.repository.InvitationRepository;
 import hu.tamas.university.repository.UserRepository;
 import hu.tamas.university.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/users")
 public class UserController {
@@ -20,13 +24,15 @@ public class UserController {
 	private final UserService userService;
 	private final AddressRepository addressRepository;
 	private final UserRepository userRepository;
+	private final InvitationRepository invitationRepository;
 	private final HttpHeaders headers = new HttpHeaders();
 
 	@Autowired
-	public UserController(UserService userService, AddressRepository addressRepository, UserRepository userRepository) {
+	public UserController(UserService userService, AddressRepository addressRepository, UserRepository userRepository, InvitationRepository invitationRepository) {
 		this.userService = userService;
 		this.addressRepository = addressRepository;
 		this.userRepository = userRepository;
+		this.invitationRepository = invitationRepository;
 		headers.add("Access-Control-Allow-Origin", "*");
 	}
 
@@ -126,6 +132,8 @@ public class UserController {
 		if (user == null) {
 			result = "no such user";
 		} else {
+			List<Invitation> invitationList = invitationRepository.findByUser(user);
+			invitationRepository.deleteAll(invitationList);
 			userRepository.delete(user);
 			addressRepository.delete(user.getAddress());
 			result = "success";

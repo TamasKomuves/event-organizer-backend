@@ -13,5 +13,7 @@ public interface InvitationRepository extends JpaRepository<Invitation, Integer>
 
 	List<Invitation> findByEvent(Event event);
 
+	List<Invitation> findByUser(User user);
+
 	List<Invitation> findByEventAndUser(Event event, User user);
 }
