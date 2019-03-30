@@ -4,6 +4,7 @@ import hu.tamas.university.dto.UserDto;
 import hu.tamas.university.entity.Address;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.AddressRepository;
+import hu.tamas.university.repository.UserRepository;
 import hu.tamas.university.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -18,11 +19,15 @@ public class UserController {
 
 	private final UserService userService;
 	private final AddressRepository addressRepository;
+	private final UserRepository userRepository;
+	private final HttpHeaders headers = new HttpHeaders();
 
 	@Autowired
-	public UserController(UserService userService, AddressRepository addressRepository) {
+	public UserController(UserService userService, AddressRepository addressRepository, UserRepository userRepository) {
 		this.userService = userService;
 		this.addressRepository = addressRepository;
+		this.userRepository = userRepository;
+		headers.add("Access-Control-Allow-Origin", "*");
 	}
 
 	@GetMapping("/{email}")
@@ -30,37 +35,28 @@ public class UserController {
 	ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
 		User tmpUser = userService.findByEmail(email);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
 		return new ResponseEntity<>(UserDto.fromEntity(tmpUser), headers, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/login/{email}/{password}", method = RequestMethod.GET)
 	public @ResponseBody
 	ResponseEntity<String> login(@PathVariable String email, @PathVariable String password) {
-		User tmpUser = userService.findByEmail(email);
+		User user = userService.findByEmail(email);
 		String result;
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
-		if (tmpUser != null && tmpUser.getPassword().equals(password)) {
-			userService.setCurrentUser(tmpUser);
-			result = "{\"result\":\"success\"}";
+		if (user != null && user.getPassword().equals(password)) {
+			userService.setCurrentUser(user);
+			result = "success";
 		} else {
-			result = "{\"result\":\"failed\"}";
+			result = "failed";
 		}
 
-		return new ResponseEntity<>(result, headers, HttpStatus.OK);
+		return new ResponseEntity<>("{\"result\":\"" + result + "\"}", headers, HttpStatus.OK);
 	}
 
 	@GetMapping("/current-user")
 	public @ResponseBody
 	ResponseEntity<UserDto> getCurrentUser() {
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
 		return new ResponseEntity<>(UserDto.fromEntity(userService.getCurrentUser()), headers, HttpStatus.OK);
 	}
 
@@ -68,8 +64,6 @@ public class UserController {
 	public @ResponseBody
 	ResponseEntity<String> logout() {
 		userService.setCurrentUser(null);
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
 
 		return new ResponseEntity<>("{\"result\":\"logout\"}", headers, HttpStatus.OK);
 	}
@@ -102,8 +96,40 @@ public class UserController {
 			result = "success";
 		}
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
+		return new ResponseEntity<>("{\"result\":\"" + result + "\"}", headers, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/update/{email}/{firstname}/{lastname}")
+	public @ResponseBody
+	ResponseEntity<String> updateUser(@PathVariable String email, @PathVariable String firstname, @PathVariable String lastname) {
+		String result;
+		User user = userService.findByEmail(email);
+
+		if (user == null) {
+			result = "no such user";
+		} else {
+			user.setFirstName(firstname);
+			user.setLastName(lastname);
+			userService.saveUser(user);
+			result = "success";
+		}
+
+		return new ResponseEntity<>("{\"result\":\"" + result + "\"}", headers, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/delete/{email}")
+	public @ResponseBody
+	ResponseEntity<String> deleteUser(@PathVariable String email) {
+		String result;
+		User user = userService.findByEmail(email);
+
+		if (user == null) {
+			result = "no such user";
+		} else {
+			userRepository.delete(user);
+			addressRepository.delete(user.getAddress());
+			result = "success";
+		}
 
 		return new ResponseEntity<>("{\"result\":\"" + result + "\"}", headers, HttpStatus.OK);
 	}
