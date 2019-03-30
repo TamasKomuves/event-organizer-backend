@@ -27,6 +27,8 @@ public class UserService {
 
 
 	public User getCurrentUser() {
+		User user = findByEmail(currentUser.getEmail());
+		setCurrentUser(user);
 		return currentUser;
 	}
 
