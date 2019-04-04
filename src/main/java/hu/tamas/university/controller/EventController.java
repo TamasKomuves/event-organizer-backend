@@ -1,6 +1,7 @@
 package hu.tamas.university.controller;
 
 import hu.tamas.university.dto.EventDto;
+import hu.tamas.university.dto.InvitationDto;
 import hu.tamas.university.dto.PostDto;
 import hu.tamas.university.dto.UserDto;
 import hu.tamas.university.entity.*;
@@ -211,5 +212,17 @@ public class EventController {
 		eventRepository.deleteById(eventId);
 
 		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+	}
+
+	@GetMapping("/{eventId}/invitation-requests")
+	public @ResponseBody
+	ResponseEntity<List<InvitationDto>> getInvitationRequests(@PathVariable int eventId) {
+		Event event = eventRepository.findEventById(eventId);
+		List<InvitationDto> invitationDtos =
+				invitationRepository.findByEvent(event).stream()
+						.filter(invitation -> invitation.getDecisionDate() == null && invitation.isUserRequested() == 1)
+						.map(InvitationDto::fromEntity).collect(Collectors.toList());
+
+		return new ResponseEntity<>(invitationDtos, headers, HttpStatus.OK);
 	}
 }
