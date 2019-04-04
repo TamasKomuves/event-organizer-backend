@@ -136,6 +136,7 @@ public class UserController {
 			invitationRepository.deleteAll(invitationList);
 			userRepository.delete(user);
 			addressRepository.delete(user.getAddress());
+			userService.setCurrentUser(null);
 			result = "success";
 		}
 
