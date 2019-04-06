@@ -225,4 +225,41 @@ public class EventController {
 
 		return new ResponseEntity<>(invitationDtos, headers, HttpStatus.OK);
 	}
+
+	@GetMapping("/{id}/update-info/{name}/{description}/{max_participant}/{total_cost}" +
+			"/{event_date}/{visibility}/{address_id}/{event_type_type}")
+	public @ResponseBody
+	ResponseEntity<String> updateEventInfo(@PathVariable int id, @PathVariable String name,
+	                                       @PathVariable String description,
+	                                       @PathVariable int max_participant,
+	                                       @PathVariable int total_cost, @PathVariable Timestamp event_date,
+	                                       @PathVariable String visibility, @PathVariable int address_id,
+	                                       @PathVariable String event_type_type) {
+		Event event = eventRepository.findEventById(id);
+		List<Invitation> invitations = invitationRepository.findByEvent(event).stream()
+				.filter(invitation -> invitation.isUserRequested() == 0).collect(Collectors.toList());
+		if (event.getUsers().size() + invitations.size() <= max_participant) {
+			event.setMaxParticipant(max_participant);
+		}
+
+		EventType eventType = eventTypeRepository.findEventTypeByType(event_type_type.toLowerCase());
+
+		if (eventType == null) {
+			eventType = new EventType();
+			eventType.setType(event_type_type.toLowerCase());
+			eventType = eventTypeRepository.save(eventType);
+		}
+
+		event.setName(name);
+		event.setDescription(description);
+		event.setVisibility(visibility);
+		event.setTotalCost(total_cost);
+		event.setEventDate(event_date);
+		event.setAddress(addressRepository.findAddressById(address_id));
+		event.setEventType(eventType);
+
+		eventRepository.save(event);
+
+		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+	}
 }
