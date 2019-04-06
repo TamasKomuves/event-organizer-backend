@@ -31,6 +31,7 @@ public class InvitationController {
 	private final UserRepository userRepository;
 	private final EventRepository eventRepository;
 	private final ParticipateInEventRepository participateInEventRepository;
+	private final HttpHeaders headers = new HttpHeaders();
 
 	@Autowired
 	public InvitationController(InvitationRepository invitationRepository, UserRepository userRepository, EventRepository eventRepository, ParticipateInEventRepository participateInEventRepository) {
@@ -38,15 +39,13 @@ public class InvitationController {
 		this.userRepository = userRepository;
 		this.eventRepository = eventRepository;
 		this.participateInEventRepository = participateInEventRepository;
+		headers.add("Access-Control-Allow-Origin", "*");
 	}
 
 	@GetMapping("/{id}")
 	public @ResponseBody
 	ResponseEntity<InvitationDto> getInvitationById(@PathVariable int id) {
 		Invitation invitation = invitationRepository.findInvitationById(id);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
 
 		return new ResponseEntity<>(InvitationDto.fromEntity(invitation), headers, HttpStatus.OK);
 	}
@@ -56,9 +55,6 @@ public class InvitationController {
 	ResponseEntity<String> createInvitation(@PathVariable int eventId,
 	                                        @PathVariable String userEmail, @PathVariable int isUserRequested) {
 		Event event = eventRepository.findEventById(eventId);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
 
 		if (!isEventHasMorePlace(event)) {
 			return new ResponseEntity<>("{\"result\":\"no more place\"}", headers, HttpStatus.OK);
@@ -121,20 +117,15 @@ public class InvitationController {
 			participateInEventRepository.save(participateInEvent);
 		}
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
 		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
 	}
 
 	@GetMapping("/is-invited/{eventId}/{userEmail}")
 	public @ResponseBody
 	ResponseEntity<String> isAlreadyInvited(@PathVariable int eventId, @PathVariable String userEmail) {
-		boolean isAlreadySent = invitationRepository.findAll().stream().anyMatch(invitation -> invitation.getEvent().getId() == eventId &&
-				invitation.getUser().getEmail().equals(userEmail) && invitation.getDecisionDate() == null);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
+		boolean isAlreadySent = invitationRepository.findAll().stream()
+				.anyMatch(invitation -> invitation.getEvent().getId() == eventId &&
+						invitation.getUser().getEmail().equals(userEmail) && invitation.getDecisionDate() == null);
 
 		return new ResponseEntity<>("{\"result\":\"" + isAlreadySent + "\"}", headers, HttpStatus.OK);
 	}
@@ -143,11 +134,16 @@ public class InvitationController {
 	public @ResponseBody
 	ResponseEntity<List<InvitationDto>> getInvitationsForUser(@PathVariable String userEmail) {
 		List<InvitationDto> invitationDtos = invitationRepository.findAll().stream().
-				filter(invitation -> invitation.getUser().getEmail().equals(userEmail)).map(InvitationDto::fromEntity).collect(Collectors.toList());
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
+				filter(invitation -> invitation.getUser().getEmail().equals(userEmail))
+				.map(InvitationDto::fromEntity).collect(Collectors.toList());
 
 		return new ResponseEntity<>(invitationDtos, headers, HttpStatus.OK);
+	}
+
+	@GetMapping("/{id}/delete")
+	public @ResponseBody
+	ResponseEntity<String> deleteInvitation(@PathVariable int id) {
+		invitationRepository.deleteById(id);
+		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
 	}
 }
