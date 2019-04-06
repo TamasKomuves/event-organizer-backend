@@ -214,6 +214,18 @@ public class EventController {
 		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
 	}
 
+	@GetMapping("/{eventId}/invitation-offers")
+	public @ResponseBody
+	ResponseEntity<List<InvitationDto>> getInvitationOffers(@PathVariable int eventId) {
+		Event event = eventRepository.findEventById(eventId);
+		List<InvitationDto> invitationDtos =
+				invitationRepository.findByEvent(event).stream()
+						.filter(invitation -> invitation.getDecisionDate() == null && invitation.isUserRequested() == 0)
+						.map(InvitationDto::fromEntity).collect(Collectors.toList());
+
+		return new ResponseEntity<>(invitationDtos, headers, HttpStatus.OK);
+	}
+
 	@GetMapping("/{eventId}/invitation-requests")
 	public @ResponseBody
 	ResponseEntity<List<InvitationDto>> getInvitationRequests(@PathVariable int eventId) {
