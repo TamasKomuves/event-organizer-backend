@@ -133,9 +133,10 @@ public class InvitationController {
 	@GetMapping("/users/{userEmail}")
 	public @ResponseBody
 	ResponseEntity<List<InvitationDto>> getInvitationsForUser(@PathVariable String userEmail) {
-		List<InvitationDto> invitationDtos = invitationRepository.findAll().stream().
-				filter(invitation -> invitation.getUser().getEmail().equals(userEmail))
-				.map(InvitationDto::fromEntity).collect(Collectors.toList());
+		List<InvitationDto> invitationDtos = invitationRepository.findAll().stream()
+						.filter(invitation ->
+										invitation.getUser() != null && invitation.getUser().getEmail().equals(userEmail))
+						.map(InvitationDto::fromEntity).collect(Collectors.toList());
 
 		return new ResponseEntity<>(invitationDtos, headers, HttpStatus.OK);
 	}
