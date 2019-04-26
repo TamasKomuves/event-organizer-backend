@@ -60,7 +60,7 @@ public class InvitationController {
 			return new ResponseEntity<>("{\"result\":\"no more place\"}", headers, HttpStatus.OK);
 		}
 
-		User user = userRepository.findByEmail(userEmail);
+		User user = userRepository.findByEmail(userEmail).get();
 
 		List<ParticipateInEvent> alreadyParticipateInEvent = participateInEventRepository.findByEventAndUser(event,
 				user);

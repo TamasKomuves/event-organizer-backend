@@ -77,7 +77,7 @@ public class PostController {
 	ResponseEntity<String> savePost(@PathVariable int eventId, @PathVariable String poster_email, @PathVariable String text) {
 		Post post = new Post();
 		post.setEvent(eventRepository.findEventById(eventId));
-		post.setPoster(userRepository.findByEmail(poster_email));
+		post.setPoster(userRepository.findByEmail(poster_email).get());
 		post.setText(text);
 		post.setPostDate(new Timestamp(System.currentTimeMillis()));
 

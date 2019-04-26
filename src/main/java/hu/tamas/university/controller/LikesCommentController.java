@@ -46,7 +46,7 @@ public class LikesCommentController {
 	ResponseEntity<String> saveLikesPost(@PathVariable String userEmail, @PathVariable int commentId) {
 
 		LikesComment likesComment = new LikesComment();
-		likesComment.setUser(userRepository.findByEmail(userEmail));
+		likesComment.setUser(userRepository.findByEmail(userEmail).get());
 		likesComment.setComment(commentRepository.findCommentById(commentId));
 
 		likesCommentRepository.save(likesComment);

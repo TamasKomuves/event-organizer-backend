@@ -6,11 +6,11 @@ import hu.tamas.university.dto.PostDto;
 import hu.tamas.university.dto.UserDto;
 import hu.tamas.university.entity.*;
 import hu.tamas.university.repository.*;
-import hu.tamas.university.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,18 +33,16 @@ public class EventController {
 	private final UserRepository userRepository;
 	private final ParticipateInEventRepository participateInEventRepository;
 	private final InvitationRepository invitationRepository;
-	private final UserService userService;
 	private final HttpHeaders headers = new HttpHeaders();
 
 	@Autowired
-	public EventController(EventRepository eventRepository, EventTypeRepository eventTypeRepository, AddressRepository addressRepository, UserRepository userRepository, ParticipateInEventRepository participateInEventRepository, InvitationRepository invitationRepository, UserService userService) {
+	public EventController(EventRepository eventRepository, EventTypeRepository eventTypeRepository, AddressRepository addressRepository, UserRepository userRepository, ParticipateInEventRepository participateInEventRepository, InvitationRepository invitationRepository) {
 		this.eventRepository = eventRepository;
 		this.eventTypeRepository = eventTypeRepository;
 		this.addressRepository = addressRepository;
 		this.userRepository = userRepository;
 		this.participateInEventRepository = participateInEventRepository;
 		this.invitationRepository = invitationRepository;
-		this.userService = userService;
 		headers.add("Access-Control-Allow-Origin", "*");
 	}
 
@@ -58,27 +56,27 @@ public class EventController {
 
 	@GetMapping("")
 	public @ResponseBody
-	ResponseEntity<List<EventDto>> getAllEvent() {
+	ResponseEntity<List<EventDto>> getAllEvent(@AuthenticationPrincipal final User user) {
 		List<Event> events = eventRepository.findAll();
-		List<EventDto> eventDtos = convertEventsToEventDtos(events);
+		List<EventDto> eventDtos = convertEventsToEventDtos(events, user);
 
 		return new ResponseEntity<>(eventDtos, headers, HttpStatus.OK);
 	}
 
-	private List<EventDto> convertEventsToEventDtos(List<Event> events) {
-		return events.stream().filter(this::isCurrentUserHasRightToGetEvent)
+	private List<EventDto> convertEventsToEventDtos(List<Event> events, User user) {
+		return events.stream().filter(event -> isCurrentUserHasRightToGetEvent(event, user))
 				.map(EventDto::fromEntity).collect(Collectors.toList());
 	}
 
-	private boolean isCurrentUserHasRightToGetEvent(Event event) {
-		return !event.getVisibility().equals(PRIVATE_VISIBILITY) || event.getUsers().contains(userService.getCurrentUser());
+	private boolean isCurrentUserHasRightToGetEvent(Event event, User user) {
+		return !event.getVisibility().equals(PRIVATE_VISIBILITY) || event.getUsers().contains(user);
 	}
 
 	@GetMapping("/type/{type}")
 	public @ResponseBody
-	ResponseEntity<List<EventDto>> getEventsByType(@PathVariable String type) {
+	ResponseEntity<List<EventDto>> getEventsByType(@AuthenticationPrincipal final User user, @PathVariable String type) {
 		List<Event> events = eventRepository.findAllByEventTypeType(type);
-		List<EventDto> eventDtos = convertEventsToEventDtos(events);
+		List<EventDto> eventDtos = convertEventsToEventDtos(events, user);
 
 		return new ResponseEntity<>(eventDtos, headers, HttpStatus.OK);
 	}
@@ -116,7 +114,7 @@ public class EventController {
 			eventType = eventTypeRepository.save(eventType);
 		}
 
-		User user = userRepository.findByEmail(organizer_email);
+		User user = userRepository.findByEmail(organizer_email).get();
 		Event event = new Event();
 		event.setName(name);
 		event.setDescription(description);
@@ -148,7 +146,7 @@ public class EventController {
 			return new ResponseEntity<>("{\"result\":\"no more place\"}", headers, HttpStatus.OK);
 		}
 
-		User user = userRepository.findByEmail(userEmail);
+		User user = userRepository.findByEmail(userEmail).get();
 		List<ParticipateInEvent> alreadyParticipateInEvent = participateInEventRepository.findByEventAndUser(event,
 				user);
 
@@ -196,14 +194,14 @@ public class EventController {
 
 	@GetMapping("/{eventId}/delete")
 	public @ResponseBody
-	ResponseEntity<String> deleteEvent(@PathVariable int eventId) {
+	ResponseEntity<String> deleteEvent(@AuthenticationPrincipal final User user, @PathVariable int eventId) {
 		Event event = eventRepository.findEventById(eventId);
 
 		if (event == null) {
 			return new ResponseEntity<>("{\"result\":\"no such event\"}", headers, HttpStatus.OK);
 		}
 
-		if (!event.getOrganizer().getEmail().equals(userService.getCurrentUser().getEmail())) {
+		if (!event.getOrganizer().getEmail().equals(user.getEmail())) {
 			return new ResponseEntity<>("{\"result\":\"no permission\"}", headers, HttpStatus.OK);
 		}
 

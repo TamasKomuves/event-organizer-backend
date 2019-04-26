@@ -46,7 +46,7 @@ public class LikesPostController {
 	ResponseEntity<String> saveLikesPost(@PathVariable String userEmail, @PathVariable int postId) {
 
 		LikesPost likesPost = new LikesPost();
-		likesPost.setUser(userRepository.findByEmail(userEmail));
+		likesPost.setUser(userRepository.findByEmail(userEmail).get());
 		likesPost.setPost(postRepository.findPostById(postId));
 
 		likesPostRepository.save(likesPost);

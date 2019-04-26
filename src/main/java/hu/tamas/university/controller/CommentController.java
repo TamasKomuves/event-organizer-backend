@@ -63,7 +63,7 @@ public class CommentController {
 	ResponseEntity<String> saveComment(@PathVariable int postId, @PathVariable String commenter_email, @PathVariable String text) {
 		Comment comment = new Comment();
 		comment.setPost(postRepository.findPostById(postId));
-		comment.setCommenter(userRepository.findByEmail(commenter_email));
+		comment.setCommenter(userRepository.findByEmail(commenter_email).get());
 		comment.setText(text);
 		comment.setCommentDate(new Timestamp(System.currentTimeMillis()));
 
