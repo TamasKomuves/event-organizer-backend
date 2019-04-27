@@ -6,9 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@Controller
 @RequestMapping("/public/users")
 final class PublicUsersController {
 
@@ -21,6 +22,7 @@ final class PublicUsersController {
     this.userAuthenticationService = userAuthenticationService;
     this.userRepository = userRepository;
     headers.add("Access-Control-Allow-Origin", "*");
+    headers.add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   }
 
   @PostMapping("/register")
@@ -31,14 +33,14 @@ final class PublicUsersController {
     return new ResponseEntity<>("\"result\":\"asd\"", headers, HttpStatus.OK);
   }
 
-  @PostMapping("/login")
+  @GetMapping("/login/{username}/{password}")
   @ResponseBody
   public ResponseEntity<String> login(
-          @RequestParam("username") final String username,
-          @RequestParam("password") final String password) {
+          @PathVariable("username") String username,
+          @PathVariable("password") String password) {
     String token = userAuthenticationService
             .login(username, password)
             .orElseThrow(() -> new RuntimeException("invalid login and/or password"));
-    return new ResponseEntity<>("\"token\":\"" + token + "\"", headers, HttpStatus.OK);
+    return new ResponseEntity<>("{\"token\":\"" + token + "\"}", headers, HttpStatus.OK);
   }
 }
