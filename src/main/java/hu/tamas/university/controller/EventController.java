@@ -7,9 +7,6 @@ import hu.tamas.university.dto.UserDto;
 import hu.tamas.university.entity.*;
 import hu.tamas.university.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +30,6 @@ public class EventController {
 	private final UserRepository userRepository;
 	private final ParticipateInEventRepository participateInEventRepository;
 	private final InvitationRepository invitationRepository;
-	private final HttpHeaders headers = new HttpHeaders();
 
 	@Autowired
 	public EventController(EventRepository eventRepository, EventTypeRepository eventTypeRepository, AddressRepository addressRepository, UserRepository userRepository, ParticipateInEventRepository participateInEventRepository, InvitationRepository invitationRepository) {
@@ -43,24 +39,22 @@ public class EventController {
 		this.userRepository = userRepository;
 		this.participateInEventRepository = participateInEventRepository;
 		this.invitationRepository = invitationRepository;
-		headers.add("Access-Control-Allow-Origin", "*");
 	}
 
 	@GetMapping("/{id}")
-	public @ResponseBody
-	ResponseEntity<EventDto> getEventById(@PathVariable int id) {
+	@ResponseBody
+	public EventDto getEventById(@PathVariable int id) {
 		Event event = eventRepository.findEventById(id);
 
-		return new ResponseEntity<>(EventDto.fromEntity(event), headers, HttpStatus.OK);
+		return EventDto.fromEntity(event);
 	}
 
 	@GetMapping("")
-	public @ResponseBody
-	ResponseEntity<List<EventDto>> getAllEvent(@AuthenticationPrincipal final User user) {
+	@ResponseBody
+	public List<EventDto> getAllEvent(@AuthenticationPrincipal final User user) {
 		List<Event> events = eventRepository.findAll();
-		List<EventDto> eventDtos = convertEventsToEventDtos(events, user);
 
-		return new ResponseEntity<>(eventDtos, headers, HttpStatus.OK);
+		return convertEventsToEventDtos(events, user);
 	}
 
 	private List<EventDto> convertEventsToEventDtos(List<Event> events, User user) {
@@ -73,35 +67,32 @@ public class EventController {
 	}
 
 	@GetMapping("/type/{type}")
-	public @ResponseBody
-	ResponseEntity<List<EventDto>> getEventsByType(@AuthenticationPrincipal final User user, @PathVariable String type) {
+	@ResponseBody
+	public List<EventDto> getEventsByType(@AuthenticationPrincipal final User user, @PathVariable String type) {
 		List<Event> events = eventRepository.findAllByEventTypeType(type);
-		List<EventDto> eventDtos = convertEventsToEventDtos(events, user);
 
-		return new ResponseEntity<>(eventDtos, headers, HttpStatus.OK);
+		return convertEventsToEventDtos(events, user);
 	}
 
 	@GetMapping("/{id}/users")
-	public @ResponseBody
-	ResponseEntity<List<UserDto>> getUsers(@PathVariable int id) {
+	@ResponseBody
+	public List<UserDto> getUsers(@PathVariable int id) {
 		Event event = eventRepository.findEventById(id);
-		List<UserDto> userDtos = event.getUsers().stream().map(UserDto::fromEntity).collect(Collectors.toList());
 
-		return new ResponseEntity<>(userDtos, headers, HttpStatus.OK);
+		return event.getUsers().stream().map(UserDto::fromEntity).collect(Collectors.toList());
 	}
 
 	@GetMapping("/{id}/posts")
-	public @ResponseBody
-	ResponseEntity<List<PostDto>> getAllPost(@PathVariable int id) {
+	@ResponseBody
+	public List<PostDto> getAllPost(@PathVariable int id) {
 		Event event = eventRepository.findEventById(id);
-		List<PostDto> postDtos = event.getPosts().stream().map(PostDto::fromEntity).collect(Collectors.toList());
 
-		return new ResponseEntity<>(postDtos, headers, HttpStatus.OK);
+		return event.getPosts().stream().map(PostDto::fromEntity).collect(Collectors.toList());
 	}
 
 	@GetMapping("/create/{name}/{description}/{max_participant}/{visibility}/{total_cost}/{event_date}/{address_id}/{event_type_type}/{organizer_email}")
-	public @ResponseBody
-	ResponseEntity<String> saveEvent(@PathVariable String name, @PathVariable String description,
+	@ResponseBody
+	public String saveEvent(@PathVariable String name, @PathVariable String description,
 	                                 @PathVariable int max_participant, @PathVariable String visibility,
 	                                 @PathVariable int total_cost, @PathVariable Timestamp event_date,
 	                                 @PathVariable int address_id, @PathVariable String event_type_type,
@@ -134,16 +125,16 @@ public class EventController {
 
 		participateInEventRepository.save(participateInEvent);
 
-		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"success\"}";
 	}
 
 	@GetMapping("/{eventId}/add-user/{userEmail}")
-	public @ResponseBody
-	ResponseEntity<String> addUserToEvent(@PathVariable int eventId, @PathVariable String userEmail) {
+	@ResponseBody
+	public String addUserToEvent(@PathVariable int eventId, @PathVariable String userEmail) {
 		Event event = eventRepository.findEventById(eventId);
 
 		if (!isEventHasMorePlace(event)) {
-			return new ResponseEntity<>("{\"result\":\"no more place\"}", headers, HttpStatus.OK);
+			return "{\"result\":\"no more place\"}";
 		}
 
 		User user = userRepository.findByEmail(userEmail).get();
@@ -151,13 +142,13 @@ public class EventController {
 				user);
 
 		if (!alreadyParticipateInEvent.isEmpty()) {
-			return new ResponseEntity<>("{\"result\":\"already added\"}", headers, HttpStatus.OK);
+			return "{\"result\":\"already added\"}";
 		}
 
 		ParticipateInEvent participateInEvent = createParticipateInEvent(event, user);
 		participateInEventRepository.save(participateInEvent);
 
-		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"success\"}";
 	}
 
 	private boolean isEventHasMorePlace(Event event) {
@@ -175,71 +166,69 @@ public class EventController {
 	}
 
 	@GetMapping("/{eventId}/has-more-place")
-	public @ResponseBody
-	ResponseEntity<String> eventHasMorePlace(@PathVariable int eventId) {
+	@ResponseBody
+	public String eventHasMorePlace(@PathVariable int eventId) {
 		Event event = eventRepository.findEventById(eventId);
 		boolean result = isEventHasMorePlace(event);
 
-		return new ResponseEntity<>("{\"result\":\"" + result + "\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"" + result + "\"}";
 	}
 
 	@GetMapping("/{eventId}/is-participate/{userEmail}")
-	public @ResponseBody
-	ResponseEntity<String> isUserParticipateInEvent(@PathVariable int eventId, @PathVariable String userEmail) {
+	@ResponseBody
+	public String isUserParticipateInEvent(@PathVariable int eventId, @PathVariable String userEmail) {
 		Event event = eventRepository.findEventById(eventId);
 		boolean result = event.getUsers().stream().anyMatch(user -> user.getEmail().equals(userEmail));
 
-		return new ResponseEntity<>("{\"result\":\"" + result + "\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"" + result + "\"}";
 	}
 
 	@GetMapping("/{eventId}/delete")
-	public @ResponseBody
-	ResponseEntity<String> deleteEvent(@AuthenticationPrincipal final User user, @PathVariable int eventId) {
+	@ResponseBody
+	public String deleteEvent(@AuthenticationPrincipal final User user, @PathVariable int eventId) {
 		Event event = eventRepository.findEventById(eventId);
 
 		if (event == null) {
-			return new ResponseEntity<>("{\"result\":\"no such event\"}", headers, HttpStatus.OK);
+			return "{\"result\":\"no such event\"}";
 		}
 
 		if (!event.getOrganizer().getEmail().equals(user.getEmail())) {
-			return new ResponseEntity<>("{\"result\":\"no permission\"}", headers, HttpStatus.OK);
+			return "{\"result\":\"no permission\"}";
 		}
 
 		invitationRepository.findAll().stream().filter(invitation -> invitation.getEvent().getId() == event.getId())
 				.collect(Collectors.toList()).forEach(invitationRepository::delete);
 		eventRepository.deleteById(eventId);
 
-		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"success\"}";
 	}
 
 	@GetMapping("/{eventId}/invitation-offers")
-	public @ResponseBody
-	ResponseEntity<List<InvitationDto>> getInvitationOffers(@PathVariable int eventId) {
+	@ResponseBody
+	public List<InvitationDto> getInvitationOffers(@PathVariable int eventId) {
 		Event event = eventRepository.findEventById(eventId);
-		List<InvitationDto> invitationDtos =
-				invitationRepository.findByEvent(event).stream()
+
+		return invitationRepository.findByEvent(event).stream()
 						.filter(invitation -> invitation.getDecisionDate() == null && invitation.isUserRequested() == 0)
 						.map(InvitationDto::fromEntity).collect(Collectors.toList());
-
-		return new ResponseEntity<>(invitationDtos, headers, HttpStatus.OK);
 	}
 
 	@GetMapping("/{eventId}/invitation-requests")
-	public @ResponseBody
-	ResponseEntity<List<InvitationDto>> getInvitationRequests(@PathVariable int eventId) {
+	@ResponseBody
+	public List<InvitationDto> getInvitationRequests(@PathVariable int eventId) {
 		Event event = eventRepository.findEventById(eventId);
 		List<InvitationDto> invitationDtos =
 				invitationRepository.findByEvent(event).stream()
 						.filter(invitation -> invitation.getDecisionDate() == null && invitation.isUserRequested() == 1)
 						.map(InvitationDto::fromEntity).collect(Collectors.toList());
 
-		return new ResponseEntity<>(invitationDtos, headers, HttpStatus.OK);
+		return invitationDtos;
 	}
 
 	@GetMapping("/{id}/update-info/{name}/{description}/{max_participant}/{total_cost}" +
 			"/{event_date}/{visibility}/{address_id}/{event_type_type}")
-	public @ResponseBody
-	ResponseEntity<String> updateEventInfo(@PathVariable int id, @PathVariable String name,
+	@ResponseBody
+	public String updateEventInfo(@PathVariable int id, @PathVariable String name,
 	                                       @PathVariable String description,
 	                                       @PathVariable int max_participant,
 	                                       @PathVariable int total_cost, @PathVariable Timestamp event_date,
@@ -270,6 +259,6 @@ public class EventController {
 
 		eventRepository.save(event);
 
-		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"success\"}";
 	}
 }

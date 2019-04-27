@@ -1,11 +1,11 @@
 package hu.tamas.university.controller;
 
+import hu.tamas.university.entity.Address;
+import hu.tamas.university.entity.User;
+import hu.tamas.university.repository.AddressRepository;
 import hu.tamas.university.repository.UserRepository;
 import hu.tamas.university.security.UserAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,32 +15,51 @@ final class PublicUsersController {
 
   private final UserAuthenticationService userAuthenticationService;
   private final UserRepository userRepository;
-  private final HttpHeaders headers = new HttpHeaders();
+  private final AddressRepository addressRepository;
 
   @Autowired
-  public PublicUsersController(UserAuthenticationService userAuthenticationService, UserRepository userRepository) {
+  public PublicUsersController(UserAuthenticationService userAuthenticationService, UserRepository userRepository, AddressRepository addressRepository) {
     this.userAuthenticationService = userAuthenticationService;
     this.userRepository = userRepository;
-    headers.add("Access-Control-Allow-Origin", "*");
-    headers.add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    this.addressRepository = addressRepository;
   }
 
-  @PostMapping("/register")
+  @PostMapping("/registration")
   @ResponseBody
-  ResponseEntity<String> register(
-          @RequestParam("username") final String username,
-          @RequestParam("password") final String password) {
-    return new ResponseEntity<>("\"result\":\"asd\"", headers, HttpStatus.OK);
+  public String registerUser(@RequestParam String email, @RequestParam String password,
+                             @RequestParam String firstname, @RequestParam String lastname,
+                             @RequestParam String country, @RequestParam String city, @RequestParam String street, @RequestParam String streetNumber) {
+    String result;
+    User user = new User();
+
+    if (userRepository.findByEmail(email).isPresent()) {
+      throw new RuntimeException("exists");
+    } else {
+      Address address = new Address();
+      address.setCountry(country);
+      address.setCity(city);
+      address.setStreet(street);
+      address.setStreetNumber(streetNumber);
+      address = addressRepository.save(address);
+
+      user.setEmail(email);
+      user.setPassword(password);
+      user.setFirstName(firstname);
+      user.setLastName(lastname);
+      user.setAddress(address);
+      userRepository.save(user);
+
+      result = "success";
+    }
+
+    return "{\"result\":\"" + result + "\"}";
   }
 
   @GetMapping("/login/{username}/{password}")
   @ResponseBody
-  public ResponseEntity<String> login(
-          @PathVariable("username") String username,
-          @PathVariable("password") String password) {
-    String token = userAuthenticationService
-            .login(username, password)
+  public String login(@PathVariable("username") String username, @PathVariable("password") String password) {
+    String token = userAuthenticationService.login(username, password)
             .orElseThrow(() -> new RuntimeException("invalid login and/or password"));
-    return new ResponseEntity<>("{\"token\":\"" + token + "\"}", headers, HttpStatus.OK);
+    return "{\"token\":\"" + token + "\"}";
   }
 }

@@ -10,9 +10,6 @@ import hu.tamas.university.repository.InvitationRepository;
 import hu.tamas.university.repository.ParticipateInEventRepository;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +28,6 @@ public class InvitationController {
 	private final UserRepository userRepository;
 	private final EventRepository eventRepository;
 	private final ParticipateInEventRepository participateInEventRepository;
-	private final HttpHeaders headers = new HttpHeaders();
 
 	@Autowired
 	public InvitationController(InvitationRepository invitationRepository, UserRepository userRepository, EventRepository eventRepository, ParticipateInEventRepository participateInEventRepository) {
@@ -39,25 +35,24 @@ public class InvitationController {
 		this.userRepository = userRepository;
 		this.eventRepository = eventRepository;
 		this.participateInEventRepository = participateInEventRepository;
-		headers.add("Access-Control-Allow-Origin", "*");
 	}
 
 	@GetMapping("/{id}")
-	public @ResponseBody
-	ResponseEntity<InvitationDto> getInvitationById(@PathVariable int id) {
+	@ResponseBody
+	public InvitationDto getInvitationById(@PathVariable int id) {
 		Invitation invitation = invitationRepository.findInvitationById(id);
 
-		return new ResponseEntity<>(InvitationDto.fromEntity(invitation), headers, HttpStatus.OK);
+		return InvitationDto.fromEntity(invitation);
 	}
 
 	@GetMapping("/create/{eventId}/{userEmail}/{isUserRequested}")
-	public @ResponseBody
-	ResponseEntity<String> createInvitation(@PathVariable int eventId,
+	@ResponseBody
+	public String createInvitation(@PathVariable int eventId,
 	                                        @PathVariable String userEmail, @PathVariable int isUserRequested) {
 		Event event = eventRepository.findEventById(eventId);
 
 		if (!isEventHasMorePlace(event)) {
-			return new ResponseEntity<>("{\"result\":\"no more place\"}", headers, HttpStatus.OK);
+			return "{\"result\":\"no more place\"}";
 		}
 
 		User user = userRepository.findByEmail(userEmail).get();
@@ -66,20 +61,20 @@ public class InvitationController {
 				user);
 
 		if (!alreadyParticipateInEvent.isEmpty()) {
-			return new ResponseEntity<>("{\"result\":\"already participate\"}", headers, HttpStatus.OK);
+			return "{\"result\":\"already participate\"}";
 		}
 
 		List<Invitation> alreadyInvited = invitationRepository.findByEventAndUser(event, user);
 
 		if (!alreadyInvited.isEmpty()) {
-			return new ResponseEntity<>("{\"result\":\"already invited\"}", headers, HttpStatus.OK);
+			return "{\"result\":\"already invited\"}";
 		}
 
 		Invitation invitation = createInvitation(event, user, isUserRequested);
 
 		invitationRepository.save(invitation);
 
-		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"success\"}";
 	}
 
 	private boolean isEventHasMorePlace(Event event) {
@@ -100,8 +95,8 @@ public class InvitationController {
 	}
 
 	@GetMapping("/{id}/answer/{isAccepted}")
-	public @ResponseBody
-	ResponseEntity<String> answerToInvitation(@PathVariable int id,
+	@ResponseBody
+	public String answerToInvitation(@PathVariable int id,
 	                                          @PathVariable int isAccepted) {
 		Invitation invitation = invitationRepository.findInvitationById(id);
 		invitation.setAccepted(isAccepted);
@@ -117,34 +112,33 @@ public class InvitationController {
 			participateInEventRepository.save(participateInEvent);
 		}
 
-		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"success\"}";
 	}
 
 	@GetMapping("/is-invited/{eventId}/{userEmail}")
-	public @ResponseBody
-	ResponseEntity<String> isAlreadyInvited(@PathVariable int eventId, @PathVariable String userEmail) {
+	@ResponseBody
+	public String isAlreadyInvited(@PathVariable int eventId, @PathVariable String userEmail) {
 		boolean isAlreadySent = invitationRepository.findAll().stream()
 				.anyMatch(invitation -> invitation.getEvent().getId() == eventId &&
 						invitation.getUser().getEmail().equals(userEmail) && invitation.getDecisionDate() == null);
 
-		return new ResponseEntity<>("{\"result\":\"" + isAlreadySent + "\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"" + isAlreadySent + "\"}";
 	}
 
 	@GetMapping("/users/{userEmail}")
-	public @ResponseBody
-	ResponseEntity<List<InvitationDto>> getInvitationsForUser(@PathVariable String userEmail) {
-		List<InvitationDto> invitationDtos = invitationRepository.findAll().stream()
+	@ResponseBody
+	public List<InvitationDto> getInvitationsForUser(@PathVariable String userEmail) {
+
+		return invitationRepository.findAll().stream()
 						.filter(invitation ->
 										invitation.getUser() != null && invitation.getUser().getEmail().equals(userEmail))
 						.map(InvitationDto::fromEntity).collect(Collectors.toList());
-
-		return new ResponseEntity<>(invitationDtos, headers, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}/delete")
-	public @ResponseBody
-	ResponseEntity<String> deleteInvitation(@PathVariable int id) {
+	@ResponseBody
+	public String deleteInvitation(@PathVariable int id) {
 		invitationRepository.deleteById(id);
-		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"success\"}";
 	}
 }

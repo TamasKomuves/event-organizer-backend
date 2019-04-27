@@ -4,9 +4,6 @@ import hu.tamas.university.dto.AnswersToPollDto;
 import hu.tamas.university.entity.AnswersToPoll;
 import hu.tamas.university.repository.AnswersToPollRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,13 +22,10 @@ public class AnswersToPollController {
 	}
 
 	@GetMapping("/{id}")
-	public @ResponseBody
-	ResponseEntity<AnswersToPollDto> getAnswersToPollById(@PathVariable int id) {
+	@ResponseBody
+	public AnswersToPollDto getAnswersToPollById(@PathVariable int id) {
 		AnswersToPoll answersToPoll = answersToPollRepository.findAnswersToPollById(id);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
-		return new ResponseEntity<>(AnswersToPollDto.fromEntity(answersToPoll), headers, HttpStatus.OK);
+		return AnswersToPollDto.fromEntity(answersToPoll);
 	}
 }

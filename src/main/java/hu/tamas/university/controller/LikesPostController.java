@@ -6,9 +6,6 @@ import hu.tamas.university.repository.LikesPostRepository;
 import hu.tamas.university.repository.PostRepository;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,19 +28,16 @@ public class LikesPostController {
 	}
 
 	@GetMapping("/{id}")
-	public @ResponseBody
-	ResponseEntity<LikesPostDto> getLikesPostById(@PathVariable int id) {
+	@ResponseBody
+	public LikesPostDto getLikesPostById(@PathVariable int id) {
 		LikesPost likesPost = likesPostRepository.findLikesPostById(id);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
-		return new ResponseEntity<>(LikesPostDto.fromEntity(likesPost), headers, HttpStatus.OK);
+		return LikesPostDto.fromEntity(likesPost);
 	}
 
 	@GetMapping("/create/{userEmail}/{postId}")
-	public @ResponseBody
-	ResponseEntity<String> saveLikesPost(@PathVariable String userEmail, @PathVariable int postId) {
+	@ResponseBody
+	public String saveLikesPost(@PathVariable String userEmail, @PathVariable int postId) {
 
 		LikesPost likesPost = new LikesPost();
 		likesPost.setUser(userRepository.findByEmail(userEmail).get());
@@ -51,9 +45,6 @@ public class LikesPostController {
 
 		likesPostRepository.save(likesPost);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
-		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"success\"}";
 	}
 }

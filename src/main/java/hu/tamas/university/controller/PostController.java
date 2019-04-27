@@ -3,15 +3,11 @@ package hu.tamas.university.controller;
 import hu.tamas.university.dto.CommentDto;
 import hu.tamas.university.dto.PostDto;
 import hu.tamas.university.dto.UserDto;
-import hu.tamas.university.entity.Comment;
 import hu.tamas.university.entity.Post;
 import hu.tamas.university.repository.EventRepository;
 import hu.tamas.university.repository.PostRepository;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,43 +34,29 @@ public class PostController {
 	}
 
 	@GetMapping("/{id}")
-	public @ResponseBody
-	ResponseEntity<PostDto> getPostById(@PathVariable int id) {
+	@ResponseBody
+	public PostDto getPostById(@PathVariable int id) {
 		Post post = postRepository.findPostById(id);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
-		return new ResponseEntity<>(PostDto.fromEntity(post), headers, HttpStatus.OK);
+		return PostDto.fromEntity(post);
 	}
 
 	@GetMapping("/{id}/comments")
-	public @ResponseBody
-	ResponseEntity<List<CommentDto>> getAllPosts(@PathVariable int id) {
+	@ResponseBody
+	public List<CommentDto> getAllPosts(@PathVariable int id) {
 		Post post = postRepository.findPostById(id);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-		List<CommentDto> commentDtos = post.getComments().stream().map(CommentDto::fromEntity).collect(Collectors.toList());
-
-		return new ResponseEntity<>(commentDtos, headers, HttpStatus.OK);
+		return post.getComments().stream().map(CommentDto::fromEntity).collect(Collectors.toList());
 	}
 
 	@GetMapping("/{id}/likers")
-	public @ResponseBody
-	ResponseEntity<List<UserDto>> getLikers(@PathVariable int id) {
+	@ResponseBody
+	public List<UserDto> getLikers(@PathVariable int id) {
 		Post post = postRepository.findPostById(id);
-		List<UserDto> userDtos = post.getLikers().stream().map(UserDto::fromEntity).collect(Collectors.toList());
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
-		return new ResponseEntity<>(userDtos, headers, HttpStatus.OK);
+		return post.getLikers().stream().map(UserDto::fromEntity).collect(Collectors.toList());
 	}
 
 	@GetMapping("create/{eventId}/{poster_email}/{text}")
-	public @ResponseBody
-	ResponseEntity<String> savePost(@PathVariable int eventId, @PathVariable String poster_email, @PathVariable String text) {
+	@ResponseBody
+	public String savePost(@PathVariable int eventId, @PathVariable String poster_email, @PathVariable String text) {
 		Post post = new Post();
 		post.setEvent(eventRepository.findEventById(eventId));
 		post.setPoster(userRepository.findByEmail(poster_email).get());
@@ -83,22 +65,16 @@ public class PostController {
 
 		postRepository.save(post);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-
-		return new ResponseEntity<>("{\"result\":\"success\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"success\"}";
 	}
 
 	@GetMapping("{id}/likers/{email}")
-	public @ResponseBody
-	ResponseEntity<String> isLikedAlready(@PathVariable int id, @PathVariable String email) {
+	@ResponseBody
+	public String isLikedAlready(@PathVariable int id, @PathVariable String email) {
 		Post post = postRepository.findPostById(id);
 		int number = post.getLikers().stream().
 				filter(user -> user.getEmail().equals(email)).collect(Collectors.toList()).size();
 		String result = number > 0 ? "true" : "false";
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Access-Control-Allow-Origin", "*");
-		return new ResponseEntity<>("{\"result\":\"" + result + "\"}", headers, HttpStatus.OK);
+		return "{\"result\":\"" + result + "\"}";
 	}
 }
