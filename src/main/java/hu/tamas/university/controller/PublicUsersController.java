@@ -1,5 +1,7 @@
 package hu.tamas.university.controller;
 
+import javax.validation.Valid;
+import hu.tamas.university.dto.RegistrationDto;
 import hu.tamas.university.entity.Address;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.AddressRepository;
@@ -26,26 +28,24 @@ final class PublicUsersController {
 
   @PostMapping("/registration")
   @ResponseBody
-  public String registerUser(@RequestParam String email, @RequestParam String password,
-                             @RequestParam String firstname, @RequestParam String lastname,
-                             @RequestParam String country, @RequestParam String city, @RequestParam String street, @RequestParam String streetNumber) {
+  public String registerUser(@RequestBody @Valid RegistrationDto registrationDto) {
     String result;
     User user = new User();
 
-    if (userRepository.findByEmail(email).isPresent()) {
+    if (userRepository.findByEmail(registrationDto.getEmail()).isPresent()) {
       throw new RuntimeException("exists");
     } else {
       Address address = new Address();
-      address.setCountry(country);
-      address.setCity(city);
-      address.setStreet(street);
-      address.setStreetNumber(streetNumber);
+      address.setCountry(registrationDto.getCountry());
+      address.setCity(registrationDto.getCity());
+      address.setStreet(registrationDto.getStreet());
+      address.setStreetNumber(registrationDto.getStreetNumber());
       address = addressRepository.save(address);
 
-      user.setEmail(email);
-      user.setPassword(password);
-      user.setFirstName(firstname);
-      user.setLastName(lastname);
+      user.setEmail(registrationDto.getEmail());
+      user.setPassword(registrationDto.getPassword());
+      user.setFirstName(registrationDto.getFirstname());
+      user.setLastName(registrationDto.getLastname());
       user.setAddress(address);
       userRepository.save(user);
 
