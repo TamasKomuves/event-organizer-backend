@@ -1,13 +1,14 @@
 package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.validation.constraints.NotNull;
 
 public class UserLoginDto {
 
-	@JsonProperty("email")
+	@NotNull
 	private String email;
 
-	@JsonProperty("password")
+	@NotNull
 	private String password;
 
 	public String getEmail() {

@@ -2,6 +2,7 @@ package hu.tamas.university.controller;
 
 import javax.validation.Valid;
 import hu.tamas.university.dto.RegistrationDto;
+import hu.tamas.university.dto.UserLoginDto;
 import hu.tamas.university.entity.Address;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.AddressRepository;
@@ -55,10 +56,10 @@ final class PublicUsersController {
     return "{\"result\":\"" + result + "\"}";
   }
 
-  @GetMapping("/login/{username}/{password}")
+  @PostMapping("/login")
   @ResponseBody
-  public String login(@PathVariable("username") String username, @PathVariable("password") String password) {
-    String token = userAuthenticationService.login(username, password)
+  public String login(@RequestBody @Valid UserLoginDto userLoginDto) {
+    String token = userAuthenticationService.login(userLoginDto.getEmail(), userLoginDto.getPassword())
             .orElseThrow(() -> new RuntimeException("invalid login and/or password"));
     return "{\"token\":\"" + token + "\"}";
   }

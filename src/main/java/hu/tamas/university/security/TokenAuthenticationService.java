@@ -22,11 +22,11 @@ final class TokenAuthenticationService implements UserAuthenticationService {
   }
 
   @Override
-  public Optional<String> login(final String username, final String password) {
+  public Optional<String> login(final String email, final String password) {
     return userRepository
-            .findByEmail(username)
+            .findByEmail(email)
             .filter(user -> Objects.equals(password, user.getPassword()))
-            .map(user -> tokenService.expiring(ImmutableMap.of("username", username)));
+            .map(user -> tokenService.expiring(ImmutableMap.of("username", email)));
   }
 
   @Override
