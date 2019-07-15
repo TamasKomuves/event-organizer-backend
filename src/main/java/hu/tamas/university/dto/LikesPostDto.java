@@ -1,19 +1,19 @@
 package hu.tamas.university.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.LikesPost;
 import hu.tamas.university.entity.Post;
 import hu.tamas.university.entity.User;
 
+import javax.validation.constraints.NotNull;
+
 public class LikesPostDto {
 
-	@JsonProperty("id")
 	private int id;
 
-	@JsonProperty("user")
+	@NotNull
 	private User user;
 
-	@JsonProperty("post")
+	@NotNull
 	private Post post;
 
 	public static LikesPostDto fromEntity(LikesPost likesPost) {

@@ -1,16 +1,16 @@
 package hu.tamas.university.controller;
 
 import hu.tamas.university.dto.LikesPostDto;
+import hu.tamas.university.dto.creatordto.LikesPostCreatorDto;
 import hu.tamas.university.entity.LikesPost;
 import hu.tamas.university.repository.LikesPostRepository;
 import hu.tamas.university.repository.PostRepository;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/likes-posts")
@@ -35,13 +35,13 @@ public class LikesPostController {
 		return LikesPostDto.fromEntity(likesPost);
 	}
 
-	@GetMapping("/create/{userEmail}/{postId}")
+	@PostMapping("/create")
 	@ResponseBody
-	public String saveLikesPost(@PathVariable String userEmail, @PathVariable int postId) {
+	public String createLikesPost(@RequestBody @Valid LikesPostCreatorDto likesPostCreatorDto) {
 
 		LikesPost likesPost = new LikesPost();
-		likesPost.setUser(userRepository.findByEmail(userEmail).get());
-		likesPost.setPost(postRepository.findPostById(postId));
+		likesPost.setUser(userRepository.findByEmail(likesPostCreatorDto.getUserEmail()).orElse(null));
+		likesPost.setPost(postRepository.findPostById(likesPostCreatorDto.getPostId()));
 
 		likesPostRepository.save(likesPost);
 

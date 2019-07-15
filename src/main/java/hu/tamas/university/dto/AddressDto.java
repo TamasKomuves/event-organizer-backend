@@ -1,23 +1,24 @@
 package hu.tamas.university.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.Address;
+
+import javax.validation.constraints.NotNull;
 
 public class AddressDto {
 
-	@JsonProperty("id")
+	@NotNull
 	private int id;
 
-	@JsonProperty("country")
+	@NotNull
 	private String country;
 
-	@JsonProperty("city")
+	@NotNull
 	private String city;
 
-	@JsonProperty("street")
+	@NotNull
 	private String street;
 
-	@JsonProperty("streetNumber")
+	@NotNull
 	private String streetNumber;
 
 	public static AddressDto fromEntity(Address address) {
@@ -30,6 +31,18 @@ public class AddressDto {
 		dto.setStreetNumber(address.getStreetNumber());
 
 		return dto;
+	}
+
+	public static Address fromDto(AddressDto addressDto) {
+		Address address = new Address();
+
+		address.setId(addressDto.id);
+		address.setCountry(addressDto.country);
+		address.setCity(addressDto.city);
+		address.setStreet(addressDto.street);
+		address.setStreetNumber(addressDto.streetNumber);
+
+		return address;
 	}
 
 	public int getId() {

@@ -11,11 +11,9 @@ import hu.tamas.university.repository.ParticipateInEventRepository;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,17 +43,16 @@ public class InvitationController {
 		return InvitationDto.fromEntity(invitation);
 	}
 
-	@GetMapping("/create/{eventId}/{userEmail}/{isUserRequested}")
+	@PostMapping("/create")
 	@ResponseBody
-	public String createInvitation(@PathVariable int eventId,
-	                                        @PathVariable String userEmail, @PathVariable int isUserRequested) {
-		Event event = eventRepository.findEventById(eventId);
+	public String createInvitation(@RequestBody @Valid InvitationDto invitationDto) {
+		Event event = eventRepository.findEventById(invitationDto.getEventId());
 
 		if (!isEventHasMorePlace(event)) {
 			return "{\"result\":\"no more place\"}";
 		}
 
-		User user = userRepository.findByEmail(userEmail).get();
+		User user = userRepository.findByEmail(invitationDto.getUserEmail()).orElse(null);
 
 		List<ParticipateInEvent> alreadyParticipateInEvent = participateInEventRepository.findByEventAndUser(event,
 				user);
@@ -64,13 +61,14 @@ public class InvitationController {
 			return "{\"result\":\"already participate\"}";
 		}
 
-		List<Invitation> alreadyInvited = invitationRepository.findByEventAndUser(event, user);
+		long activeInvitations = invitationRepository.findByEventAndUser(event, user).stream()
+						.filter(invitation -> invitation.getDecisionDate() == null).count();
 
-		if (!alreadyInvited.isEmpty()) {
+		if (activeInvitations != 0) {
 			return "{\"result\":\"already invited\"}";
 		}
 
-		Invitation invitation = createInvitation(event, user, isUserRequested);
+		Invitation invitation = createInvitation(event, user, invitationDto.getUserRequested());
 
 		invitationRepository.save(invitation);
 
@@ -119,8 +117,9 @@ public class InvitationController {
 	@ResponseBody
 	public String isAlreadyInvited(@PathVariable int eventId, @PathVariable String userEmail) {
 		boolean isAlreadySent = invitationRepository.findAll().stream()
-				.anyMatch(invitation -> invitation.getEvent().getId() == eventId &&
-						invitation.getUser().getEmail().equals(userEmail) && invitation.getDecisionDate() == null);
+						.anyMatch(invitation -> invitation.getEvent().getId() == eventId &&
+										invitation.getUser() != null && invitation.getUser().getEmail().equals(userEmail)
+										&& invitation.getDecisionDate() == null);
 
 		return "{\"result\":\"" + isAlreadySent + "\"}";
 	}

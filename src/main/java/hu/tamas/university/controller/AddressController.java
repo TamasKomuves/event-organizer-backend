@@ -5,10 +5,9 @@ import hu.tamas.university.entity.Address;
 import hu.tamas.university.repository.AddressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/addresses")
@@ -29,16 +28,10 @@ public class AddressController {
 		return AddressDto.fromEntity(tmpAddress);
 	}
 
-	@GetMapping("/create/{country}/{city}/{street}/{streetNumber}")
+	@PostMapping("/create")
 	@ResponseBody
-	public String saveAddress(@PathVariable String country, @PathVariable String city,
-	                                   @PathVariable String street, @PathVariable String streetNumber) {
-		Address address = new Address();
-		address.setCountry(country);
-		address.setCity(city);
-		address.setStreet(street);
-		address.setStreetNumber(streetNumber);
-
+	public String createAddress(@RequestBody @Valid AddressDto addressDto) {
+		Address address = AddressDto.fromDto(addressDto);
 		address = addressRepository.save(address);
 
 		return "{\"result\":\"success\", " + "\"addressId\":\"" + address.getId() + "\"}";

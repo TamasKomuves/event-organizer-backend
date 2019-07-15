@@ -4,16 +4,15 @@ import hu.tamas.university.dto.EventDto;
 import hu.tamas.university.dto.InvitationDto;
 import hu.tamas.university.dto.PostDto;
 import hu.tamas.university.dto.UserDto;
+import hu.tamas.university.dto.creatordto.EventCreatorDto;
 import hu.tamas.university.entity.*;
 import hu.tamas.university.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -90,33 +89,21 @@ public class EventController {
 		return event.getPosts().stream().map(PostDto::fromEntity).collect(Collectors.toList());
 	}
 
-	@GetMapping("/create/{name}/{description}/{max_participant}/{visibility}/{total_cost}/{event_date}/{address_id}/{event_type_type}/{organizer_email}")
+	@PostMapping("/create")
 	@ResponseBody
-	public String saveEvent(@PathVariable String name, @PathVariable String description,
-	                                 @PathVariable int max_participant, @PathVariable String visibility,
-	                                 @PathVariable int total_cost, @PathVariable Timestamp event_date,
-	                                 @PathVariable int address_id, @PathVariable String event_type_type,
-	                                 @PathVariable String organizer_email) {
-		EventType eventType = eventTypeRepository.findEventTypeByType(event_type_type.toLowerCase());
+	public String createEvent(@RequestBody @Valid EventCreatorDto eventCreatorDto) {
+		EventType eventType = eventTypeRepository.findEventTypeByType(eventCreatorDto.getEventTypeType().toLowerCase());
 
 		if (eventType == null) {
 			eventType = new EventType();
-			eventType.setType(event_type_type.toLowerCase());
+			eventType.setType(eventCreatorDto.getEventTypeType().toLowerCase());
 			eventType = eventTypeRepository.save(eventType);
 		}
 
-		User user = userRepository.findByEmail(organizer_email).get();
-		Event event = new Event();
-		event.setName(name);
-		event.setDescription(description);
-		event.setMaxParticipant(max_participant);
-		event.setVisibility(visibility);
-		event.setTotalCost(total_cost);
-		event.setEventDate(event_date);
-		event.setAddress(addressRepository.findAddressById(address_id));
-		event.setEventType(eventType);
-		event.setOrganizer(user);
+		Address address = addressRepository.findAddressById(eventCreatorDto.getAddressId());
+		User user = userRepository.findByEmail(eventCreatorDto.getOrganizerEmail()).orElse(null);
 
+		Event event = EventCreatorDto.fromDto(eventCreatorDto, address, eventType, user);
 		event = eventRepository.save(event);
 
 		ParticipateInEvent participateInEvent = new ParticipateInEvent();
@@ -137,7 +124,7 @@ public class EventController {
 			return "{\"result\":\"no more place\"}";
 		}
 
-		User user = userRepository.findByEmail(userEmail).get();
+		User user = userRepository.findByEmail(userEmail).orElse(null);
 		List<ParticipateInEvent> alreadyParticipateInEvent = participateInEventRepository.findByEventAndUser(event,
 				user);
 
@@ -209,7 +196,7 @@ public class EventController {
 		Event event = eventRepository.findEventById(eventId);
 
 		return invitationRepository.findByEvent(event).stream()
-						.filter(invitation -> invitation.getDecisionDate() == null && invitation.isUserRequested() == 0)
+						.filter(invitation -> invitation.getDecisionDate() == null && invitation.getUserRequested() == 0)
 						.map(InvitationDto::fromEntity).collect(Collectors.toList());
 	}
 
@@ -219,7 +206,7 @@ public class EventController {
 		Event event = eventRepository.findEventById(eventId);
 		List<InvitationDto> invitationDtos =
 				invitationRepository.findByEvent(event).stream()
-						.filter(invitation -> invitation.getDecisionDate() == null && invitation.isUserRequested() == 1)
+								.filter(invitation -> invitation.getDecisionDate() == null && invitation.getUserRequested() == 1)
 						.map(InvitationDto::fromEntity).collect(Collectors.toList());
 
 		return invitationDtos;
@@ -236,7 +223,7 @@ public class EventController {
 	                                       @PathVariable String event_type_type) {
 		Event event = eventRepository.findEventById(id);
 		List<Invitation> invitations = invitationRepository.findByEvent(event).stream()
-				.filter(invitation -> invitation.isUserRequested() == 0).collect(Collectors.toList());
+						.filter(invitation -> invitation.getUserRequested() == 0).collect(Collectors.toList());
 		if (event.getUsers().size() + invitations.size() <= max_participant) {
 			event.setMaxParticipant(max_participant);
 		}

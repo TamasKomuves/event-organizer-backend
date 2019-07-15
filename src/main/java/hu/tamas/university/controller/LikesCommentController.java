@@ -1,16 +1,18 @@
 package hu.tamas.university.controller;
 
 import hu.tamas.university.dto.LikesCommentDto;
+import hu.tamas.university.dto.creatordto.LikesCommentCreatorDto;
+import hu.tamas.university.entity.Comment;
 import hu.tamas.university.entity.LikesComment;
+import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.CommentRepository;
 import hu.tamas.university.repository.LikesCommentRepository;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/likes-comments")
@@ -35,13 +37,15 @@ public class LikesCommentController {
 		return LikesCommentDto.fromEntity(likesComment);
 	}
 
-	@GetMapping("/create/{userEmail}/{commentId}")
+	@PostMapping("/create")
 	@ResponseBody
-	public String saveLikesPost(@PathVariable String userEmail, @PathVariable int commentId) {
+	public String saveLikesPost(@RequestBody @Valid LikesCommentCreatorDto likesCommentCreatorDto) {
+		User user = userRepository.findByEmail(likesCommentCreatorDto.getUserEmail()).orElse(null);
+		Comment comment = commentRepository.findCommentById(likesCommentCreatorDto.getCommentId());
 
 		LikesComment likesComment = new LikesComment();
-		likesComment.setUser(userRepository.findByEmail(userEmail).get());
-		likesComment.setComment(commentRepository.findCommentById(commentId));
+		likesComment.setUser(user);
+		likesComment.setComment(comment);
 
 		likesCommentRepository.save(likesComment);
 

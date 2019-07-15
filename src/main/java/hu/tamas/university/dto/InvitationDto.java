@@ -3,42 +3,43 @@ package hu.tamas.university.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.Invitation;
 
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 public class InvitationDto {
 
-	@JsonProperty("id")
+	@NotNull
 	private int id;
 
-	@JsonProperty("eventId")
 	private int eventId;
 
-	@JsonProperty("userEmail")
+	@NotNull
 	private String userEmail;
 
-	@JsonProperty("sentDate")
 	private Timestamp sentDate;
 
-	@JsonProperty("decisionDate")
 	private Timestamp decisionDate;
 
 	@JsonProperty("isAccepted")
-	private int isAccepted;
+	private int accepted;
 
+	@NotNull
 	@JsonProperty("isUserRequested")
-	private int isUserRequested;
+	private int userRequested;
 
 	public static InvitationDto fromEntity(Invitation invitation) {
 		InvitationDto invitationDto = new InvitationDto();
 		invitationDto.setId(invitation.getId());
-		if (invitation.getEvent() != null)
+		if (invitation.getEvent() != null) {
 			invitationDto.setEventId(invitation.getEvent().getId());
-		if (invitation.getUser() != null)
+		}
+		if (invitation.getUser() != null) {
 			invitationDto.setUserEmail(invitation.getUser().getEmail());
+		}
 		invitationDto.setSentDate(invitation.getSentDate());
 		invitationDto.setDecisionDate(invitation.getDecisionDate());
-		invitationDto.setAccepted(invitation.isAccepted());
-		invitationDto.setUserRequested(invitation.isUserRequested());
+		invitationDto.setAccepted(invitation.getAccepted());
+		invitationDto.setUserRequested(invitation.getUserRequested());
 		return invitationDto;
 	}
 
@@ -82,19 +83,19 @@ public class InvitationDto {
 		this.decisionDate = decisionDate;
 	}
 
-	public int isAccepted() {
-		return isAccepted;
+	public int getAccepted() {
+		return accepted;
 	}
 
 	public void setAccepted(int accepted) {
-		isAccepted = accepted;
+		this.accepted = accepted;
 	}
 
-	public int isUserRequested() {
-		return isUserRequested;
+	public int getUserRequested() {
+		return userRequested;
 	}
 
 	public void setUserRequested(int userRequested) {
-		isUserRequested = userRequested;
+		this.userRequested = userRequested;
 	}
 }

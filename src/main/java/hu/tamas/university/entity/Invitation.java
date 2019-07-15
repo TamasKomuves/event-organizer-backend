@@ -1,8 +1,5 @@
 package hu.tamas.university.entity;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 
@@ -29,10 +26,10 @@ public class Invitation {
 	private Timestamp decisionDate;
 
 	@Column(name = "is_accepted")
-	private int isAccepted;
+	private int accepted;
 
 	@Column(name = "is_user_requested")
-	private int isUserRequested;
+	private int userRequested;
 
 	public int getId() {
 		return id;
@@ -74,19 +71,19 @@ public class Invitation {
 		this.decisionDate = decisionDate;
 	}
 
-	public int isAccepted() {
-		return isAccepted;
+	public int getAccepted() {
+		return accepted;
 	}
 
 	public void setAccepted(int accepted) {
-		isAccepted = accepted;
+		this.accepted = accepted;
 	}
 
-	public int isUserRequested() {
-		return isUserRequested;
+	public int getUserRequested() {
+		return userRequested;
 	}
 
 	public void setUserRequested(int userRequested) {
-		isUserRequested = userRequested;
+		this.userRequested = userRequested;
 	}
 }
