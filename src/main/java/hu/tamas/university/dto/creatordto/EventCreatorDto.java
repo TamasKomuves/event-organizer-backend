@@ -27,7 +27,6 @@ public class EventCreatorDto {
 	private int totalCost;
 
 	@NotNull
-	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Timestamp eventDate;
 
 	@NotNull
