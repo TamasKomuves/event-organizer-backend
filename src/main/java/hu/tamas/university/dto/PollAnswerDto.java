@@ -9,8 +9,8 @@ public class PollAnswerDto {
 	@JsonProperty("id")
 	private int id;
 
-	@JsonProperty("pollQuestion")
-	private PollQuestion pollQuestion;
+	@JsonProperty("pollQuestionId")
+	private int pollQuestionId;
 
 	@JsonProperty("text")
 	private String text;
@@ -18,7 +18,7 @@ public class PollAnswerDto {
 	public static PollAnswerDto fromEntity(PollAnswer pollAnswer) {
 		PollAnswerDto pollAnswerDto = new PollAnswerDto();
 		pollAnswerDto.setId(pollAnswer.getId());
-		pollAnswerDto.setPollQuestion(pollAnswer.getPollQuestion());
+		pollAnswerDto.setPollQuestionId(pollAnswer.getPollQuestion().getId());
 		pollAnswerDto.setText(pollAnswer.getText());
 		return pollAnswerDto;
 	}
@@ -31,12 +31,12 @@ public class PollAnswerDto {
 		this.id = id;
 	}
 
-	public PollQuestion getPollQuestion() {
-		return pollQuestion;
+	public int getPollQuestionId() {
+		return pollQuestionId;
 	}
 
-	public void setPollQuestion(PollQuestion pollQuestion) {
-		this.pollQuestion = pollQuestion;
+	public void setPollQuestionId(int pollQuestion) {
+		this.pollQuestionId = pollQuestion;
 	}
 
 	public String getText() {
