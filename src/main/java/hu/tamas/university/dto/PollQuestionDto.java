@@ -1,7 +1,6 @@
 package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.PollQuestion;
 
 import java.sql.Timestamp;
@@ -11,21 +10,21 @@ public class PollQuestionDto {
 	@JsonProperty("id")
 	private int id;
 
-	@JsonProperty("event")
-	private Event event;
+	@JsonProperty("eventId")
+	private int eventId;
 
 	@JsonProperty("text")
 	private String text;
 
-	@JsonProperty("pollQuestionDate")
-	private Timestamp pollQuestionDate;
+	@JsonProperty("date")
+	private Timestamp date;
 
 	public static PollQuestionDto fromEntity(PollQuestion pollQuestion) {
 		PollQuestionDto pollQuestionDto = new PollQuestionDto();
 		pollQuestionDto.setId(pollQuestion.getId());
-		pollQuestionDto.setEvent(pollQuestion.getEvent());
+		pollQuestionDto.setEventId(pollQuestion.getEvent().getId());
 		pollQuestionDto.setText(pollQuestion.getText());
-		pollQuestionDto.setPollQuestionDate(pollQuestion.getPollQuestionDate());
+		pollQuestionDto.setDate(pollQuestion.getDate());
 		return pollQuestionDto;
 	}
 
@@ -37,12 +36,12 @@ public class PollQuestionDto {
 		this.id = id;
 	}
 
-	public Event getEvent() {
-		return event;
+	public int getEventId() {
+		return eventId;
 	}
 
-	public void setEvent(Event event) {
-		this.event = event;
+	public void setEventId(int eventId) {
+		this.eventId = eventId;
 	}
 
 	public String getText() {
@@ -53,11 +52,11 @@ public class PollQuestionDto {
 		this.text = text;
 	}
 
-	public Timestamp getPollQuestionDate() {
-		return pollQuestionDate;
+	public Timestamp getDate() {
+		return date;
 	}
 
-	public void setPollQuestionDate(Timestamp pollQuestionDate) {
-		this.pollQuestionDate = pollQuestionDate;
+	public void setDate(Timestamp date) {
+		this.date = date;
 	}
 }

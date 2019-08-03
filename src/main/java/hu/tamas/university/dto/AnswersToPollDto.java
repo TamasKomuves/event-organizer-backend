@@ -2,25 +2,27 @@ package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.AnswersToPoll;
-import hu.tamas.university.entity.PollAnswer;
-import hu.tamas.university.entity.User;
+
+import javax.validation.constraints.NotNull;
 
 public class AnswersToPollDto {
 
 	@JsonProperty("id")
 	private int id;
 
-	@JsonProperty("user")
-	private User user;
+	@JsonProperty("userEmail")
+	private String userEmail;
 
-	@JsonProperty("pollAnswer")
-	private PollAnswer pollAnswer;
+	@NotNull
+	@JsonProperty("pollAnswerId")
+	private int pollAnswerId;
 
 	public static AnswersToPollDto fromEntity(AnswersToPoll answersToPoll) {
 		AnswersToPollDto answersToPollDto = new AnswersToPollDto();
 		answersToPollDto.setId(answersToPoll.getId());
-		answersToPollDto.setUser(answersToPoll.getUser());
-		answersToPollDto.setPollAnswer(answersToPoll.getPollAnswer());
+		answersToPollDto.setUserEmail(answersToPoll.getUser().getEmail());
+		answersToPollDto.setPollAnswerId(answersToPoll.getPollAnswer().getId());
+
 		return answersToPollDto;
 	}
 
@@ -32,19 +34,19 @@ public class AnswersToPollDto {
 		this.id = id;
 	}
 
-	public User getUser() {
-		return user;
+	public String getUserEmail() {
+		return userEmail;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
 	}
 
-	public PollAnswer getPollAnswer() {
-		return pollAnswer;
+	public int getPollAnswerId() {
+		return pollAnswerId;
 	}
 
-	public void setPollAnswer(PollAnswer pollAnswer) {
-		this.pollAnswer = pollAnswer;
+	public void setPollAnswerId(int pollAnswerId) {
+		this.pollAnswerId = pollAnswerId;
 	}
 }

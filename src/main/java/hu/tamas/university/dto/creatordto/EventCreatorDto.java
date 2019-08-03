@@ -1,6 +1,5 @@
 package hu.tamas.university.dto.creatordto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import hu.tamas.university.entity.Address;
 import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.EventType;

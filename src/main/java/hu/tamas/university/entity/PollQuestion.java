@@ -23,7 +23,7 @@ public class PollQuestion {
 	private String text;
 
 	@Column(name = "poll_question_date")
-	private Timestamp pollQuestionDate;
+	private Timestamp date;
 
 	public int getId() {
 		return id;
@@ -49,11 +49,11 @@ public class PollQuestion {
 		this.text = text;
 	}
 
-	public Timestamp getPollQuestionDate() {
-		return pollQuestionDate;
+	public Timestamp getDate() {
+		return date;
 	}
 
-	public void setPollQuestionDate(Timestamp pollQuestionDate) {
-		this.pollQuestionDate = pollQuestionDate;
+	public void setDate(Timestamp date) {
+		this.date = date;
 	}
 }
