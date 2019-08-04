@@ -4,14 +4,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.PollAnswer;
 import hu.tamas.university.entity.PollQuestion;
 
+import javax.validation.constraints.NotNull;
+
 public class PollAnswerDto {
 
 	@JsonProperty("id")
 	private int id;
 
+	@NotNull
 	@JsonProperty("pollQuestionId")
 	private int pollQuestionId;
 
+	@NotNull
 	@JsonProperty("text")
 	private String text;
 
