@@ -10,4 +10,6 @@ public interface AnswersToPollRepository extends JpaRepository<AnswersToPoll, In
 	AnswersToPoll findAnswersToPollById(int id);
 
 	List<AnswersToPoll> findAnswersToPollByPollAnswerId(int pollAnswerId);
+
+	AnswersToPoll findAnswersToPollByPollAnswerIdAndUserEmail(int pollAnswerId, String userEmail);
 }

@@ -53,4 +53,14 @@ public class AnswersToPollController {
 
 		return "{\"result\":\"success\"}";
 	}
+
+	@GetMapping("/{answerId}/delete")
+	@ResponseBody
+	public String deleteAnswersToPollById(@PathVariable int answerId, @AuthenticationPrincipal final User user) {
+		AnswersToPoll answersToPoll = answersToPollRepository
+						.findAnswersToPollByPollAnswerIdAndUserEmail(answerId, user.getEmail());
+		answersToPollRepository.delete(answersToPoll);
+
+		return "{\"result\":\"success\"}";
+	}
 }

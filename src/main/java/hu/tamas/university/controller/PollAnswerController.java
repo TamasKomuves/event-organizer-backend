@@ -4,9 +4,11 @@ import hu.tamas.university.dto.AnswersToPollDto;
 import hu.tamas.university.dto.PollAnswerDto;
 import hu.tamas.university.entity.AnswersToPoll;
 import hu.tamas.university.entity.PollAnswer;
+import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.AnswersToPollRepository;
 import hu.tamas.university.repository.PollAnswerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,5 +46,15 @@ public class PollAnswerController {
 		List<AnswersToPoll> answersToPolls = answersToPollRepository.findAnswersToPollByPollAnswerId(id);
 
 		return answersToPolls.stream().map(AnswersToPollDto::fromEntity).collect(Collectors.toList());
+	}
+
+	@GetMapping("/{answerId}/is-already-selected")
+	@ResponseBody
+	public String isAlreadySelected(@PathVariable int answerId, @AuthenticationPrincipal final User user) {
+		AnswersToPoll answersToPoll = answersToPollRepository
+						.findAnswersToPollByPollAnswerIdAndUserEmail(answerId, user.getEmail());
+		boolean isAlreadySelected = answersToPoll != null;
+
+		return "{\"isAlreadySelected\":\"" + isAlreadySelected + "\"}";
 	}
 }
