@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 public class PollQuestion {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", nullable = false, unique = true)
 	private int id;
 

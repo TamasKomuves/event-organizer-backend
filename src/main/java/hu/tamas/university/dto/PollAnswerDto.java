@@ -11,7 +11,6 @@ public class PollAnswerDto {
 	@JsonProperty("id")
 	private int id;
 
-	@NotNull
 	@JsonProperty("pollQuestionId")
 	private int pollQuestionId;
 
@@ -25,6 +24,15 @@ public class PollAnswerDto {
 		pollAnswerDto.setPollQuestionId(pollAnswer.getPollQuestion().getId());
 		pollAnswerDto.setText(pollAnswer.getText());
 		return pollAnswerDto;
+	}
+
+	public static PollAnswer fromDto(PollAnswerDto pollAnswerDto, PollQuestion pollQuestion) {
+		PollAnswer pollAnswer = new PollAnswer();
+		pollAnswer.setId(pollAnswerDto.getId());
+		pollAnswer.setText(pollAnswerDto.getText());
+		pollAnswer.setPollQuestion(pollQuestion);
+
+		return pollAnswer;
 	}
 
 	public int getId() {
