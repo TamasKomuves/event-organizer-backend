@@ -1,5 +1,6 @@
 package hu.tamas.university.controller;
 
+import com.google.common.collect.Lists;
 import hu.tamas.university.dto.EventDto;
 import hu.tamas.university.dto.InvitationDto;
 import hu.tamas.university.dto.PostDto;
@@ -42,8 +43,12 @@ public class EventController {
 
 	@GetMapping("/{id}")
 	@ResponseBody
-	public EventDto getEventById(@PathVariable int id) {
+	public EventDto getEventById(@PathVariable int id, @AuthenticationPrincipal final User user) {
 		Event event = eventRepository.findEventById(id);
+
+		if (!isParticipate(user, event)) {
+			return null;
+		}
 
 		return EventDto.fromEntity(event);
 	}
@@ -62,7 +67,7 @@ public class EventController {
 	}
 
 	private boolean isCurrentUserHasRightToGetEvent(Event event, User user) {
-		return !event.getVisibility().equals(PRIVATE_VISIBILITY) || event.getUsers().contains(user);
+		return !event.getVisibility().equals(PRIVATE_VISIBILITY) || isParticipate(user, event);
 	}
 
 	@GetMapping("/type/{type}")
@@ -75,8 +80,12 @@ public class EventController {
 
 	@GetMapping("/{id}/users")
 	@ResponseBody
-	public List<UserDto> getUsers(@PathVariable int id) {
+	public List<UserDto> getUsers(@PathVariable int id, @AuthenticationPrincipal final User user) {
 		Event event = eventRepository.findEventById(id);
+
+		if (!isParticipate(user, event)) {
+			return Lists.newArrayList();
+		}
 
 		return event.getUsers().stream().map(UserDto::fromEntity).collect(Collectors.toList());
 	}
@@ -136,6 +145,11 @@ public class EventController {
 		participateInEventRepository.save(participateInEvent);
 
 		return "{\"result\":\"success\"}";
+	}
+
+	private boolean isParticipate(User user, Event event) {
+		List<User> participants = event.getUsers();
+		return participants.stream().anyMatch(user1 -> user1.getEmail().equals(user.getEmail()));
 	}
 
 	private boolean isEventHasMorePlace(Event event) {
