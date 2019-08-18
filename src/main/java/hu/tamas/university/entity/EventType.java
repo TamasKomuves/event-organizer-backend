@@ -1,15 +1,13 @@
 package hu.tamas.university.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "event_type")
 public class EventType {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "type", nullable = false, unique = true)
 	private String type;
 
