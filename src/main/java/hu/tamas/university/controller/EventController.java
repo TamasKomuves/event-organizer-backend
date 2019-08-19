@@ -1,10 +1,7 @@
 package hu.tamas.university.controller;
 
 import com.google.common.collect.Lists;
-import hu.tamas.university.dto.EventDto;
-import hu.tamas.university.dto.InvitationDto;
-import hu.tamas.university.dto.PostDto;
-import hu.tamas.university.dto.UserDto;
+import hu.tamas.university.dto.*;
 import hu.tamas.university.dto.creatordto.EventCreatorDto;
 import hu.tamas.university.entity.*;
 import hu.tamas.university.repository.*;
@@ -15,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,15 +28,22 @@ public class EventController {
 	private final UserRepository userRepository;
 	private final ParticipateInEventRepository participateInEventRepository;
 	private final InvitationRepository invitationRepository;
+	private final PollQuestionRepository pollQuestionRepository;
+	private final PostRepository postRepository;
 
 	@Autowired
-	public EventController(EventRepository eventRepository, EventTypeRepository eventTypeRepository, AddressRepository addressRepository, UserRepository userRepository, ParticipateInEventRepository participateInEventRepository, InvitationRepository invitationRepository) {
+	public EventController(EventRepository eventRepository, EventTypeRepository eventTypeRepository,
+			AddressRepository addressRepository, UserRepository userRepository,
+			ParticipateInEventRepository participateInEventRepository, InvitationRepository invitationRepository,
+			PollQuestionRepository pollQuestionRepository, PostRepository postRepository) {
 		this.eventRepository = eventRepository;
 		this.eventTypeRepository = eventTypeRepository;
 		this.addressRepository = addressRepository;
 		this.userRepository = userRepository;
 		this.participateInEventRepository = participateInEventRepository;
 		this.invitationRepository = invitationRepository;
+		this.pollQuestionRepository = pollQuestionRepository;
+		this.postRepository = postRepository;
 	}
 
 	@GetMapping("/{id}")
@@ -46,9 +51,9 @@ public class EventController {
 	public EventDto getEventById(@PathVariable int id, @AuthenticationPrincipal final User user) {
 		Event event = eventRepository.findEventById(id);
 
-		if (!isParticipate(user, event)) {
-			return null;
-		}
+//		if (!isParticipate(user, event)) {
+//			return null;
+//		}
 
 		return EventDto.fromEntity(event);
 	}
@@ -83,9 +88,9 @@ public class EventController {
 	public List<UserDto> getUsers(@PathVariable int id, @AuthenticationPrincipal final User user) {
 		Event event = eventRepository.findEventById(id);
 
-		if (!isParticipate(user, event)) {
-			return Lists.newArrayList();
-		}
+//		if (!isParticipate(user, event)) {
+//			return Lists.newArrayList();
+//		}
 
 		return event.getUsers().stream().map(UserDto::fromEntity).collect(Collectors.toList());
 	}
@@ -261,5 +266,25 @@ public class EventController {
 		eventRepository.save(event);
 
 		return "{\"result\":\"success\"}";
+	}
+
+	@GetMapping("/{id}/polls")
+	@ResponseBody
+	public List<PollQuestionDto> getAllPolls(@PathVariable int id) {
+		List<PollQuestion> pollQuestions = pollQuestionRepository.findAllByEventId(id);
+		return pollQuestions.stream().map(PollQuestionDto::fromEntity).collect(Collectors.toList());
+	}
+
+	@GetMapping("/{id}/news")
+	@ResponseBody
+	public List<NewsDto> getAllNews(@PathVariable int id) {
+		List<PollQuestionDto> pollQuestionDtos = pollQuestionRepository.findAllByEventId(id).stream()
+				.map(PollQuestionDto::fromEntity).collect(Collectors.toList());
+		List<NewsDto> newsDtos = postRepository.findAllByEventId(id).stream().map(PostDto::fromEntity)
+				.collect(Collectors.toList());
+
+		newsDtos.addAll(pollQuestionDtos);
+
+		return newsDtos;
 	}
 }

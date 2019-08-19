@@ -2,24 +2,16 @@ package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.Post;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.sql.Timestamp;
+public class PostDto extends NewsDto {
 
-public class PostDto {
-
-	@JsonProperty("id")
-	private int id;
+	private static final String TYPE = "POST";
 
 	@JsonProperty("eventId")
 	private int eventId;
 
 	@JsonProperty("posterEmail")
 	private String posterEmail;
-
-	@JsonProperty("postDate")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Timestamp postDate;
 
 	@JsonProperty("text")
 	private String text;
@@ -30,17 +22,9 @@ public class PostDto {
 		if (post.getEvent() != null)
 			postDto.setEventId(post.getEvent().getId());
 		postDto.setPosterEmail(post.getPoster().getEmail());
-		postDto.setPosttDate(post.getPostDate());
+		postDto.setDate(post.getPostDate());
 		postDto.setText(post.getText());
 		return postDto;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public int getEventId() {
@@ -59,19 +43,16 @@ public class PostDto {
 		this.posterEmail = posterEmail;
 	}
 
-	public Timestamp getPostDate() {
-		return postDate;
-	}
-
-	public void setPosttDate(Timestamp postDate) {
-		this.postDate = postDate;
-	}
-
 	public String getText() {
 		return text;
 	}
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	@Override
+	public String getType() {
+		return TYPE;
 	}
 }

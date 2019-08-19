@@ -3,21 +3,15 @@ package hu.tamas.university.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.PollQuestion;
 
-import java.sql.Timestamp;
+public class PollQuestionDto extends NewsDto {
 
-public class PollQuestionDto {
-
-	@JsonProperty("id")
-	private int id;
+	private static final String TYPE = "POLL";
 
 	@JsonProperty("eventId")
 	private int eventId;
 
 	@JsonProperty("text")
 	private String text;
-
-	@JsonProperty("date")
-	private Timestamp date;
 
 	public static PollQuestionDto fromEntity(PollQuestion pollQuestion) {
 		PollQuestionDto pollQuestionDto = new PollQuestionDto();
@@ -26,14 +20,6 @@ public class PollQuestionDto {
 		pollQuestionDto.setText(pollQuestion.getText());
 		pollQuestionDto.setDate(pollQuestion.getDate());
 		return pollQuestionDto;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public int getEventId() {
@@ -52,11 +38,8 @@ public class PollQuestionDto {
 		this.text = text;
 	}
 
-	public Timestamp getDate() {
-		return date;
-	}
-
-	public void setDate(Timestamp date) {
-		this.date = date;
+	@Override
+	public String getType() {
+		return TYPE;
 	}
 }
