@@ -19,6 +19,9 @@ public class ChatMessageDto {
 	@JsonProperty
 	private boolean isCurrentUserSent;
 
+	@JsonProperty("partnerEmail")
+	private String partnerEmail;
+
 	public static ChatMessageDto fromEntity(ChatMessage chatMessage, String currentUserEmail) {
 		ChatMessageDto chatMessageDto = new ChatMessageDto();
 
@@ -27,8 +30,15 @@ public class ChatMessageDto {
 		chatMessageDto.setDate(chatMessage.getDate());
 		boolean isCurrentUserSent = currentUserEmail.equals(chatMessage.getSender().getEmail());
 		chatMessageDto.setCurrentUserSent(isCurrentUserSent);
+		chatMessageDto.setPartnerEmail(getPartnerEmail(chatMessage, currentUserEmail));
 
 		return chatMessageDto;
+	}
+
+	private static String getPartnerEmail(ChatMessage chatMessage, String currentUserEmail) {
+		final String senderEmail = chatMessage.getSender().getEmail();
+		final String receiverEmail = chatMessage.getReceiver().getEmail();
+		return senderEmail.equals(currentUserEmail) ? receiverEmail : senderEmail;
 	}
 
 	public int getId() {
@@ -61,5 +71,13 @@ public class ChatMessageDto {
 
 	public void setCurrentUserSent(boolean currentUserSent) {
 		isCurrentUserSent = currentUserSent;
+	}
+
+	public String getPartnerEmail() {
+		return partnerEmail;
+	}
+
+	public void setPartnerEmail(String partnerEmail) {
+		this.partnerEmail = partnerEmail;
 	}
 }

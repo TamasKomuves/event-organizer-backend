@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/users")
@@ -27,7 +28,8 @@ public class UserController {
 	private final UserAuthenticationService userAuthenticationService;
 
 	@Autowired
-	public UserController(AddressRepository addressRepository, UserRepository userRepository, InvitationRepository invitationRepository, UserAuthenticationService userAuthenticationService) {
+	public UserController(AddressRepository addressRepository, UserRepository userRepository,
+			InvitationRepository invitationRepository, UserAuthenticationService userAuthenticationService) {
 		this.addressRepository = addressRepository;
 		this.userRepository = userRepository;
 		this.invitationRepository = invitationRepository;
@@ -57,7 +59,8 @@ public class UserController {
 
 	@GetMapping(value = "/update/{email}/{firstname}/{lastname}")
 	@ResponseBody
-	public String updateUser(@PathVariable String email, @PathVariable String firstname, @PathVariable String lastname) {
+	public String updateUser(@PathVariable String email, @PathVariable String firstname,
+			@PathVariable String lastname) {
 		String result;
 		User user = userRepository.findByEmail(email).get();
 
@@ -83,5 +86,13 @@ public class UserController {
 		result = "success";
 
 		return "{\"result\":\"" + result + "\"}";
+	}
+
+	@GetMapping(value = "/all")
+	@ResponseBody
+	public List<UserDto> getAllUsers() {
+		List<User> users = userRepository.findAll();
+
+		return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
 	}
 }

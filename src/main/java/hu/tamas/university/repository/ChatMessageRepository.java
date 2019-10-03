@@ -10,4 +10,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
 	ChatMessage findById(int id);
 
 	List<ChatMessage> findBySenderEmailAndReceiverEmail(String senderEmail, String receiverEmail);
+
+	List<ChatMessage> findBySenderEmailOrReceiverEmail(String senderEmail, String receiverEmail);
 }
