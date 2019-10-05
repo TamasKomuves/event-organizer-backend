@@ -29,7 +29,7 @@ public class ChatMessageController {
 		this.chatMessageRepository = chatMessageRepository;
 	}
 
-	@GetMapping("/all-messages/{userEmail1}/{userEmail2}")
+	@GetMapping("/all-messages/{userEmail}")
 	@ResponseBody
 	public List<ChatMessageDto> getAllChatMessages(@AuthenticationPrincipal final User user,
 			@PathVariable String userEmail) {
