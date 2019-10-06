@@ -3,6 +3,7 @@ package hu.tamas.university.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.ChatMessage;
 
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 public class ChatMessageDto {
@@ -13,12 +14,14 @@ public class ChatMessageDto {
 	@JsonProperty("date")
 	private Timestamp date;
 
+	@NotNull
 	@JsonProperty("text")
 	private String text;
 
 	@JsonProperty
 	private boolean isCurrentUserSent;
 
+	@NotNull
 	@JsonProperty("partnerEmail")
 	private String partnerEmail;
 

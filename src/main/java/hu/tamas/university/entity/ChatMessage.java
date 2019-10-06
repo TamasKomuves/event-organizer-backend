@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 public class ChatMessage {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false, unique = true)
 	private int id;
 

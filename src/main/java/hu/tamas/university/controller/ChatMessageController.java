@@ -5,14 +5,14 @@ import hu.tamas.university.dto.ChatMessageDto;
 import hu.tamas.university.entity.ChatMessage;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.ChatMessageRepository;
+import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +23,13 @@ import java.util.stream.Collectors;
 public class ChatMessageController {
 
 	private final ChatMessageRepository chatMessageRepository;
+	private final UserRepository userRepository;
 
 	@Autowired
-	public ChatMessageController(ChatMessageRepository chatMessageRepository) {
+	public ChatMessageController(ChatMessageRepository chatMessageRepository,
+			UserRepository userRepository) {
 		this.chatMessageRepository = chatMessageRepository;
+		this.userRepository = userRepository;
 	}
 
 	@GetMapping("/all-messages/{userEmail}")
@@ -63,6 +66,24 @@ public class ChatMessageController {
 
 		return map.values().stream().map(chatMessage -> ChatMessageDto.fromEntity(chatMessage, email))
 				.collect(Collectors.toList());
+	}
+
+	// Will be replaced with websocket
+	@PostMapping("/create")
+	@ResponseBody
+	public ChatMessageDto createChatMessage(@RequestBody @Valid final ChatMessageDto chatMessageDto,
+			@AuthenticationPrincipal final User user) {
+		final User receiver = userRepository.findByEmail(chatMessageDto.getPartnerEmail()).orElse(null);
+
+		final ChatMessage chatMessage = new ChatMessage();
+		chatMessage.setText(chatMessageDto.getText());
+		chatMessage.setDate(new Timestamp(System.currentTimeMillis()));
+		chatMessage.setSender(user);
+		chatMessage.setReceiver(receiver);
+
+		ChatMessage createdChatMessage = chatMessageRepository.save(chatMessage);
+
+		return ChatMessageDto.fromEntity(createdChatMessage, user.getEmail());
 	}
 
 	private String getPartnerEmail(ChatMessage chatMessage, String currentUserEmail) {
