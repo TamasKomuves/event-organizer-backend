@@ -8,7 +8,7 @@ import java.util.List;
 public class EventType {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "type", nullable = false, unique = true)
 	private String type;
 
