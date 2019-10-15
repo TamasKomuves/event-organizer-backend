@@ -1,10 +1,9 @@
 package hu.tamas.university.entity;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "poll_question")
@@ -15,8 +14,7 @@ public class PollQuestion {
 	@Column(name = "id", nullable = false, unique = true)
 	private int id;
 
-	@ManyToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "event_id")
 	private Event event;
 
@@ -25,6 +23,35 @@ public class PollQuestion {
 
 	@Column(name = "poll_question_date")
 	private Timestamp date;
+
+	@OneToMany(mappedBy = "poll_question", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PollAnswer> pollAnswers;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof PollQuestion)) {
+			return false;
+		}
+		return id == ((PollQuestion) o).id;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	public void addPollAnswer(PollAnswer pollAnswer) {
+		pollAnswers.add(pollAnswer);
+		pollAnswer.setPollQuestion(this);
+	}
+
+	public void removePollAnswer(PollAnswer pollAnswer) {
+		pollAnswers.remove(pollAnswer);
+		pollAnswer.setPollQuestion(null);
+	}
 
 	public int getId() {
 		return id;
@@ -56,5 +83,13 @@ public class PollQuestion {
 
 	public void setDate(Timestamp date) {
 		this.date = date;
+	}
+
+	public List<PollAnswer> getPollAnswers() {
+		return pollAnswers;
+	}
+
+	public void setPollAnswers(List<PollAnswer> pollAnswers) {
+		this.pollAnswers = pollAnswers;
 	}
 }

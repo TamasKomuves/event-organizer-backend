@@ -1,6 +1,7 @@
 package hu.tamas.university.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "address")
@@ -22,6 +23,28 @@ public class Address {
 
 	@Column(name = "street_number")
 	private String streetNumber;
+
+	@OneToOne(mappedBy = "address")
+	private User user;
+
+	@OneToOne(mappedBy = "address")
+	private Event event;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Address)) {
+			return false;
+		}
+		return id == ((Address) o).id;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
 	public int getId() {
 		return id;
@@ -61,5 +84,21 @@ public class Address {
 
 	public void setStreetNumber(String streetNumber) {
 		this.streetNumber = streetNumber;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Event getEvent() {
+		return event;
+	}
+
+	public void setEvent(Event event) {
+		this.event = event;
 	}
 }

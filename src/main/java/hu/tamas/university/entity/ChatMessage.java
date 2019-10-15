@@ -14,11 +14,11 @@ public class ChatMessage {
 	@Column(name = "id", nullable = false, unique = true)
 	private int id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sender_email")
 	private User sender;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "receiver_email")
 	private User receiver;
 
@@ -28,6 +28,17 @@ public class ChatMessage {
 
 	@Column(name = "text")
 	private String text;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ChatMessage)) {
+			return false;
+		}
+		return id == ((ChatMessage) o).id;
+	}
 
 	public int getId() {
 		return id;

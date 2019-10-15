@@ -12,11 +12,11 @@ public class Invitation {
 	@Column(name = "id", nullable = false, unique = true)
 	private int id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "event_id")
 	private Event event;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_email")
 	private User user;
 
@@ -31,6 +31,22 @@ public class Invitation {
 
 	@Column(name = "is_user_requested")
 	private int userRequested;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Invitation)) {
+			return false;
+		}
+		return id == ((Invitation) o).getId();
+	}
+
+	@Override
+	public int hashCode() {
+		return 41;
+	}
 
 	public int getId() {
 		return id;

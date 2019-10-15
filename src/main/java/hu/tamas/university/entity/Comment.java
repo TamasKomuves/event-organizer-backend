@@ -1,12 +1,11 @@
 package hu.tamas.university.entity;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "comment")
@@ -17,13 +16,12 @@ public class Comment {
 	@Column(name = "id", nullable = false, unique = true)
 	private int id;
 
-	@ManyToOne
-	@JoinColumn(name="commenter_email")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "commenter_email")
 	private User commenter;
 
-	@ManyToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	@JoinColumn(name="post_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "post_id")
 	private Post post;
 
 	@Column(name = "comment_date")
@@ -33,9 +31,38 @@ public class Comment {
 	@Column(name = "text")
 	private String text;
 
-	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "likes_comment", joinColumns = @JoinColumn(name = "comment_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_email", referencedColumnName = "email"))
-	List<User> likers;
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+	List<LikesComment> likesComments;
+
+	public void addLiker(User user) {
+		LikesComment likesComment = new LikesComment(user, this);
+		likesComments.add(likesComment);
+		user.getLikesComments().add(likesComment);
+	}
+
+	public void removeLiker(User user) {
+		LikesComment likesComment = new LikesComment(user, this);
+		likesComments.remove(likesComment);
+		user.getLikesComments().remove(likesComment);
+		likesComment.setUser(null);
+		likesComment.setComment(null);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Comment)) {
+			return false;
+		}
+		return id == ((Comment) o).id;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
 	public int getId() {
 		return id;
@@ -77,11 +104,11 @@ public class Comment {
 		this.text = text;
 	}
 
-	public List<User> getLikers() {
-		return likers;
+	public List<LikesComment> getLikesComments() {
+		return likesComments;
 	}
 
-	public void setLikers(List<User> likers) {
-		this.likers = likers;
+	public void setLikesComments(List<LikesComment> likesComments) {
+		this.likesComments = likesComments;
 	}
 }

@@ -1,10 +1,9 @@
 package hu.tamas.university.entity;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "event")
@@ -33,24 +32,89 @@ public class Event {
 	@Column(name = "event_date")
 	private Timestamp eventDate;
 
-	@ManyToOne
-	@JoinColumn(name = "address_id")
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "address_id", referencedColumnName = "id")
 	private Address address;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "event_type_type")
 	private EventType eventType;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "organizer_email")
 	private User organizer;
 
-	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Post> posts;
 
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "participate_in_event", joinColumns = @JoinColumn(name = "event_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_email", referencedColumnName = "email"))
-	private List<User> users;
+	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ParticipateInEvent> participateInEvents;
+
+	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Invitation> invitations;
+
+	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PollQuestion> pollQuestions;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Event)) {
+			return false;
+		}
+		return id == ((Event) o).id;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	public void addParticipant(User user) {
+		ParticipateInEvent participateInEvent = new ParticipateInEvent(this, user);
+		participateInEvents.add(participateInEvent);
+		user.getParticipateInEvents().add(participateInEvent);
+	}
+
+	public void removeParticipant(User user) {
+		ParticipateInEvent participateInEvent = new ParticipateInEvent(this, user);
+		participateInEvents.remove(participateInEvent);
+		user.getParticipateInEvents().remove(participateInEvent);
+		participateInEvent.setUser(null);
+		participateInEvent.setEvent(null);
+	}
+
+	public void addPost(Post post) {
+		posts.add(post);
+		post.setEvent(this);
+	}
+
+	public void removePost(Post post) {
+		posts.remove(post);
+		post.setEvent(null);
+	}
+
+	public void addInvitation(Invitation invitation) {
+		invitations.add(invitation);
+		invitation.setEvent(this);
+	}
+
+	public void removeInvitation(Invitation invitation) {
+		invitations.remove(invitation);
+		invitation.setEvent(null);
+	}
+
+	public void addPollQuestion(PollQuestion pollQuestion) {
+		pollQuestions.add(pollQuestion);
+		pollQuestion.setEvent(this);
+	}
+
+	public void removePollQuestion(PollQuestion pollQuestion) {
+		pollQuestions.remove(pollQuestion);
+		pollQuestion.setEvent(null);
+	}
 
 	public int getId() {
 		return id;
@@ -140,11 +204,27 @@ public class Event {
 		this.posts = posts;
 	}
 
-	public List<User> getUsers() {
-		return users;
+	public List<ParticipateInEvent> getParticipateInEvents() {
+		return participateInEvents;
 	}
 
-	public void setUsers(List<User> users) {
-		this.users = users;
+	public void setParticipateInEvents(List<ParticipateInEvent> participateInEvents) {
+		this.participateInEvents = participateInEvents;
+	}
+
+	public List<Invitation> getInvitations() {
+		return invitations;
+	}
+
+	public void setInvitations(List<Invitation> invitations) {
+		this.invitations = invitations;
+	}
+
+	public List<PollQuestion> getPollQuestions() {
+		return pollQuestions;
+	}
+
+	public void setPollQuestions(List<PollQuestion> pollQuestions) {
+		this.pollQuestions = pollQuestions;
 	}
 }

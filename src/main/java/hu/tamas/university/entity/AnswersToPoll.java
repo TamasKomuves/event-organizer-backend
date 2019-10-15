@@ -1,9 +1,7 @@
 package hu.tamas.university.entity;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "answers_to_poll")
@@ -14,14 +12,34 @@ public class AnswersToPoll {
 	@Column(name = "id", nullable = false, unique = true)
 	private int id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_email")
 	private User user;
 
-	@ManyToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "poll_answer_id")
 	private PollAnswer pollAnswer;
+
+	public AnswersToPoll(User user, PollAnswer pollAnswer) {
+		this.user = user;
+		this.pollAnswer = pollAnswer;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof AnswersToPoll)) {
+			return false;
+		}
+		return id == ((AnswersToPoll) o).id;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
 	public int getId() {
 		return id;

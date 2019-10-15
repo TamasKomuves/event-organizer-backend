@@ -1,6 +1,7 @@
 package hu.tamas.university.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "participate_in_event")
@@ -11,13 +12,34 @@ public class ParticipateInEvent {
 	@Column(name = "id", nullable = false, unique = true)
 	private int id;
 
-	@ManyToOne
-	@JoinColumn(name="event_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "event_id")
 	private Event event;
 
-	@ManyToOne
-	@JoinColumn(name="user_email")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_email")
 	private User user;
+
+	public ParticipateInEvent(Event event, User user) {
+		this.event = event;
+		this.user = user;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ParticipateInEvent)) {
+			return false;
+		}
+		return id == ((ParticipateInEvent) o).id;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
 	public int getId() {
 		return id;

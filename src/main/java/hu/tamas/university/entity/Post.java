@@ -1,13 +1,11 @@
 package hu.tamas.university.entity;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "post")
@@ -18,11 +16,11 @@ public class Post {
 	@Column(name = "id", nullable = false, unique = true)
 	private int id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "event_id")
 	private Event event;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "poster_email")
 	private User poster;
 
@@ -33,12 +31,51 @@ public class Post {
 	@Column(name = "text")
 	private String text;
 
-	@OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Comment> comments;
 
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name = "likes_post", joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_email", referencedColumnName = "email"))
-	private List<User> likers;
+	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<LikesPost> likesPosts;
+
+	public void addComment(Comment comment) {
+		comments.add(comment);
+		comment.setPost(this);
+	}
+
+	public void removeComment(Comment comment) {
+		comments.remove(comment);
+		comment.setPost(null);
+	}
+
+	public void addLiker(User user) {
+		LikesPost likesPost = new LikesPost(user, this);
+		likesPosts.add(likesPost);
+		user.getLikesPosts().add(likesPost);
+	}
+
+	public void removeLiker(User user) {
+		LikesPost likesPost = new LikesPost(user, this);
+		likesPosts.remove(likesPost);
+		user.getLikesPosts().remove(likesPost);
+		likesPost.setPost(null);
+		likesPost.setUser(null);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Post)) {
+			return false;
+		}
+		return id == ((Post) o).getId();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
 	public int getId() {
 		return id;
@@ -88,11 +125,11 @@ public class Post {
 		this.comments = comments;
 	}
 
-	public List<User> getLikers() {
-		return likers;
+	public List<LikesPost> getLikesPosts() {
+		return likesPosts;
 	}
 
-	public void setLikers(List<User> likers) {
-		this.likers = likers;
+	public void setLikesPosts(List<LikesPost> likesPosts) {
+		this.likesPosts = likesPosts;
 	}
 }
