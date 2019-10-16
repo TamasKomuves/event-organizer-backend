@@ -20,6 +20,9 @@ public class ParticipateInEvent {
 	@JoinColumn(name = "user_email")
 	private User user;
 
+	public ParticipateInEvent() {
+	}
+
 	public ParticipateInEvent(Event event, User user) {
 		this.event = event;
 		this.user = user;

@@ -20,6 +20,9 @@ public class LikesComment {
 	@JoinColumn(name = "comment_id")
 	private Comment comment;
 
+	public LikesComment() {
+	}
+
 	public LikesComment(User user, Comment comment) {
 		this.user = user;
 		this.comment = comment;

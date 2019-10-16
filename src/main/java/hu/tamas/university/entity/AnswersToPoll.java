@@ -20,6 +20,9 @@ public class AnswersToPoll {
 	@JoinColumn(name = "poll_answer_id")
 	private PollAnswer pollAnswer;
 
+	public AnswersToPoll() {
+	}
+
 	public AnswersToPoll(User user, PollAnswer pollAnswer) {
 		this.user = user;
 		this.pollAnswer = pollAnswer;
