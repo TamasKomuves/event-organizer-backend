@@ -12,7 +12,7 @@ public class EventType {
 	@Column(name = "type", nullable = false, unique = true)
 	private String type;
 
-	@OneToMany(mappedBy = "event_type", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "eventType", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Event> events;
 
 	public void addEvent(Event event) {

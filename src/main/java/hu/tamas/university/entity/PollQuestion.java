@@ -24,7 +24,7 @@ public class PollQuestion {
 	@Column(name = "poll_question_date")
 	private Timestamp date;
 
-	@OneToMany(mappedBy = "poll_question", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "pollQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PollAnswer> pollAnswers;
 
 	@Override

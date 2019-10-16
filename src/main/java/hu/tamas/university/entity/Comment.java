@@ -31,7 +31,7 @@ public class Comment {
 	@Column(name = "text")
 	private String text;
 
-	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
 	List<LikesComment> likesComments;
 
 	public void addLiker(User user) {

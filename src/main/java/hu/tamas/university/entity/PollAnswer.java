@@ -20,7 +20,7 @@ public class PollAnswer {
 	@Column(name = "text")
 	private String text;
 
-	@OneToMany(mappedBy = "poll_answer", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "pollAnswer", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<AnswersToPoll> answersToPolls;
 
 	@Override
