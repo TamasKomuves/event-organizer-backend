@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.AnswersToPoll;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AnswersToPollDto {
 
@@ -24,6 +26,10 @@ public class AnswersToPollDto {
 		answersToPollDto.setPollAnswerId(answersToPoll.getPollAnswer().getId());
 
 		return answersToPollDto;
+	}
+
+	public static List<AnswersToPollDto> fromEntityList(List<AnswersToPoll> answersToPolls) {
+		return answersToPolls.stream().map(AnswersToPollDto::fromEntity).collect(Collectors.toList());
 	}
 
 	public int getId() {

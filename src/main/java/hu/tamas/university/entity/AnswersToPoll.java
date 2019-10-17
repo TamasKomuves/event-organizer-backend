@@ -36,7 +36,8 @@ public class AnswersToPoll {
 		if (!(o instanceof AnswersToPoll)) {
 			return false;
 		}
-		return id == ((AnswersToPoll) o).id;
+		return Objects.equals(user, ((AnswersToPoll) o).user) && Objects
+				.equals(pollAnswer, ((AnswersToPoll) o).pollAnswer);
 	}
 
 	@Override
