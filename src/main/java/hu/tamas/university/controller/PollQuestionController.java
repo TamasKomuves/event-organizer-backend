@@ -45,9 +45,7 @@ public class PollQuestionController {
 	@GetMapping("/{id}/answerIds")
 	@ResponseBody
 	public List<Integer> getPollAnswerIdsForQuestion(@PathVariable int id) {
-		List<PollAnswer> pollAnswers = pollAnswerRepository.findAll().stream()
-						.filter(pollAnswer -> id == pollAnswer.getPollQuestion().getId()).collect(
-										Collectors.toList());
+		final List<PollAnswer> pollAnswers = pollAnswerRepository.findPollAnswersByPollQuestionId(id);
 
 		return pollAnswers.stream().map(PollAnswer::getId).collect(Collectors.toList());
 	}
@@ -55,21 +53,20 @@ public class PollQuestionController {
 	@PostMapping("/createPoll")
 	@ResponseBody
 	public String createPoll(@RequestBody @Valid PollCreatorDto pollCreatorDto) {
-		Event event = eventRepository.findEventById(pollCreatorDto.getEventId());
-		PollQuestion pollQuestion = new PollQuestion();
+		final PollQuestion pollQuestion = new PollQuestion();
 		pollQuestion.setText(pollCreatorDto.getQuestionText());
-		pollQuestion.setEvent(event);
 		pollQuestion.setDate(new Timestamp(System.currentTimeMillis()));
 
-		PollQuestion savedPollQuestion = pollQuestionRepository.save(pollQuestion);
-
-		List<PollAnswer> pollAnswers = pollCreatorDto.getPollAnswers().stream()
-				.map(pollAnswerDto -> PollAnswerDto.fromDto(pollAnswerDto, savedPollQuestion))
+		final List<PollAnswer> pollAnswers = pollCreatorDto.getPollAnswers().stream().map(PollAnswerDto::fromDto)
 				.collect(Collectors.toList());
 
 		for (PollAnswer pollAnswer : pollAnswers) {
-			pollAnswerRepository.save(pollAnswer);
+			pollQuestion.addPollAnswer(pollAnswer);
 		}
+
+		final Event event = eventRepository.findEventById(pollCreatorDto.getEventId());
+		event.addPollQuestion(pollQuestion);
+		eventRepository.flush();
 
 		return "{\"result\":\"success\"}";
 	}

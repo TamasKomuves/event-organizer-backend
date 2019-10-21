@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
@@ -27,7 +28,8 @@ public class PostController {
 	private final UserRepository userRepository;
 
 	@Autowired
-	public PostController(PostRepository postRepository, EventRepository eventRepository, UserRepository userRepository) {
+	public PostController(PostRepository postRepository, EventRepository eventRepository,
+			UserRepository userRepository) {
 		this.postRepository = postRepository;
 		this.eventRepository = eventRepository;
 		this.userRepository = userRepository;
@@ -51,7 +53,8 @@ public class PostController {
 	@ResponseBody
 	public List<UserDto> getLikers(@PathVariable int id) {
 		Post post = postRepository.findPostById(id);
-		return post.getLikers().stream().map(UserDto::fromEntity).collect(Collectors.toList());
+		return post.getLikesPosts().stream().map(likesPost -> UserDto.fromEntity(likesPost.getUser()))
+				.collect(Collectors.toList());
 	}
 
 	@GetMapping("create/{eventId}/{poster_email}/{text}")
@@ -72,9 +75,8 @@ public class PostController {
 	@ResponseBody
 	public String isLikedAlready(@PathVariable int id, @PathVariable String email) {
 		Post post = postRepository.findPostById(id);
-		int number = post.getLikers().stream().
-				filter(user -> user.getEmail().equals(email)).collect(Collectors.toList()).size();
-		String result = number > 0 ? "true" : "false";
-		return "{\"result\":\"" + result + "\"}";
+		boolean isLikedAlready = post.getLikesPosts().stream()
+				.anyMatch(likesPost -> Objects.equals(likesPost.getUser().getEmail(), email));
+		return "{\"result\":\"" + isLikedAlready + "\"}";
 	}
 }

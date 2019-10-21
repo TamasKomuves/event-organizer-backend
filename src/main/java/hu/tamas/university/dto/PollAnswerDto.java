@@ -2,7 +2,6 @@ package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.PollAnswer;
-import hu.tamas.university.entity.PollQuestion;
 
 import javax.validation.constraints.NotNull;
 
@@ -26,11 +25,10 @@ public class PollAnswerDto {
 		return pollAnswerDto;
 	}
 
-	public static PollAnswer fromDto(PollAnswerDto pollAnswerDto, PollQuestion pollQuestion) {
+	public static PollAnswer fromDto(PollAnswerDto pollAnswerDto) {
 		PollAnswer pollAnswer = new PollAnswer();
 		pollAnswer.setId(pollAnswerDto.getId());
 		pollAnswer.setText(pollAnswerDto.getText());
-		pollAnswer.setPollQuestion(pollQuestion);
 
 		return pollAnswer;
 	}
