@@ -1,5 +1,7 @@
 package hu.tamas.university.entity;
 
+import com.google.common.collect.Lists;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
@@ -45,16 +47,16 @@ public class Event {
 	private User organizer;
 
 	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Post> posts;
+	private List<Post> posts = Lists.newArrayList();
 
 	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ParticipateInEvent> participateInEvents;
+	private List<ParticipateInEvent> participateInEvents = Lists.newArrayList();
 
 	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Invitation> invitations;
+	private List<Invitation> invitations = Lists.newArrayList();
 
 	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<PollQuestion> pollQuestions;
+	private List<PollQuestion> pollQuestions = Lists.newArrayList();
 
 	@Override
 	public boolean equals(Object o) {

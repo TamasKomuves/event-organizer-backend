@@ -1,5 +1,7 @@
 package hu.tamas.university.entity;
 
+import com.google.common.collect.Lists;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +23,7 @@ public class PollAnswer {
 	private String text;
 
 	@OneToMany(mappedBy = "pollAnswer", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<AnswersToPoll> answersToPolls;
+	private List<AnswersToPoll> answersToPolls = Lists.newArrayList();
 
 	@Override
 	public boolean equals(Object o) {

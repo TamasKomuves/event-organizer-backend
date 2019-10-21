@@ -1,5 +1,7 @@
 package hu.tamas.university.entity;
 
+import com.google.common.collect.Lists;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
@@ -25,7 +27,7 @@ public class PollQuestion {
 	private Timestamp date;
 
 	@OneToMany(mappedBy = "pollQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<PollAnswer> pollAnswers;
+	private List<PollAnswer> pollAnswers = Lists.newArrayList();
 
 	@Override
 	public boolean equals(Object o) {
