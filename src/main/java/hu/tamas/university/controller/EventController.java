@@ -1,6 +1,5 @@
 package hu.tamas.university.controller;
 
-import com.google.common.collect.Lists;
 import hu.tamas.university.dto.*;
 import hu.tamas.university.dto.creatordto.EventCreatorDto;
 import hu.tamas.university.entity.*;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,14 +49,10 @@ public class EventController {
 	public EventDto getEventById(@PathVariable int id, @AuthenticationPrincipal final User user) {
 		Event event = eventRepository.findEventById(id);
 
-//		if (!isParticipate(user, event)) {
-//			return null;
-//		}
-
 		return EventDto.fromEntity(event);
 	}
 
-	@GetMapping("")
+	@GetMapping("/all")
 	@ResponseBody
 	public List<EventDto> getAllEvent(@AuthenticationPrincipal final User user) {
 		List<Event> events = eventRepository.findAll();
@@ -86,13 +80,11 @@ public class EventController {
 	@GetMapping("/{id}/users")
 	@ResponseBody
 	public List<UserDto> getUsers(@PathVariable int id, @AuthenticationPrincipal final User user) {
-		Event event = eventRepository.findEventById(id);
+		final Event event = eventRepository.findEventById(id);
+		final List<User> participants = event.getParticipateInEvents().stream()
+				.map(ParticipateInEvent::getUser).collect(Collectors.toList());
 
-//		if (!isParticipate(user, event)) {
-//			return Lists.newArrayList();
-//		}
-
-		return event.getUsers().stream().map(UserDto::fromEntity).collect(Collectors.toList());
+		return participants.stream().map(UserDto::fromEntity).collect(Collectors.toList());
 	}
 
 	@GetMapping("/{id}/posts")
@@ -153,15 +145,13 @@ public class EventController {
 	}
 
 	private boolean isParticipate(User user, Event event) {
-		List<User> participants = event.getUsers();
+		final List<User> participants = event.getParticipateInEvents().stream().map(ParticipateInEvent::getUser)
+				.collect(Collectors.toList());
 		return participants.stream().anyMatch(user1 -> user1.getEmail().equals(user.getEmail()));
 	}
 
 	private boolean isEventHasMorePlace(Event event) {
-		List<Invitation> invitations = invitationRepository.findByEvent(event).stream()
-				.filter(invitation -> invitation.getDecisionDate() == null).collect(Collectors.toList());
-
-		return invitations.size() + event.getUsers().size() < event.getMaxParticipant();
+		return event.getInvitations().size() + event.getParticipateInEvents().size() < event.getMaxParticipant();
 	}
 
 	private ParticipateInEvent createParticipateInEvent(Event event, User user) {
@@ -184,7 +174,9 @@ public class EventController {
 	@ResponseBody
 	public String isUserParticipateInEvent(@PathVariable int eventId, @PathVariable String userEmail) {
 		Event event = eventRepository.findEventById(eventId);
-		boolean result = event.getUsers().stream().anyMatch(user -> user.getEmail().equals(userEmail));
+		List<User> participants = event.getParticipateInEvents().stream().map(ParticipateInEvent::getUser)
+				.collect(Collectors.toList());
+		boolean result = participants.stream().anyMatch(user -> user.getEmail().equals(userEmail));
 
 		return "{\"result\":\"" + result + "\"}";
 	}
@@ -212,11 +204,11 @@ public class EventController {
 	@GetMapping("/{eventId}/invitation-offers")
 	@ResponseBody
 	public List<InvitationDto> getInvitationOffers(@PathVariable int eventId) {
-		Event event = eventRepository.findEventById(eventId);
+		final Event event = eventRepository.findEventById(eventId);
 
 		return invitationRepository.findByEvent(event).stream()
-						.filter(invitation -> invitation.getDecisionDate() == null && invitation.getUserRequested() == 0)
-						.map(InvitationDto::fromEntity).collect(Collectors.toList());
+				.filter(invitation -> invitation.getDecisionDate() == null && invitation.getUserRequested() == 0)
+				.map(InvitationDto::fromEntity).collect(Collectors.toList());
 	}
 
 	@GetMapping("/{eventId}/invitation-requests")
@@ -225,7 +217,8 @@ public class EventController {
 		Event event = eventRepository.findEventById(eventId);
 		List<InvitationDto> invitationDtos =
 				invitationRepository.findByEvent(event).stream()
-								.filter(invitation -> invitation.getDecisionDate() == null && invitation.getUserRequested() == 1)
+						.filter(invitation -> invitation.getDecisionDate() == null
+								&& invitation.getUserRequested() == 1)
 						.map(InvitationDto::fromEntity).collect(Collectors.toList());
 
 		return invitationDtos;
@@ -235,15 +228,15 @@ public class EventController {
 			"/{event_date}/{visibility}/{address_id}/{event_type_type}")
 	@ResponseBody
 	public String updateEventInfo(@PathVariable int id, @PathVariable String name,
-	                                       @PathVariable String description,
-	                                       @PathVariable int max_participant,
-	                                       @PathVariable int total_cost, @PathVariable Timestamp event_date,
-	                                       @PathVariable String visibility, @PathVariable int address_id,
-	                                       @PathVariable String event_type_type) {
+			@PathVariable String description,
+			@PathVariable int max_participant,
+			@PathVariable int total_cost, @PathVariable Timestamp event_date,
+			@PathVariable String visibility, @PathVariable int address_id,
+			@PathVariable String event_type_type) {
 		Event event = eventRepository.findEventById(id);
 		List<Invitation> invitations = invitationRepository.findByEvent(event).stream()
-						.filter(invitation -> invitation.getUserRequested() == 0).collect(Collectors.toList());
-		if (event.getUsers().size() + invitations.size() <= max_participant) {
+				.filter(invitation -> invitation.getUserRequested() == 0).collect(Collectors.toList());
+		if (event.getParticipateInEvents().size() + invitations.size() <= max_participant) {
 			event.setMaxParticipant(max_participant);
 		}
 
