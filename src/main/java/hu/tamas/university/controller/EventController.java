@@ -116,22 +116,21 @@ public class EventController {
 	@GetMapping("/{eventId}/add-user/{userEmail}")
 	@ResponseBody
 	public String addUserToEvent(@PathVariable int eventId, @PathVariable String userEmail) {
-		Event event = eventRepository.findEventById(eventId);
-
+		final Event event = eventRepository.findEventById(eventId);
 		if (!isEventHasMorePlace(event)) {
 			return "{\"result\":\"no more place\"}";
 		}
 
-		User user = userRepository.findByEmail(userEmail).orElse(null);
-		List<ParticipateInEvent> alreadyParticipateInEvent = participateInEventRepository.findByEventAndUser(event,
-				user);
-
-		if (!alreadyParticipateInEvent.isEmpty()) {
+		final boolean isAlreadyParticipate = participateInEventRepository.findByEventIdAndUserEmail(eventId, userEmail)
+				.isPresent();
+		if (isAlreadyParticipate) {
 			return "{\"result\":\"already added\"}";
 		}
 
-		ParticipateInEvent participateInEvent = createParticipateInEvent(event, user);
-		participateInEventRepository.save(participateInEvent);
+		final User user = userRepository.findByEmail(userEmail).orElse(null);
+		event.addParticipant(user);
+
+		eventRepository.flush();
 
 		return "{\"result\":\"success\"}";
 	}
