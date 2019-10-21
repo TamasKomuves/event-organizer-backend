@@ -98,25 +98,17 @@ public class EventController {
 	@PostMapping("/create")
 	@ResponseBody
 	public String createEvent(@RequestBody @Valid EventCreatorDto eventCreatorDto) {
-		EventType eventType = eventTypeRepository.findEventTypeByType(eventCreatorDto.getEventTypeType().toLowerCase());
+		final String eventTypeLowerCase = eventCreatorDto.getEventTypeType().toLowerCase();
+		final EventType eventType = eventTypeRepository.findByType(eventTypeLowerCase)
+				.orElse(new EventType(eventTypeLowerCase));
+		final Address address = addressRepository.findAddressById(eventCreatorDto.getAddressId());
+		final User user = userRepository.findByEmail(eventCreatorDto.getOrganizerEmail()).orElse(null);
+		final Event event = EventCreatorDto.fromDto(eventCreatorDto, address, eventType, user);
 
-		if (eventType == null) {
-			eventType = new EventType();
-			eventType.setType(eventCreatorDto.getEventTypeType().toLowerCase());
-			eventType = eventTypeRepository.save(eventType);
-		}
+		event.addParticipant(user);
 
-		Address address = addressRepository.findAddressById(eventCreatorDto.getAddressId());
-		User user = userRepository.findByEmail(eventCreatorDto.getOrganizerEmail()).orElse(null);
-
-		Event event = EventCreatorDto.fromDto(eventCreatorDto, address, eventType, user);
-		event = eventRepository.save(event);
-
-		ParticipateInEvent participateInEvent = new ParticipateInEvent();
-		participateInEvent.setUser(user);
-		participateInEvent.setEvent(event);
-
-		participateInEventRepository.save(participateInEvent);
+		eventRepository.save(event);
+		eventRepository.flush();
 
 		return "{\"result\":\"success\"}";
 	}
@@ -240,7 +232,7 @@ public class EventController {
 			event.setMaxParticipant(max_participant);
 		}
 
-		EventType eventType = eventTypeRepository.findEventTypeByType(event_type_type.toLowerCase());
+		EventType eventType = eventTypeRepository.findByType(event_type_type.toLowerCase()).orElse(null);
 
 		if (eventType == null) {
 			eventType = new EventType();

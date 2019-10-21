@@ -15,6 +15,13 @@ public class EventType {
 	@OneToMany(mappedBy = "eventType", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Event> events;
 
+	public EventType(String type) {
+		this.type = type;
+	}
+
+	public EventType() {
+	}
+
 	public void addEvent(Event event) {
 		events.add(event);
 		event.setEventType(this);
