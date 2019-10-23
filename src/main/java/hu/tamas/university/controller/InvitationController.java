@@ -1,5 +1,6 @@
 package hu.tamas.university.controller;
 
+import com.google.common.collect.Lists;
 import hu.tamas.university.dto.InvitationDto;
 import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.Invitation;
@@ -28,7 +29,8 @@ public class InvitationController {
 	private final ParticipateInEventRepository participateInEventRepository;
 
 	@Autowired
-	public InvitationController(InvitationRepository invitationRepository, UserRepository userRepository, EventRepository eventRepository, ParticipateInEventRepository participateInEventRepository) {
+	public InvitationController(InvitationRepository invitationRepository, UserRepository userRepository,
+			EventRepository eventRepository, ParticipateInEventRepository participateInEventRepository) {
 		this.invitationRepository = invitationRepository;
 		this.userRepository = userRepository;
 		this.eventRepository = eventRepository;
@@ -54,15 +56,16 @@ public class InvitationController {
 
 		User user = userRepository.findByEmail(invitationDto.getUserEmail()).orElse(null);
 
-		List<ParticipateInEvent> alreadyParticipateInEvent = participateInEventRepository.findByEventAndUser(event,
-				user);
+		List<ParticipateInEvent> alreadyParticipateInEvent = participateInEventRepository
+				.findByEventIdAndUserEmail(invitationDto.getEventId(), invitationDto.getUserEmail())
+				.orElse(Lists.newArrayList());
 
 		if (!alreadyParticipateInEvent.isEmpty()) {
 			return "{\"result\":\"already participate\"}";
 		}
 
-		long activeInvitations = invitationRepository.findByEventAndUser(event, user).stream()
-						.filter(invitation -> invitation.getDecisionDate() == null).count();
+		final long activeInvitations = invitationRepository.findByEventAndUser(event, user).stream()
+				.filter(invitation -> invitation.getDecisionDate() == null).count();
 
 		if (activeInvitations != 0) {
 			return "{\"result\":\"already invited\"}";
@@ -76,10 +79,12 @@ public class InvitationController {
 	}
 
 	private boolean isEventHasMorePlace(Event event) {
-		List<Invitation> invitations = invitationRepository.findByEvent(event).stream()
-				.filter(invitation -> invitation.getDecisionDate() == null).collect(Collectors.toList());
+		List<Invitation> invitations = invitationRepository.findByEventId(event.getId())
+				.orElse(Lists.newArrayList());
+		invitations = invitations.stream().filter(invitation -> invitation.getDecisionDate() == null)
+				.collect(Collectors.toList());
 
-		return invitations.size() + event.getUsers().size() < event.getMaxParticipant();
+		return invitations.size() + event.getParticipateInEvents().size() < event.getMaxParticipant();
 	}
 
 	private Invitation createInvitation(Event event, User user, int isUserRequested) {
@@ -95,7 +100,7 @@ public class InvitationController {
 	@GetMapping("/{id}/answer/{isAccepted}")
 	@ResponseBody
 	public String answerToInvitation(@PathVariable int id,
-	                                          @PathVariable int isAccepted) {
+			@PathVariable int isAccepted) {
 		Invitation invitation = invitationRepository.findInvitationById(id);
 		invitation.setAccepted(isAccepted);
 		invitation.setDecisionDate(new Timestamp(System.currentTimeMillis()));
@@ -117,9 +122,9 @@ public class InvitationController {
 	@ResponseBody
 	public String isAlreadyInvited(@PathVariable int eventId, @PathVariable String userEmail) {
 		boolean isAlreadySent = invitationRepository.findAll().stream()
-						.anyMatch(invitation -> invitation.getEvent().getId() == eventId &&
-										invitation.getUser() != null && invitation.getUser().getEmail().equals(userEmail)
-										&& invitation.getDecisionDate() == null);
+				.anyMatch(invitation -> invitation.getEvent().getId() == eventId &&
+						invitation.getUser() != null && invitation.getUser().getEmail().equals(userEmail)
+						&& invitation.getDecisionDate() == null);
 
 		return "{\"result\":\"" + isAlreadySent + "\"}";
 	}
@@ -129,9 +134,9 @@ public class InvitationController {
 	public List<InvitationDto> getInvitationsForUser(@PathVariable String userEmail) {
 
 		return invitationRepository.findAll().stream()
-						.filter(invitation ->
-										invitation.getUser() != null && invitation.getUser().getEmail().equals(userEmail))
-						.map(InvitationDto::fromEntity).collect(Collectors.toList());
+				.filter(invitation ->
+						invitation.getUser() != null && invitation.getUser().getEmail().equals(userEmail))
+				.map(InvitationDto::fromEntity).collect(Collectors.toList());
 	}
 
 	@GetMapping("/{id}/delete")

@@ -1,5 +1,6 @@
 package hu.tamas.university.controller;
 
+import com.google.common.collect.Lists;
 import hu.tamas.university.dto.*;
 import hu.tamas.university.dto.creatordto.EventCreatorDto;
 import hu.tamas.university.entity.*;
@@ -145,13 +146,6 @@ public class EventController {
 		return event.getInvitations().size() + event.getParticipateInEvents().size() < event.getMaxParticipant();
 	}
 
-	private ParticipateInEvent createParticipateInEvent(Event event, User user) {
-		ParticipateInEvent participateInEvent = new ParticipateInEvent();
-		participateInEvent.setEvent(event);
-		participateInEvent.setUser(user);
-		return participateInEvent;
-	}
-
 	@GetMapping("/{eventId}/has-more-place")
 	@ResponseBody
 	public String eventHasMorePlace(@PathVariable int eventId) {
@@ -164,12 +158,10 @@ public class EventController {
 	@GetMapping("/{eventId}/is-participate/{userEmail}")
 	@ResponseBody
 	public String isUserParticipateInEvent(@PathVariable int eventId, @PathVariable String userEmail) {
-		Event event = eventRepository.findEventById(eventId);
-		List<User> participants = event.getParticipateInEvents().stream().map(ParticipateInEvent::getUser)
-				.collect(Collectors.toList());
-		boolean result = participants.stream().anyMatch(user -> user.getEmail().equals(userEmail));
+		final boolean isParticipate = participateInEventRepository.findByEventIdAndUserEmail(eventId, userEmail)
+				.isPresent();
 
-		return "{\"result\":\"" + result + "\"}";
+		return "{\"result\":\"" + isParticipate + "\"}";
 	}
 
 	@GetMapping("/{eventId}/delete")
@@ -195,24 +187,25 @@ public class EventController {
 	@GetMapping("/{eventId}/invitation-offers")
 	@ResponseBody
 	public List<InvitationDto> getInvitationOffers(@PathVariable int eventId) {
-		final Event event = eventRepository.findEventById(eventId);
+		final List<Invitation> invitations = invitationRepository.findByEventId(eventId).orElse(Lists.newArrayList());
+		return invitations.stream().filter(this::isInvitationOffer).map(InvitationDto::fromEntity)
+				.collect(Collectors.toList());
+	}
 
-		return invitationRepository.findByEvent(event).stream()
-				.filter(invitation -> invitation.getDecisionDate() == null && invitation.getUserRequested() == 0)
-				.map(InvitationDto::fromEntity).collect(Collectors.toList());
+	private boolean isInvitationOffer(Invitation invitation) {
+		return invitation.getDecisionDate() == null && invitation.getUserRequested() == 0;
 	}
 
 	@GetMapping("/{eventId}/invitation-requests")
 	@ResponseBody
 	public List<InvitationDto> getInvitationRequests(@PathVariable int eventId) {
-		Event event = eventRepository.findEventById(eventId);
-		List<InvitationDto> invitationDtos =
-				invitationRepository.findByEvent(event).stream()
-						.filter(invitation -> invitation.getDecisionDate() == null
-								&& invitation.getUserRequested() == 1)
-						.map(InvitationDto::fromEntity).collect(Collectors.toList());
+		final List<Invitation> invitations = invitationRepository.findByEventId(eventId).orElse(Lists.newArrayList());
+		return invitations.stream().filter(this::isInvitationRequest).map(InvitationDto::fromEntity)
+				.collect(Collectors.toList());
+	}
 
-		return invitationDtos;
+	private boolean isInvitationRequest(Invitation invitation) {
+		return invitation.getDecisionDate() == null && invitation.getUserRequested() == 1;
 	}
 
 	@GetMapping("/{id}/update-info/{name}/{description}/{max_participant}/{total_cost}" +
@@ -224,30 +217,31 @@ public class EventController {
 			@PathVariable int total_cost, @PathVariable Timestamp event_date,
 			@PathVariable String visibility, @PathVariable int address_id,
 			@PathVariable String event_type_type) {
-		Event event = eventRepository.findEventById(id);
-		List<Invitation> invitations = invitationRepository.findByEvent(event).stream()
-				.filter(invitation -> invitation.getUserRequested() == 0).collect(Collectors.toList());
+		final Event event = eventRepository.findEventById(id);
+		List<Invitation> invitations = invitationRepository.findByEventId(id).orElse(Lists.newArrayList());
+		invitations = invitations.stream().filter(invitation -> invitation.getUserRequested() == 0)
+				.collect(Collectors.toList());
+
 		if (event.getParticipateInEvents().size() + invitations.size() <= max_participant) {
 			event.setMaxParticipant(max_participant);
 		}
 
-		EventType eventType = eventTypeRepository.findByType(event_type_type.toLowerCase()).orElse(null);
-
-		if (eventType == null) {
-			eventType = new EventType();
-			eventType.setType(event_type_type.toLowerCase());
-			eventType = eventTypeRepository.save(eventType);
-		}
+		final String eventTypeLowerCase = event_type_type.toLowerCase();
+		final EventType eventType = eventTypeRepository.findByType(eventTypeLowerCase)
+				.orElse(new EventType(eventTypeLowerCase));
+		final Address address = addressRepository.findAddressById(address_id);
 
 		event.setName(name);
 		event.setDescription(description);
 		event.setVisibility(visibility);
 		event.setTotalCost(total_cost);
 		event.setEventDate(event_date);
-		event.setAddress(addressRepository.findAddressById(address_id));
-		event.setEventType(eventType);
+		event.setAddress(address);
+		if (!eventType.equals(event.getEventType())) {
+			eventType.addEvent(event);
+		}
 
-		eventRepository.save(event);
+		eventTypeRepository.saveAndFlush(eventType);
 
 		return "{\"result\":\"success\"}";
 	}
@@ -255,16 +249,16 @@ public class EventController {
 	@GetMapping("/{id}/polls")
 	@ResponseBody
 	public List<PollQuestionDto> getAllPolls(@PathVariable int id) {
-		List<PollQuestion> pollQuestions = pollQuestionRepository.findAllByEventId(id);
+		final List<PollQuestion> pollQuestions = pollQuestionRepository.findAllByEventId(id);
 		return pollQuestions.stream().map(PollQuestionDto::fromEntity).collect(Collectors.toList());
 	}
 
 	@GetMapping("/{id}/news")
 	@ResponseBody
 	public List<NewsDto> getAllNews(@PathVariable int id) {
-		List<PollQuestionDto> pollQuestionDtos = pollQuestionRepository.findAllByEventId(id).stream()
+		final List<PollQuestionDto> pollQuestionDtos = pollQuestionRepository.findAllByEventId(id).stream()
 				.map(PollQuestionDto::fromEntity).collect(Collectors.toList());
-		List<NewsDto> newsDtos = postRepository.findAllByEventId(id).stream().map(PostDto::fromEntity)
+		final List<NewsDto> newsDtos = postRepository.findAllByEventId(id).stream().map(PostDto::fromEntity)
 				.collect(Collectors.toList());
 
 		newsDtos.addAll(pollQuestionDtos);
