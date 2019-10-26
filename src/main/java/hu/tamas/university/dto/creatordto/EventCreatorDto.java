@@ -1,10 +1,10 @@
 package hu.tamas.university.dto.creatordto;
 
+import hu.tamas.university.dto.AddressDto;
 import hu.tamas.university.entity.Address;
 import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.EventType;
 import hu.tamas.university.entity.User;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -35,6 +35,8 @@ public class EventCreatorDto {
 	@NotNull
 	private String eventType;
 
+	private AddressDto address;
+
 	public static Event fromDto(EventCreatorDto eventCreatorDto, Address address, EventType eventType, User user) {
 		Event event = new Event();
 
@@ -49,6 +51,15 @@ public class EventCreatorDto {
 		user.addOrganizedEvent(event);
 
 		return event;
+	}
+
+	public static void updateInfoFromDto(Event event, EventCreatorDto eventCreatorDto) {
+		event.setName(eventCreatorDto.getName());
+		event.setDescription(eventCreatorDto.getDescription());
+		event.setVisibility(eventCreatorDto.getVisibility());
+		event.setTotalCost(eventCreatorDto.getTotalCost());
+		event.setEventDate(eventCreatorDto.getEventDate());
+		AddressDto.updateFromDto(event.getAddress(), eventCreatorDto.getAddress());
 	}
 
 	public String getName() {
@@ -113,5 +124,13 @@ public class EventCreatorDto {
 
 	public void setEventType(String eventType) {
 		this.eventType = eventType;
+	}
+
+	public AddressDto getAddress() {
+		return address;
+	}
+
+	public void setAddress(AddressDto address) {
+		this.address = address;
 	}
 }

@@ -6,7 +6,6 @@ import javax.validation.constraints.NotNull;
 
 public class AddressDto {
 
-	@NotNull
 	private int id;
 
 	@NotNull
@@ -31,6 +30,13 @@ public class AddressDto {
 		dto.setStreetNumber(address.getStreetNumber());
 
 		return dto;
+	}
+
+	public static void updateFromDto(Address address, AddressDto addressDto) {
+		address.setCountry(addressDto.getCountry());
+		address.setCity(addressDto.getCity());
+		address.setStreet(addressDto.getStreet());
+		address.setStreetNumber(addressDto.getStreetNumber());
 	}
 
 	public static Address fromDto(AddressDto addressDto) {

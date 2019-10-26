@@ -11,8 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -48,7 +48,7 @@ public class EventController {
 	@GetMapping("/{id}")
 	@ResponseBody
 	public EventDto getEventById(@PathVariable int id, @AuthenticationPrincipal final User user) {
-		Event event = eventRepository.findEventById(id);
+		final Event event = eventRepository.findEventById(id);
 
 		return EventDto.fromEntity(event);
 	}
@@ -56,7 +56,7 @@ public class EventController {
 	@GetMapping("/all")
 	@ResponseBody
 	public List<EventDto> getAllEvent(@AuthenticationPrincipal final User user) {
-		List<Event> events = eventRepository.findAll();
+		final List<Event> events = eventRepository.findAll();
 
 		return convertEventsToEventDtos(events, user);
 	}
@@ -73,7 +73,7 @@ public class EventController {
 	@GetMapping("/type/{type}")
 	@ResponseBody
 	public List<EventDto> getEventsByType(@AuthenticationPrincipal final User user, @PathVariable String type) {
-		List<Event> events = eventRepository.findAllByEventTypeType(type);
+		final List<Event> events = eventRepository.findAllByEventTypeType(type);
 
 		return convertEventsToEventDtos(events, user);
 	}
@@ -86,14 +86,6 @@ public class EventController {
 				.map(ParticipateInEvent::getUser).collect(Collectors.toList());
 
 		return participants.stream().map(UserDto::fromEntity).collect(Collectors.toList());
-	}
-
-	@GetMapping("/{id}/posts")
-	@ResponseBody
-	public List<PostDto> getAllPost(@PathVariable int id) {
-		Event event = eventRepository.findEventById(id);
-
-		return event.getPosts().stream().map(PostDto::fromEntity).collect(Collectors.toList());
 	}
 
 	@PostMapping("/create")
@@ -207,35 +199,21 @@ public class EventController {
 		return invitation.getDecisionDate() == null && invitation.getUserRequested() == 1;
 	}
 
-	@GetMapping("/{id}/update-info/{name}/{description}/{max_participant}/{total_cost}" +
-			"/{event_date}/{visibility}/{address_id}/{event_type_type}")
+	@PutMapping("/update-info/{id}")
 	@ResponseBody
-	public String updateEventInfo(@PathVariable int id, @PathVariable String name,
-			@PathVariable String description,
-			@PathVariable int max_participant,
-			@PathVariable int total_cost, @PathVariable Timestamp event_date,
-			@PathVariable String visibility, @PathVariable int address_id,
-			@PathVariable String event_type_type) {
+	public String updateEventInfo(@PathVariable int id, @RequestBody EventCreatorDto eventCreatorDto) {
 		final Event event = eventRepository.findEventById(id);
-		List<Invitation> invitations = invitationRepository.findByEventId(id).orElse(Lists.newArrayList());
-		invitations = invitations.stream().filter(invitation -> invitation.getUserRequested() == 0)
-				.collect(Collectors.toList());
 
-		if (event.getParticipateInEvents().size() + invitations.size() <= max_participant) {
-			event.setMaxParticipant(max_participant);
+		EventCreatorDto.updateInfoFromDto(event, eventCreatorDto);
+
+		final int newMaxParticipant = eventCreatorDto.getMaxParticipant();
+		if (isNewMaxParticipantHigher(event, id, newMaxParticipant)) {
+			event.setMaxParticipant(newMaxParticipant);
 		}
 
-		final String eventTypeLowerCase = event_type_type.toLowerCase();
+		final String eventTypeLowerCase = eventCreatorDto.getEventType().toLowerCase();
 		final EventType eventType = eventTypeRepository.findByType(eventTypeLowerCase)
 				.orElse(new EventType(eventTypeLowerCase));
-		final Address address = addressRepository.findAddressById(address_id);
-
-		event.setName(name);
-		event.setDescription(description);
-		event.setVisibility(visibility);
-		event.setTotalCost(total_cost);
-		event.setEventDate(event_date);
-		event.setAddress(address);
 		if (!eventType.equals(event.getEventType())) {
 			eventType.addEvent(event);
 		}
@@ -243,6 +221,18 @@ public class EventController {
 		eventTypeRepository.saveAndFlush(eventType);
 
 		return "{\"result\":\"success\"}";
+	}
+
+	private boolean isNewMaxParticipantHigher(Event event, int eventId, int newMaxParticipant) {
+		final Optional<List<Invitation>> invitations = invitationRepository.findByEventId(eventId);
+		long invitationCount = 0;
+
+		if (invitations.isPresent()) {
+			invitationCount = invitations.get().stream().filter(invitation -> invitation.getUserRequested() == 0)
+					.count();
+		}
+
+		return event.getParticipateInEvents().size() + invitationCount < newMaxParticipant;
 	}
 
 	@GetMapping("/{id}/polls")
