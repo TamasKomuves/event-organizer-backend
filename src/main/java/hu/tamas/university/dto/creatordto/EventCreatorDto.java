@@ -48,7 +48,7 @@ public class EventCreatorDto {
 		event.setEventDate(eventCreatorDto.getEventDate());
 		event.setAddress(address);
 		event.setEventType(eventType);
-		event.setOrganizer(user);
+		user.addOrganizedEvent(event);
 
 		return event;
 	}
