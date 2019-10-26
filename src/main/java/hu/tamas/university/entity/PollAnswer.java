@@ -1,10 +1,10 @@
 package hu.tamas.university.entity;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "poll_answer")
@@ -23,7 +23,7 @@ public class PollAnswer {
 	private String text;
 
 	@OneToMany(mappedBy = "pollAnswer", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<AnswersToPoll> answersToPolls = Lists.newArrayList();
+	private Set<AnswersToPoll> answersToPolls = Sets.newHashSet();
 
 	@Override
 	public boolean equals(Object o) {
@@ -79,11 +79,11 @@ public class PollAnswer {
 		this.text = text;
 	}
 
-	public List<AnswersToPoll> getAnswersToPolls() {
+	public Set<AnswersToPoll> getAnswersToPolls() {
 		return answersToPolls;
 	}
 
-	public void setAnswersToPolls(List<AnswersToPoll> answersToPolls) {
+	public void setAnswersToPolls(Set<AnswersToPoll> answersToPolls) {
 		this.answersToPolls = answersToPolls;
 	}
 }

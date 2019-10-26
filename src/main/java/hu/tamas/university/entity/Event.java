@@ -1,11 +1,11 @@
 package hu.tamas.university.entity;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "event")
@@ -47,16 +47,16 @@ public class Event {
 	private User organizer;
 
 	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Post> posts = Lists.newArrayList();
+	private Set<Post> posts = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ParticipateInEvent> participateInEvents = Lists.newArrayList();
+	private Set<ParticipateInEvent> participateInEvents = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Invitation> invitations = Lists.newArrayList();
+	private Set<Invitation> invitations = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<PollQuestion> pollQuestions = Lists.newArrayList();
+	private Set<PollQuestion> pollQuestions = Sets.newHashSet();
 
 	@Override
 	public boolean equals(Object o) {
@@ -198,35 +198,35 @@ public class Event {
 		this.organizer = organizer;
 	}
 
-	public List<Post> getPosts() {
+	public Set<Post> getPosts() {
 		return posts;
 	}
 
-	public void setPosts(List<Post> posts) {
+	public void setPosts(Set<Post> posts) {
 		this.posts = posts;
 	}
 
-	public List<ParticipateInEvent> getParticipateInEvents() {
+	public Set<ParticipateInEvent> getParticipateInEvents() {
 		return participateInEvents;
 	}
 
-	public void setParticipateInEvents(List<ParticipateInEvent> participateInEvents) {
+	public void setParticipateInEvents(Set<ParticipateInEvent> participateInEvents) {
 		this.participateInEvents = participateInEvents;
 	}
 
-	public List<Invitation> getInvitations() {
+	public Set<Invitation> getInvitations() {
 		return invitations;
 	}
 
-	public void setInvitations(List<Invitation> invitations) {
+	public void setInvitations(Set<Invitation> invitations) {
 		this.invitations = invitations;
 	}
 
-	public List<PollQuestion> getPollQuestions() {
+	public Set<PollQuestion> getPollQuestions() {
 		return pollQuestions;
 	}
 
-	public void setPollQuestions(List<PollQuestion> pollQuestions) {
+	public void setPollQuestions(Set<PollQuestion> pollQuestions) {
 		this.pollQuestions = pollQuestions;
 	}
 }

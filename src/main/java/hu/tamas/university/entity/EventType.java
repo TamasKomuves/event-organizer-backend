@@ -1,10 +1,10 @@
 package hu.tamas.university.entity;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "event_type")
@@ -15,7 +15,7 @@ public class EventType {
 	private String type;
 
 	@OneToMany(mappedBy = "eventType", cascade = CascadeType.ALL)
-	private List<Event> events = Lists.newArrayList();
+	private Set<Event> events = Sets.newHashSet();
 
 	public EventType(String type) {
 		this.type = type;
@@ -58,11 +58,11 @@ public class EventType {
 		this.type = type;
 	}
 
-	public List<Event> getEvents() {
+	public Set<Event> getEvents() {
 		return events;
 	}
 
-	public void setEvents(List<Event> events) {
+	public void setEvents(Set<Event> events) {
 		this.events = events;
 	}
 }

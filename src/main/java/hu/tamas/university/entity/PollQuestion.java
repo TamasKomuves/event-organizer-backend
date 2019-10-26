@@ -1,11 +1,11 @@
 package hu.tamas.university.entity;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "poll_question")
@@ -27,7 +27,7 @@ public class PollQuestion {
 	private Timestamp date;
 
 	@OneToMany(mappedBy = "pollQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<PollAnswer> pollAnswers = Lists.newArrayList();
+	private Set<PollAnswer> pollAnswers = Sets.newHashSet();
 
 	@Override
 	public boolean equals(Object o) {
@@ -87,11 +87,11 @@ public class PollQuestion {
 		this.date = date;
 	}
 
-	public List<PollAnswer> getPollAnswers() {
+	public Set<PollAnswer> getPollAnswers() {
 		return pollAnswers;
 	}
 
-	public void setPollAnswers(List<PollAnswer> pollAnswers) {
+	public void setPollAnswers(Set<PollAnswer> pollAnswers) {
 		this.pollAnswers = pollAnswers;
 	}
 }

@@ -1,11 +1,12 @@
 package hu.tamas.university.entity;
 
+import com.google.common.collect.Sets;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "comment")
@@ -32,7 +33,7 @@ public class Comment {
 	private String text;
 
 	@OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-	List<LikesComment> likesComments;
+	Set<LikesComment> likesComments = Sets.newHashSet();
 
 	public void addLiker(User user) {
 		LikesComment likesComment = new LikesComment(user, this);
@@ -104,11 +105,11 @@ public class Comment {
 		this.text = text;
 	}
 
-	public List<LikesComment> getLikesComments() {
+	public Set<LikesComment> getLikesComments() {
 		return likesComments;
 	}
 
-	public void setLikesComments(List<LikesComment> likesComments) {
+	public void setLikesComments(Set<LikesComment> likesComments) {
 		this.likesComments = likesComments;
 	}
 }

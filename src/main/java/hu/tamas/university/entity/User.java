@@ -1,13 +1,14 @@
 package hu.tamas.university.entity;
 
+import com.google.common.collect.Sets;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
@@ -31,34 +32,34 @@ public class User implements UserDetails {
 	private Address address;
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ParticipateInEvent> participateInEvents;
+	private Set<ParticipateInEvent> participateInEvents = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Invitation> invitations;
+	private Set<Invitation> invitations = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Event> organizedEvents;
+	private Set<Event> organizedEvents = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<LikesComment> likesComments;
+	private Set<LikesComment> likesComments = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "commenter", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Comment> comments;
+	private Set<Comment> comments = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "poster", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Post> posts;
+	private Set<Post> posts = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<LikesPost> likesPosts;
+	private Set<LikesPost> likesPosts = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<AnswersToPoll> answersToPolls;
+	private Set<AnswersToPoll> answersToPolls = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ChatMessage> sentChatMessages;
+	private Set<ChatMessage> sentChatMessages = Sets.newHashSet();
 
 	@OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ChatMessage> receivedChatMessages;
+	private Set<ChatMessage> receivedChatMessages = Sets.newHashSet();
 
 	@Override
 	public boolean equals(Object o) {
@@ -252,83 +253,83 @@ public class User implements UserDetails {
 		this.email = email;
 	}
 
-	public List<ParticipateInEvent> getParticipateInEvents() {
+	public Set<ParticipateInEvent> getParticipateInEvents() {
 		return participateInEvents;
 	}
 
-	public void setParticipateInEvents(List<ParticipateInEvent> participateInEvents) {
+	public void setParticipateInEvents(Set<ParticipateInEvent> participateInEvents) {
 		this.participateInEvents = participateInEvents;
 	}
 
-	public List<Invitation> getInvitations() {
+	public Set<Invitation> getInvitations() {
 		return invitations;
 	}
 
-	public void setInvitations(List<Invitation> invitations) {
+	public void setInvitations(Set<Invitation> invitations) {
 		this.invitations = invitations;
 	}
 
-	public List<Event> getOrganizedEvents() {
+	public Set<Event> getOrganizedEvents() {
 		return organizedEvents;
 	}
 
-	public void setOrganizedEvents(List<Event> organizedEvents) {
+	public void setOrganizedEvents(Set<Event> organizedEvents) {
 		this.organizedEvents = organizedEvents;
 	}
 
-	public List<LikesComment> getLikesComments() {
+	public Set<LikesComment> getLikesComments() {
 		return likesComments;
 	}
 
-	public void setLikesComments(List<LikesComment> likesComments) {
+	public void setLikesComments(Set<LikesComment> likesComments) {
 		this.likesComments = likesComments;
 	}
 
-	public List<Comment> getComments() {
+	public Set<Comment> getComments() {
 		return comments;
 	}
 
-	public void setComments(List<Comment> comments) {
+	public void setComments(Set<Comment> comments) {
 		this.comments = comments;
 	}
 
-	public List<Post> getPosts() {
+	public Set<Post> getPosts() {
 		return posts;
 	}
 
-	public void setPosts(List<Post> posts) {
+	public void setPosts(Set<Post> posts) {
 		this.posts = posts;
 	}
 
-	public List<LikesPost> getLikesPosts() {
+	public Set<LikesPost> getLikesPosts() {
 		return likesPosts;
 	}
 
-	public void setLikesPosts(List<LikesPost> likesPosts) {
+	public void setLikesPosts(Set<LikesPost> likesPosts) {
 		this.likesPosts = likesPosts;
 	}
 
-	public List<AnswersToPoll> getAnswersToPolls() {
+	public Set<AnswersToPoll> getAnswersToPolls() {
 		return answersToPolls;
 	}
 
-	public void setAnswersToPolls(List<AnswersToPoll> answersToPolls) {
+	public void setAnswersToPolls(Set<AnswersToPoll> answersToPolls) {
 		this.answersToPolls = answersToPolls;
 	}
 
-	public List<ChatMessage> getSentChatMessages() {
+	public Set<ChatMessage> getSentChatMessages() {
 		return sentChatMessages;
 	}
 
-	public void setSentChatMessages(List<ChatMessage> sentChatMessages) {
+	public void setSentChatMessages(Set<ChatMessage> sentChatMessages) {
 		this.sentChatMessages = sentChatMessages;
 	}
 
-	public List<ChatMessage> getReceivedChatMessages() {
+	public Set<ChatMessage> getReceivedChatMessages() {
 		return receivedChatMessages;
 	}
 
-	public void setReceivedChatMessages(List<ChatMessage> receivedChatMessages) {
+	public void setReceivedChatMessages(Set<ChatMessage> receivedChatMessages) {
 		this.receivedChatMessages = receivedChatMessages;
 	}
 }
