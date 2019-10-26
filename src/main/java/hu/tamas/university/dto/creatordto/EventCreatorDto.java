@@ -4,6 +4,7 @@ import hu.tamas.university.entity.Address;
 import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.EventType;
 import hu.tamas.university.entity.User;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -32,10 +33,7 @@ public class EventCreatorDto {
 	private int addressId;
 
 	@NotNull
-	private String eventTypeType;
-
-	@NotNull
-	private String organizerEmail;
+	private String eventType;
 
 	public static Event fromDto(EventCreatorDto eventCreatorDto, Address address, EventType eventType, User user) {
 		Event event = new Event();
@@ -47,7 +45,7 @@ public class EventCreatorDto {
 		event.setTotalCost(eventCreatorDto.getTotalCost());
 		event.setEventDate(eventCreatorDto.getEventDate());
 		event.setAddress(address);
-		event.setEventType(eventType);
+		eventType.addEvent(event);
 		user.addOrganizedEvent(event);
 
 		return event;
@@ -109,19 +107,11 @@ public class EventCreatorDto {
 		this.addressId = addressId;
 	}
 
-	public String getEventTypeType() {
-		return eventTypeType;
+	public String getEventType() {
+		return eventType;
 	}
 
-	public void setEventTypeType(String eventTypeType) {
-		this.eventTypeType = eventTypeType;
-	}
-
-	public String getOrganizerEmail() {
-		return organizerEmail;
-	}
-
-	public void setOrganizerEmail(String organizerEmail) {
-		this.organizerEmail = organizerEmail;
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
 	}
 }

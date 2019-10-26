@@ -3,6 +3,7 @@ package hu.tamas.university.controller;
 import hu.tamas.university.dto.CommentDto;
 import hu.tamas.university.dto.PostDto;
 import hu.tamas.university.dto.UserDto;
+import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.Post;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.EventRepository;
@@ -11,10 +12,7 @@ import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -59,16 +57,19 @@ public class PostController {
 				.collect(Collectors.toList());
 	}
 
-	@GetMapping("create/{eventId}/{poster_email}/{text}")
+	@PostMapping("/create")
 	@ResponseBody
-	public String savePost(@PathVariable int eventId, @PathVariable String poster_email, @PathVariable String text) {
-		Post post = new Post();
-		post.setEvent(eventRepository.findEventById(eventId));
-		post.setPoster(userRepository.findByEmail(poster_email).get());
-		post.setText(text);
-		post.setPostDate(new Timestamp(System.currentTimeMillis()));
+	public String savePost(@RequestBody PostDto postDto, @AuthenticationPrincipal User user) {
+		final Event event = eventRepository.findEventById(postDto.getEventId());
+		final User poster = userRepository.findByEmail(user.getEmail()).get();
+		final Post post = new Post();
 
-		postRepository.save(post);
+		post.setText(postDto.getText());
+		post.setPostDate(new Timestamp(System.currentTimeMillis()));
+		event.addPost(post);
+		poster.addPost(post);
+
+		postRepository.saveAndFlush(post);
 
 		return "{\"result\":\"success\"}";
 	}

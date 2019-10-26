@@ -3,6 +3,7 @@ package hu.tamas.university.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.Comment;
 
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 public class CommentDto {
@@ -13,12 +14,14 @@ public class CommentDto {
 	@JsonProperty("commenterEmail")
 	private String commenterEmail;
 
+	@NotNull
 	@JsonProperty("postId")
 	private int postId;
 
 	@JsonProperty("commentDate")
 	private Timestamp commentDate;
 
+	@NotNull
 	@JsonProperty("text")
 	private String text;
 

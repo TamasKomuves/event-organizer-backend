@@ -14,11 +14,9 @@ import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -60,25 +58,24 @@ public class CommentController {
 				.collect(Collectors.toList());
 	}
 
-	@GetMapping("create/{postId}/{commenter_email}/{text}")
+	@PostMapping("/create")
 	@ResponseBody
-	public String saveComment(@PathVariable int postId, @PathVariable String commenter_email,
-			@PathVariable String text) {
-		final Post post = postRepository.findPostById(postId);
-		final User user = userRepository.findByEmail(commenter_email).orElse(null);
-
+	public String createComment(@RequestBody @Valid CommentDto commentDto, @AuthenticationPrincipal User user) {
+		final Post post = postRepository.findPostById(commentDto.getPostId());
+		final User commenter = userRepository.findByEmail(user.getEmail()).get();
 		final Comment comment = new Comment();
-		comment.setText(text);
+
+		comment.setText(commentDto.getText());
 		comment.setCommentDate(new Timestamp(System.currentTimeMillis()));
 		post.addComment(comment);
-		user.addComment(comment);
+		commenter.addComment(comment);
 
 		commentRepository.saveAndFlush(comment);
 
 		return "{\"result\":\"success\"}";
 	}
 
-	@GetMapping("{id}/likers/{email}")
+	@GetMapping("/{id}/likers/{email}")
 	@ResponseBody
 	public String isLikedAlready(@PathVariable int id, @PathVariable String email) {
 		final Optional<LikesComment> likesComment = likesCommentRepository.findByCommentIdAndUserEmail(id, email);
@@ -86,7 +83,7 @@ public class CommentController {
 		return "{\"result\":\"" + likesComment.isPresent() + "\"}";
 	}
 
-	@GetMapping("{id}/add-liker")
+	@GetMapping("/{id}/add-liker")
 	@ResponseBody
 	public String addLiker(@PathVariable int id, @AuthenticationPrincipal User user) {
 		final Comment comment = commentRepository.findCommentById(id);

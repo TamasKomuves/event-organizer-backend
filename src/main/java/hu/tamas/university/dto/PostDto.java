@@ -3,16 +3,20 @@ package hu.tamas.university.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.Post;
 
+import javax.validation.constraints.NotNull;
+
 public class PostDto extends NewsDto {
 
 	private static final String TYPE = "POST";
 
+	@NotNull
 	@JsonProperty("eventId")
 	private int eventId;
 
 	@JsonProperty("posterEmail")
 	private String posterEmail;
 
+	@NotNull
 	@JsonProperty("text")
 	private String text;
 
