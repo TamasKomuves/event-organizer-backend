@@ -42,7 +42,7 @@ public class AnswersToPoll {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id);
+		return Objects.hash(user, pollAnswer);
 	}
 
 	public int getId() {

@@ -36,12 +36,12 @@ public class ParticipateInEvent {
 		if (!(o instanceof ParticipateInEvent)) {
 			return false;
 		}
-		return id == ((ParticipateInEvent) o).id;
+		return event == ((ParticipateInEvent) o).event && user == ((ParticipateInEvent) o).user;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id);
+		return Objects.hash(event, user);
 	}
 
 	public int getId() {

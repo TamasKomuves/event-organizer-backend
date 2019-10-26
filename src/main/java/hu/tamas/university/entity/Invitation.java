@@ -2,6 +2,7 @@ package hu.tamas.university.entity;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 @Entity
 @Table(name = "invitation")
@@ -45,7 +46,7 @@ public class Invitation {
 
 	@Override
 	public int hashCode() {
-		return 41;
+		return Objects.hash(id);
 	}
 
 	public int getId() {

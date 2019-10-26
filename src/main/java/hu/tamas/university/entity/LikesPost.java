@@ -36,12 +36,12 @@ public class LikesPost {
 		if (!(o instanceof LikesPost)) {
 			return false;
 		}
-		return id == ((LikesPost) o).id;
+		return user == ((LikesPost) o).user && post == ((LikesPost) o).post;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id);
+		return Objects.hash(user, post);
 	}
 
 	public int getId() {
