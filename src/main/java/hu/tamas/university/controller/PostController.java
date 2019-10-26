@@ -4,10 +4,12 @@ import hu.tamas.university.dto.CommentDto;
 import hu.tamas.university.dto.PostDto;
 import hu.tamas.university.dto.UserDto;
 import hu.tamas.university.entity.Post;
+import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.EventRepository;
 import hu.tamas.university.repository.PostRepository;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,5 +80,17 @@ public class PostController {
 		boolean isLikedAlready = post.getLikesPosts().stream()
 				.anyMatch(likesPost -> Objects.equals(likesPost.getUser().getEmail(), email));
 		return "{\"result\":\"" + isLikedAlready + "\"}";
+	}
+
+	@GetMapping("{id}/add-liker")
+	@ResponseBody
+	public String addLiker(@PathVariable int id, @AuthenticationPrincipal User user) {
+		final Post post = postRepository.findById(id).get();
+		final User liker = userRepository.findByEmail(user.getEmail()).get();
+
+		post.addLiker(liker);
+		postRepository.flush();
+
+		return "{\"result\":\"success\"}";
 	}
 }
