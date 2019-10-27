@@ -48,31 +48,22 @@ public class InvitationController {
 	@PostMapping("/create")
 	@ResponseBody
 	public String createInvitation(@RequestBody @Valid InvitationDto invitationDto) {
-		Event event = eventRepository.findEventById(invitationDto.getEventId());
+		final Event event = eventRepository.findEventById(invitationDto.getEventId());
 
 		if (!isEventHasMorePlace(event)) {
 			return "{\"result\":\"no more place\"}";
 		}
 
-		User user = userRepository.findByEmail(invitationDto.getUserEmail()).orElse(null);
-
-		List<ParticipateInEvent> alreadyParticipateInEvent = participateInEventRepository
-				.findByEventIdAndUserEmail(invitationDto.getEventId(), invitationDto.getUserEmail())
-				.orElse(Lists.newArrayList());
-
-		if (!alreadyParticipateInEvent.isEmpty()) {
+		if (isAlreadyParticipateInEvent(invitationDto)) {
 			return "{\"result\":\"already participate\"}";
 		}
 
-		final long activeInvitations = invitationRepository.findByEventAndUser(event, user).stream()
-				.filter(invitation -> invitation.getDecisionDate() == null).count();
-
-		if (activeInvitations != 0) {
+		final User user = userRepository.findByEmail(invitationDto.getUserEmail()).get();
+		if (isAlreadyInvited(event, user)) {
 			return "{\"result\":\"already invited\"}";
 		}
 
-		Invitation invitation = createInvitation(event, user, invitationDto.getUserRequested());
-
+		final Invitation invitation = createInvitation(event, user, invitationDto.getUserRequested());
 		invitationRepository.save(invitation);
 
 		return "{\"result\":\"success\"}";
@@ -85,6 +76,16 @@ public class InvitationController {
 				.collect(Collectors.toList());
 
 		return invitations.size() + event.getParticipateInEvents().size() < event.getMaxParticipant();
+	}
+
+	private boolean isAlreadyParticipateInEvent(InvitationDto invitationDto) {
+		return participateInEventRepository
+				.findByEventIdAndUserEmail(invitationDto.getEventId(), invitationDto.getUserEmail()).isPresent();
+	}
+
+	private boolean isAlreadyInvited(Event event, User user) {
+		return invitationRepository.findByEventAndUser(event, user).stream()
+				.anyMatch(invitation -> invitation.getDecisionDate() != null);
 	}
 
 	private Invitation createInvitation(Event event, User user, int isUserRequested) {
