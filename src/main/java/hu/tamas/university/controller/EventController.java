@@ -155,10 +155,10 @@ public class EventController {
 		return "{\"result\":\"" + isParticipate + "\"}";
 	}
 
-	@GetMapping("/{eventId}/delete")
+	@DeleteMapping("/delete/{eventId}")
 	@ResponseBody
 	public String deleteEvent(@AuthenticationPrincipal final User user, @PathVariable int eventId) {
-		Event event = eventRepository.findEventById(eventId);
+		final Event event = eventRepository.findEventById(eventId);
 
 		if (event == null) {
 			return "{\"result\":\"no such event\"}";
@@ -168,8 +168,6 @@ public class EventController {
 			return "{\"result\":\"no permission\"}";
 		}
 
-		invitationRepository.findAll().stream().filter(invitation -> invitation.getEvent().getId() == event.getId())
-				.collect(Collectors.toList()).forEach(invitationRepository::delete);
 		eventRepository.deleteById(eventId);
 
 		return "{\"result\":\"success\"}";
