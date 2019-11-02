@@ -46,16 +46,16 @@ public class Event {
 	@JoinColumn(name = "organizer_email")
 	private User organizer;
 
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Post> posts = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<ParticipateInEvent> participateInEvents = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Invitation> invitations = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<PollQuestion> pollQuestions = Sets.newHashSet();
 
 	@Override

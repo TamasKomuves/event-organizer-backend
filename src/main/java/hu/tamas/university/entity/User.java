@@ -31,34 +31,34 @@ public class User implements UserDetails {
 	@JoinColumn(name = "address_id", referencedColumnName = "id")
 	private Address address;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<ParticipateInEvent> participateInEvents = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Invitation> invitations = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "organizer", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Event> organizedEvents = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<LikesComment> likesComments = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "commenter", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "commenter", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Comment> comments = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "poster", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "poster", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Post> posts = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<LikesPost> likesPosts = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<AnswersToPoll> answersToPolls = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "sender", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<ChatMessage> sentChatMessages = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "receiver", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<ChatMessage> receivedChatMessages = Sets.newHashSet();
 
 	@Override

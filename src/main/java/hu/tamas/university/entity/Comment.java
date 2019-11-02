@@ -32,7 +32,7 @@ public class Comment {
 	@Column(name = "text")
 	private String text;
 
-	@OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "comment", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	Set<LikesComment> likesComments = Sets.newHashSet();
 
 	public void addLiker(User user) {

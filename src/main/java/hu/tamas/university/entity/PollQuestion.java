@@ -26,7 +26,7 @@ public class PollQuestion {
 	@Column(name = "poll_question_date")
 	private Timestamp date;
 
-	@OneToMany(mappedBy = "pollQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "pollQuestion", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<PollAnswer> pollAnswers = Sets.newHashSet();
 
 	@Override

@@ -22,7 +22,7 @@ public class PollAnswer {
 	@Column(name = "text")
 	private String text;
 
-	@OneToMany(mappedBy = "pollAnswer", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "pollAnswer", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<AnswersToPoll> answersToPolls = Sets.newHashSet();
 
 	@Override

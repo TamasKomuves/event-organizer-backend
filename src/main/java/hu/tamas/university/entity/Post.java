@@ -32,10 +32,10 @@ public class Post {
 	@Column(name = "text")
 	private String text;
 
-	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Comment> comments = Sets.newHashSet();
 
-	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<LikesPost> likesPosts = Sets.newHashSet();
 
 	public void addComment(Comment comment) {

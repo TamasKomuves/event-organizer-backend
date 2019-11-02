@@ -14,7 +14,7 @@ public class EventType {
 	@Column(name = "type", nullable = false, unique = true)
 	private String type;
 
-	@OneToMany(mappedBy = "eventType", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "eventType", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Event> events = Sets.newHashSet();
 
 	public EventType(String type) {
