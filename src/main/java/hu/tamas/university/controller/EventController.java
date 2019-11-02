@@ -5,6 +5,7 @@ import hu.tamas.university.dto.*;
 import hu.tamas.university.dto.creatordto.EventCreatorDto;
 import hu.tamas.university.entity.*;
 import hu.tamas.university.repository.*;
+import hu.tamas.university.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -29,12 +30,13 @@ public class EventController {
 	private final InvitationRepository invitationRepository;
 	private final PollQuestionRepository pollQuestionRepository;
 	private final PostRepository postRepository;
+	private final EventService eventService;
 
 	@Autowired
 	public EventController(EventRepository eventRepository, EventTypeRepository eventTypeRepository,
 			AddressRepository addressRepository, UserRepository userRepository,
 			ParticipateInEventRepository participateInEventRepository, InvitationRepository invitationRepository,
-			PollQuestionRepository pollQuestionRepository, PostRepository postRepository) {
+			PollQuestionRepository pollQuestionRepository, PostRepository postRepository, EventService eventService) {
 		this.eventRepository = eventRepository;
 		this.eventTypeRepository = eventTypeRepository;
 		this.addressRepository = addressRepository;
@@ -43,6 +45,7 @@ public class EventController {
 		this.invitationRepository = invitationRepository;
 		this.pollQuestionRepository = pollQuestionRepository;
 		this.postRepository = postRepository;
+		this.eventService = eventService;
 	}
 
 	@GetMapping("/{id}")
@@ -158,19 +161,9 @@ public class EventController {
 	@DeleteMapping("/delete/{eventId}")
 	@ResponseBody
 	public String deleteEvent(@AuthenticationPrincipal final User user, @PathVariable int eventId) {
-		final Event event = eventRepository.findEventById(eventId);
+		final String result = eventService.deleteEvent(eventId, user.getEmail());
 
-		if (event == null) {
-			return "{\"result\":\"no such event\"}";
-		}
-
-		if (!event.getOrganizer().getEmail().equals(user.getEmail())) {
-			return "{\"result\":\"no permission\"}";
-		}
-
-		eventRepository.deleteById(eventId);
-
-		return "{\"result\":\"success\"}";
+		return "{\"result\":\"" + result + "\"}";
 	}
 
 	@GetMapping("/{eventId}/invitation-offers")
