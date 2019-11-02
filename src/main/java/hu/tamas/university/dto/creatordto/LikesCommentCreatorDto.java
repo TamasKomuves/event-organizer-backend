@@ -1,7 +1,12 @@
 package hu.tamas.university.dto.creatordto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
 public class LikesCommentCreatorDto {
 
 	@NotNull
@@ -9,20 +14,4 @@ public class LikesCommentCreatorDto {
 
 	@NotNull
 	private int commentId;
-
-	public String getUserEmail() {
-		return userEmail;
-	}
-
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
-	}
-
-	public int getCommentId() {
-		return commentId;
-	}
-
-	public void setCommentId(int commentId) {
-		this.commentId = commentId;
-	}
 }

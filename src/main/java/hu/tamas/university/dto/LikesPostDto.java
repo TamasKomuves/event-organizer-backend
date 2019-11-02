@@ -3,9 +3,13 @@ package hu.tamas.university.dto;
 import hu.tamas.university.entity.LikesPost;
 import hu.tamas.university.entity.Post;
 import hu.tamas.university.entity.User;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
 public class LikesPostDto {
 
 	private int id;
@@ -22,29 +26,5 @@ public class LikesPostDto {
 		likesPostDto.setUser(likesPost.getUser());
 		likesPostDto.setPost(likesPost.getPost());
 		return likesPostDto;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public Post getPost() {
-		return post;
-	}
-
-	public void setPost(Post post) {
-		this.post = post;
 	}
 }

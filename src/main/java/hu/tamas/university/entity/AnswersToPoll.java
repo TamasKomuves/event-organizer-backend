@@ -1,8 +1,13 @@
 package hu.tamas.university.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.Objects;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "answers_to_poll")
 public class AnswersToPoll {
@@ -43,29 +48,5 @@ public class AnswersToPoll {
 	@Override
 	public int hashCode() {
 		return Objects.hash(user, pollAnswer);
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public PollAnswer getPollAnswer() {
-		return pollAnswer;
-	}
-
-	public void setPollAnswer(PollAnswer pollAnswer) {
-		this.pollAnswer = pollAnswer;
 	}
 }

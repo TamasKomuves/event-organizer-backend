@@ -3,7 +3,11 @@ package hu.tamas.university.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.ParticipateInEvent;
 import hu.tamas.university.entity.User;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ParticipateInEventDto {
 
 	@JsonProperty("id")
@@ -23,29 +27,5 @@ public class ParticipateInEventDto {
 		if (participateInEvent.getUser() != null)
 			participateInEventDto.setUserEmail(participateInEvent.getUser().getEmail());
 		return participateInEventDto;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getEventId() {
-		return eventId;
-	}
-
-	public void setEventId(int eventId) {
-		this.eventId = eventId;
-	}
-
-	public String getUserEmail() {
-		return userEmail;
-	}
-
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
 	}
 }

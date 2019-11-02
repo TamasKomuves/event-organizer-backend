@@ -1,9 +1,13 @@
 package hu.tamas.university.dto;
 
 import hu.tamas.university.entity.Address;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
 public class AddressDto {
 
 	private int id;
@@ -49,45 +53,5 @@ public class AddressDto {
 		address.setStreetNumber(addressDto.streetNumber);
 
 		return address;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getCountry() {
-		return country;
-	}
-
-	public void setCountry(String country) {
-		this.country = country;
-	}
-
-	public String getCity() {
-		return city;
-	}
-
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	public String getStreet() {
-		return street;
-	}
-
-	public void setStreet(String street) {
-		this.street = street;
-	}
-
-	public String getStreetNumber() {
-		return streetNumber;
-	}
-
-	public void setStreetNumber(String streetNumber) {
-		this.streetNumber = streetNumber;
 	}
 }

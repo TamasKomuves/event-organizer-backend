@@ -2,9 +2,13 @@ package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.PollAnswer;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
 public class PollAnswerDto {
 
 	@JsonProperty("id")
@@ -31,29 +35,5 @@ public class PollAnswerDto {
 		pollAnswer.setText(pollAnswerDto.getText());
 
 		return pollAnswer;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getPollQuestionId() {
-		return pollQuestionId;
-	}
-
-	public void setPollQuestionId(int pollQuestion) {
-		this.pollQuestionId = pollQuestion;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
 	}
 }

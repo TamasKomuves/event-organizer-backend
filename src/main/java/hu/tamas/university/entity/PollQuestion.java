@@ -1,12 +1,16 @@
 package hu.tamas.university.entity;
 
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "poll_question")
 public class PollQuestion {
@@ -53,45 +57,5 @@ public class PollQuestion {
 	public void removePollAnswer(PollAnswer pollAnswer) {
 		pollAnswers.remove(pollAnswer);
 		pollAnswer.setPollQuestion(null);
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public Event getEvent() {
-		return event;
-	}
-
-	public void setEvent(Event event) {
-		this.event = event;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	public Timestamp getDate() {
-		return date;
-	}
-
-	public void setDate(Timestamp date) {
-		this.date = date;
-	}
-
-	public Set<PollAnswer> getPollAnswers() {
-		return pollAnswers;
-	}
-
-	public void setPollAnswers(Set<PollAnswer> pollAnswers) {
-		this.pollAnswers = pollAnswers;
 	}
 }

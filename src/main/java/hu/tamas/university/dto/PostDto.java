@@ -2,9 +2,13 @@ package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.Post;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
 public class PostDto extends NewsDto {
 
 	private static final String TYPE = "POST";
@@ -29,30 +33,6 @@ public class PostDto extends NewsDto {
 		postDto.setDate(post.getPostDate());
 		postDto.setText(post.getText());
 		return postDto;
-	}
-
-	public int getEventId() {
-		return eventId;
-	}
-
-	public void setEventId(int eventId) {
-		this.eventId = eventId;
-	}
-
-	public String getPosterEmail() {
-		return posterEmail;
-	}
-
-	public void setPosterEmail(String posterEmail) {
-		this.posterEmail = posterEmail;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
 	}
 
 	@Override

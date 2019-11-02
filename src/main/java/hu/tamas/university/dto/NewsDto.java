@@ -1,9 +1,13 @@
 package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 
+@Getter
+@Setter
 public class NewsDto {
 
 	@JsonProperty("id")
@@ -14,28 +18,4 @@ public class NewsDto {
 
 	@JsonProperty("type")
 	private String type;
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public Timestamp getDate() {
-		return date;
-	}
-
-	public void setDate(Timestamp date) {
-		this.date = date;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
 }

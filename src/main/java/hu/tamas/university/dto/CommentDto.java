@@ -2,10 +2,14 @@ package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.Comment;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
+@Getter
+@Setter
 public class CommentDto {
 
 	@JsonProperty("id")
@@ -35,45 +39,5 @@ public class CommentDto {
 		commentDto.setCommentDate(comment.getCommentDate());
 		commentDto.setText(comment.getText());
 		return commentDto;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getCommenterEmail() {
-		return commenterEmail;
-	}
-
-	public void setCommenterEmail(String commenterEmail) {
-		this.commenterEmail = commenterEmail;
-	}
-
-	public int getPostId() {
-		return postId;
-	}
-
-	public void setPostId(int postId) {
-		this.postId = postId;
-	}
-
-	public Timestamp getCommentDate() {
-		return commentDate;
-	}
-
-	public void setCommentDate(Timestamp commentDate) {
-		this.commentDate = commentDate;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
 	}
 }

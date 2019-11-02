@@ -1,6 +1,8 @@
 package hu.tamas.university.entity;
 
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -8,6 +10,8 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "post")
 public class Post {
@@ -76,61 +80,5 @@ public class Post {
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public Event getEvent() {
-		return event;
-	}
-
-	public void setEvent(Event event) {
-		this.event = event;
-	}
-
-	public User getPoster() {
-		return poster;
-	}
-
-	public void setPoster(User poster) {
-		this.poster = poster;
-	}
-
-	public Timestamp getPostDate() {
-		return postDate;
-	}
-
-	public void setPostDate(Timestamp postDate) {
-		this.postDate = postDate;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	public Set<Comment> getComments() {
-		return comments;
-	}
-
-	public void setComments(Set<Comment> comments) {
-		this.comments = comments;
-	}
-
-	public Set<LikesPost> getLikesPosts() {
-		return likesPosts;
-	}
-
-	public void setLikesPosts(Set<LikesPost> likesPosts) {
-		this.likesPosts = likesPosts;
 	}
 }

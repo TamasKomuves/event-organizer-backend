@@ -1,10 +1,14 @@
 package hu.tamas.university.dto.creatordto;
 
 import hu.tamas.university.dto.PollAnswerDto;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+@Getter
+@Setter
 public class PollCreatorDto {
 
 	@NotNull
@@ -15,28 +19,4 @@ public class PollCreatorDto {
 
 	@NotNull
 	private List<PollAnswerDto> pollAnswers;
-
-	public int getEventId() {
-		return eventId;
-	}
-
-	public void setEventId(int eventId) {
-		this.eventId = eventId;
-	}
-
-	public String getQuestionText() {
-		return questionText;
-	}
-
-	public void setQuestionText(String questionText) {
-		this.questionText = questionText;
-	}
-
-	public List<PollAnswerDto> getPollAnswers() {
-		return pollAnswers;
-	}
-
-	public void setPollAnswers(List<PollAnswerDto> pollAnswers) {
-		this.pollAnswers = pollAnswers;
-	}
 }

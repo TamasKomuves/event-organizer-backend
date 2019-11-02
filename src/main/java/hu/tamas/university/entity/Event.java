@@ -1,12 +1,16 @@
 package hu.tamas.university.entity;
 
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "event")
 public class Event {
@@ -116,117 +120,5 @@ public class Event {
 	public void removePollQuestion(PollQuestion pollQuestion) {
 		pollQuestions.remove(pollQuestion);
 		pollQuestion.setEvent(null);
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public int getMaxParticipant() {
-		return maxParticipant;
-	}
-
-	public void setMaxParticipant(int maxParticipant) {
-		this.maxParticipant = maxParticipant;
-	}
-
-	public String getVisibility() {
-		return visibility;
-	}
-
-	public void setVisibility(String visibility) {
-		this.visibility = visibility;
-	}
-
-	public int getTotalCost() {
-		return totalCost;
-	}
-
-	public void setTotalCost(int totalCost) {
-		this.totalCost = totalCost;
-	}
-
-	public Timestamp getEventDate() {
-		return eventDate;
-	}
-
-	public void setEventDate(Timestamp eventDate) {
-		this.eventDate = eventDate;
-	}
-
-	public Address getAddress() {
-		return address;
-	}
-
-	public void setAddress(Address address) {
-		this.address = address;
-	}
-
-	public EventType getEventType() {
-		return eventType;
-	}
-
-	public void setEventType(EventType eventType) {
-		this.eventType = eventType;
-	}
-
-	public User getOrganizer() {
-		return organizer;
-	}
-
-	public void setOrganizer(User organizer) {
-		this.organizer = organizer;
-	}
-
-	public Set<Post> getPosts() {
-		return posts;
-	}
-
-	public void setPosts(Set<Post> posts) {
-		this.posts = posts;
-	}
-
-	public Set<ParticipateInEvent> getParticipateInEvents() {
-		return participateInEvents;
-	}
-
-	public void setParticipateInEvents(Set<ParticipateInEvent> participateInEvents) {
-		this.participateInEvents = participateInEvents;
-	}
-
-	public Set<Invitation> getInvitations() {
-		return invitations;
-	}
-
-	public void setInvitations(Set<Invitation> invitations) {
-		this.invitations = invitations;
-	}
-
-	public Set<PollQuestion> getPollQuestions() {
-		return pollQuestions;
-	}
-
-	public void setPollQuestions(Set<PollQuestion> pollQuestions) {
-		this.pollQuestions = pollQuestions;
 	}
 }

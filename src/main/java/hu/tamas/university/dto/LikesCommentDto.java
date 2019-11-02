@@ -4,7 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.Comment;
 import hu.tamas.university.entity.LikesComment;
 import hu.tamas.university.entity.User;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class LikesCommentDto {
 
 	@JsonProperty("id")
@@ -22,29 +26,5 @@ public class LikesCommentDto {
 		likesCommentDto.setUser(likesComment.getUser());
 		likesCommentDto.setComment(likesComment.getComment());
 		return likesCommentDto;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public Comment getComment() {
-		return comment;
-	}
-
-	public void setComment(Comment comment) {
-		this.comment = comment;
 	}
 }

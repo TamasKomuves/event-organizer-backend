@@ -1,8 +1,13 @@
 package hu.tamas.university.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.Objects;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "participate_in_event")
 public class ParticipateInEvent {
@@ -42,29 +47,5 @@ public class ParticipateInEvent {
 	@Override
 	public int hashCode() {
 		return Objects.hash(event, user);
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public Event getEvent() {
-		return event;
-	}
-
-	public void setEvent(Event event) {
-		this.event = event;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 }

@@ -2,11 +2,15 @@ package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.AnswersToPoll;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
+@Setter
 public class AnswersToPollDto {
 
 	@JsonProperty("id")
@@ -30,29 +34,5 @@ public class AnswersToPollDto {
 
 	public static List<AnswersToPollDto> fromEntityList(List<AnswersToPoll> answersToPolls) {
 		return answersToPolls.stream().map(AnswersToPollDto::fromEntity).collect(Collectors.toList());
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getUserEmail() {
-		return userEmail;
-	}
-
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
-	}
-
-	public int getPollAnswerId() {
-		return pollAnswerId;
-	}
-
-	public void setPollAnswerId(int pollAnswerId) {
-		this.pollAnswerId = pollAnswerId;
 	}
 }

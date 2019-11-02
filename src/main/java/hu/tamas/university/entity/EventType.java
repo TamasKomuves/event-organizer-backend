@@ -1,11 +1,15 @@
 package hu.tamas.university.entity;
 
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "event_type")
 public class EventType {
@@ -48,21 +52,5 @@ public class EventType {
 	public void removeEvent(Event event) {
 		events.remove(event);
 		event.setEventType(null);
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public Set<Event> getEvents() {
-		return events;
-	}
-
-	public void setEvents(Set<Event> events) {
-		this.events = events;
 	}
 }

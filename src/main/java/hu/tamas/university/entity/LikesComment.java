@@ -1,8 +1,13 @@
 package hu.tamas.university.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.Objects;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "likes_comment")
 public class LikesComment {
@@ -42,29 +47,5 @@ public class LikesComment {
 	@Override
 	public int hashCode() {
 		return Objects.hash(user, comment);
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public Comment getComment() {
-		return comment;
-	}
-
-	public void setComment(Comment comment) {
-		this.comment = comment;
 	}
 }

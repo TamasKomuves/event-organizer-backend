@@ -1,10 +1,14 @@
 package hu.tamas.university.entity;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "chat_message")
 public class ChatMessage {
@@ -38,45 +42,5 @@ public class ChatMessage {
 			return false;
 		}
 		return id == ((ChatMessage) o).id;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public User getSender() {
-		return sender;
-	}
-
-	public void setSender(User sender) {
-		this.sender = sender;
-	}
-
-	public User getReceiver() {
-		return receiver;
-	}
-
-	public void setReceiver(User receiver) {
-		this.receiver = receiver;
-	}
-
-	public Timestamp getDate() {
-		return date;
-	}
-
-	public void setDate(Timestamp date) {
-		this.date = date;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
 	}
 }

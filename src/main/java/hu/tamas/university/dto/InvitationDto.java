@@ -2,10 +2,14 @@ package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.Invitation;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
+@Getter
+@Setter
 public class InvitationDto {
 
 	@NotNull
@@ -41,61 +45,5 @@ public class InvitationDto {
 		invitationDto.setAccepted(invitation.getAccepted());
 		invitationDto.setUserRequested(invitation.getUserRequested());
 		return invitationDto;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getEventId() {
-		return eventId;
-	}
-
-	public void setEventId(int eventId) {
-		this.eventId = eventId;
-	}
-
-	public String getUserEmail() {
-		return userEmail;
-	}
-
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
-	}
-
-	public Timestamp getSentDate() {
-		return sentDate;
-	}
-
-	public void setSentDate(Timestamp sentDate) {
-		this.sentDate = sentDate;
-	}
-
-	public Timestamp getDecisionDate() {
-		return decisionDate;
-	}
-
-	public void setDecisionDate(Timestamp decisionDate) {
-		this.decisionDate = decisionDate;
-	}
-
-	public int getAccepted() {
-		return accepted;
-	}
-
-	public void setAccepted(int accepted) {
-		this.accepted = accepted;
-	}
-
-	public int getUserRequested() {
-		return userRequested;
-	}
-
-	public void setUserRequested(int userRequested) {
-		this.userRequested = userRequested;
 	}
 }

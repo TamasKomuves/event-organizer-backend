@@ -2,7 +2,11 @@ package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.User;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class UserDto {
 
 	@JsonProperty("firstName")
@@ -25,37 +29,5 @@ public class UserDto {
 		if (user.getAddress() != null)
 			dto.setAddressId(user.getAddress().getId());
 		return dto;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public int getAddressId() {
-		return addressId;
-	}
-
-	public void setAddressId(int addressId) {
-		this.addressId = addressId;
-	}
-	
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 }

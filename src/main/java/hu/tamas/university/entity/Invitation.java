@@ -1,9 +1,14 @@
 package hu.tamas.university.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "invitation")
 public class Invitation {
@@ -47,61 +52,5 @@ public class Invitation {
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public Event getEvent() {
-		return event;
-	}
-
-	public void setEvent(Event event) {
-		this.event = event;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public Timestamp getSentDate() {
-		return sentDate;
-	}
-
-	public void setSentDate(Timestamp sentDate) {
-		this.sentDate = sentDate;
-	}
-
-	public Timestamp getDecisionDate() {
-		return decisionDate;
-	}
-
-	public void setDecisionDate(Timestamp decisionDate) {
-		this.decisionDate = decisionDate;
-	}
-
-	public int getAccepted() {
-		return accepted;
-	}
-
-	public void setAccepted(int accepted) {
-		this.accepted = accepted;
-	}
-
-	public int getUserRequested() {
-		return userRequested;
-	}
-
-	public void setUserRequested(int userRequested) {
-		this.userRequested = userRequested;
 	}
 }

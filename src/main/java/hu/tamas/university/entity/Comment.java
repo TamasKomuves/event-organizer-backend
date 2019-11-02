@@ -1,6 +1,8 @@
 package hu.tamas.university.entity;
 
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -8,6 +10,8 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "comment")
 public class Comment {
@@ -63,53 +67,5 @@ public class Comment {
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public User getCommenter() {
-		return commenter;
-	}
-
-	public void setCommenter(User commenter) {
-		this.commenter = commenter;
-	}
-
-	public Post getPost() {
-		return post;
-	}
-
-	public void setPost(Post post) {
-		this.post = post;
-	}
-
-	public Timestamp getCommentDate() {
-		return commentDate;
-	}
-
-	public void setCommentDate(Timestamp commentDate) {
-		this.commentDate = commentDate;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	public Set<LikesComment> getLikesComments() {
-		return likesComments;
-	}
-
-	public void setLikesComments(Set<LikesComment> likesComments) {
-		this.likesComments = likesComments;
 	}
 }

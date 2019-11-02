@@ -1,6 +1,8 @@
 package hu.tamas.university.entity;
 
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -10,6 +12,8 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "user")
 public class User implements UserDetails {
@@ -183,14 +187,6 @@ public class User implements UserDetails {
 		chatMessage.setSender(null);
 	}
 
-	public Address getAddress() {
-		return address;
-	}
-
-	public void setAddress(Address address) {
-		this.address = address;
-	}
-
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return new ArrayList<>();
@@ -223,113 +219,5 @@ public class User implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return true;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public Set<ParticipateInEvent> getParticipateInEvents() {
-		return participateInEvents;
-	}
-
-	public void setParticipateInEvents(Set<ParticipateInEvent> participateInEvents) {
-		this.participateInEvents = participateInEvents;
-	}
-
-	public Set<Invitation> getInvitations() {
-		return invitations;
-	}
-
-	public void setInvitations(Set<Invitation> invitations) {
-		this.invitations = invitations;
-	}
-
-	public Set<Event> getOrganizedEvents() {
-		return organizedEvents;
-	}
-
-	public void setOrganizedEvents(Set<Event> organizedEvents) {
-		this.organizedEvents = organizedEvents;
-	}
-
-	public Set<LikesComment> getLikesComments() {
-		return likesComments;
-	}
-
-	public void setLikesComments(Set<LikesComment> likesComments) {
-		this.likesComments = likesComments;
-	}
-
-	public Set<Comment> getComments() {
-		return comments;
-	}
-
-	public void setComments(Set<Comment> comments) {
-		this.comments = comments;
-	}
-
-	public Set<Post> getPosts() {
-		return posts;
-	}
-
-	public void setPosts(Set<Post> posts) {
-		this.posts = posts;
-	}
-
-	public Set<LikesPost> getLikesPosts() {
-		return likesPosts;
-	}
-
-	public void setLikesPosts(Set<LikesPost> likesPosts) {
-		this.likesPosts = likesPosts;
-	}
-
-	public Set<AnswersToPoll> getAnswersToPolls() {
-		return answersToPolls;
-	}
-
-	public void setAnswersToPolls(Set<AnswersToPoll> answersToPolls) {
-		this.answersToPolls = answersToPolls;
-	}
-
-	public Set<ChatMessage> getSentChatMessages() {
-		return sentChatMessages;
-	}
-
-	public void setSentChatMessages(Set<ChatMessage> sentChatMessages) {
-		this.sentChatMessages = sentChatMessages;
-	}
-
-	public Set<ChatMessage> getReceivedChatMessages() {
-		return receivedChatMessages;
-	}
-
-	public void setReceivedChatMessages(Set<ChatMessage> receivedChatMessages) {
-		this.receivedChatMessages = receivedChatMessages;
 	}
 }

@@ -3,10 +3,14 @@ package hu.tamas.university.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.EventType;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Timestamp;
 
+@Getter
+@Setter
 public class EventDto {
 
 	@JsonProperty("id")
@@ -58,85 +62,5 @@ public class EventDto {
 			eventDto.setOrganizerEmail(event.getOrganizer().getEmail());
 
 		return eventDto;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public int getMaxParticipant() {
-		return maxParticipant;
-	}
-
-	public void setMaxParticipant(int maxParticipant) {
-		this.maxParticipant = maxParticipant;
-	}
-
-	public String getVisibility() {
-		return visibility;
-	}
-
-	public void setVisibility(String visibility) {
-		this.visibility = visibility;
-	}
-
-	public int getTotalCost() {
-		return totalCost;
-	}
-
-	public void setTotalCost(int totalCost) {
-		this.totalCost = totalCost;
-	}
-
-	public int getAddressId() {
-		return addressId;
-	}
-
-	public void setAddressId(int addressId) {
-		this.addressId = addressId;
-	}
-
-	public String getEventType() {
-		return eventType;
-	}
-
-	public void setEventType(String eventType) {
-		this.eventType = eventType;
-	}
-
-	public String getOrganizerEmail() {
-		return organizerEmail;
-	}
-
-	public void setOrganizerEmail(String organizerEmail) {
-		this.organizerEmail = organizerEmail;
-	}
-
-	public Timestamp getEventDate() {
-		return eventDate;
-	}
-
-	public void setEventDate(Timestamp eventDate) {
-		this.eventDate = eventDate;
 	}
 }

@@ -1,11 +1,15 @@
 package hu.tamas.university.entity;
 
 import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "poll_answer")
 public class PollAnswer {
@@ -53,37 +57,5 @@ public class PollAnswer {
 		user.getAnswersToPolls().remove(answersToPoll);
 		answersToPoll.setPollAnswer(null);
 		answersToPoll.setUser(null);
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public PollQuestion getPollQuestion() {
-		return pollQuestion;
-	}
-
-	public void setPollQuestion(PollQuestion pollQuestion) {
-		this.pollQuestion = pollQuestion;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	public Set<AnswersToPoll> getAnswersToPolls() {
-		return answersToPolls;
-	}
-
-	public void setAnswersToPolls(Set<AnswersToPoll> answersToPolls) {
-		this.answersToPolls = answersToPolls;
 	}
 }

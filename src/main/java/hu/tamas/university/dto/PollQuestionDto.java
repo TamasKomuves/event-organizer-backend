@@ -2,7 +2,11 @@ package hu.tamas.university.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.PollQuestion;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class PollQuestionDto extends NewsDto {
 
 	private static final String TYPE = "POLL";
@@ -20,22 +24,6 @@ public class PollQuestionDto extends NewsDto {
 		pollQuestionDto.setText(pollQuestion.getText());
 		pollQuestionDto.setDate(pollQuestion.getDate());
 		return pollQuestionDto;
-	}
-
-	public int getEventId() {
-		return eventId;
-	}
-
-	public void setEventId(int eventId) {
-		this.eventId = eventId;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
 	}
 
 	@Override
