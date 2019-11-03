@@ -1,10 +1,10 @@
 package hu.tamas.university.entity;
 
-import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -19,7 +19,7 @@ public class EventType {
 	private String type;
 
 	@OneToMany(mappedBy = "eventType", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<Event> events = Sets.newHashSet();
+	private Set<Event> events = new HashSet<>();
 
 	public EventType(String type) {
 		this.type = type;

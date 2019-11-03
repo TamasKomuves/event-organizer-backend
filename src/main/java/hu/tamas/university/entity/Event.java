@@ -1,11 +1,11 @@
 package hu.tamas.university.entity;
 
-import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -51,16 +51,16 @@ public class Event {
 	private User organizer;
 
 	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<Post> posts = Sets.newHashSet();
+	private Set<Post> posts = new HashSet<>();
 
 	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<ParticipateInEvent> participateInEvents = Sets.newHashSet();
+	private Set<ParticipateInEvent> participateInEvents = new HashSet<>();
 
 	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<Invitation> invitations = Sets.newHashSet();
+	private Set<Invitation> invitations = new HashSet<>();
 
 	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<PollQuestion> pollQuestions = Sets.newHashSet();
+	private Set<PollQuestion> pollQuestions = new HashSet<>();
 
 	@Override
 	public boolean equals(Object o) {

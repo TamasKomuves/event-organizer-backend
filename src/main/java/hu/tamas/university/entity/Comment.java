@@ -1,12 +1,12 @@
 package hu.tamas.university.entity;
 
-import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -37,7 +37,7 @@ public class Comment {
 	private String text;
 
 	@OneToMany(mappedBy = "comment", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	Set<LikesComment> likesComments = Sets.newHashSet();
+	Set<LikesComment> likesComments = new HashSet<>();
 
 	public void addLiker(User user) {
 		LikesComment likesComment = new LikesComment(user, this);

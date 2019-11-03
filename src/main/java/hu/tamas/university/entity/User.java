@@ -1,16 +1,12 @@
 package hu.tamas.university.entity;
 
-import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -36,34 +32,34 @@ public class User implements UserDetails {
 	private Address address;
 
 	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<ParticipateInEvent> participateInEvents = Sets.newHashSet();
+	private Set<ParticipateInEvent> participateInEvents = new HashSet<>();
 
 	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<Invitation> invitations = Sets.newHashSet();
+	private Set<Invitation> invitations = new HashSet<>();
 
 	@OneToMany(mappedBy = "organizer", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<Event> organizedEvents = Sets.newHashSet();
+	private Set<Event> organizedEvents = new HashSet<>();
 
 	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<LikesComment> likesComments = Sets.newHashSet();
+	private Set<LikesComment> likesComments = new HashSet<>();
 
 	@OneToMany(mappedBy = "commenter", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<Comment> comments = Sets.newHashSet();
+	private Set<Comment> comments = new HashSet<>();
 
 	@OneToMany(mappedBy = "poster", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<Post> posts = Sets.newHashSet();
+	private Set<Post> posts = new HashSet<>();
 
 	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<LikesPost> likesPosts = Sets.newHashSet();
+	private Set<LikesPost> likesPosts = new HashSet<>();
 
 	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<AnswersToPoll> answersToPolls = Sets.newHashSet();
+	private Set<AnswersToPoll> answersToPolls = new HashSet<>();
 
 	@OneToMany(mappedBy = "sender", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<ChatMessage> sentChatMessages = Sets.newHashSet();
+	private Set<ChatMessage> sentChatMessages = new HashSet<>();
 
 	@OneToMany(mappedBy = "receiver", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<ChatMessage> receivedChatMessages = Sets.newHashSet();
+	private Set<ChatMessage> receivedChatMessages = new HashSet<>();
 
 	@Override
 	public boolean equals(Object o) {

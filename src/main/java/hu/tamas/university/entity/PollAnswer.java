@@ -1,10 +1,10 @@
 package hu.tamas.university.entity;
 
-import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -27,7 +27,7 @@ public class PollAnswer {
 	private String text;
 
 	@OneToMany(mappedBy = "pollAnswer", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<AnswersToPoll> answersToPolls = Sets.newHashSet();
+	private Set<AnswersToPoll> answersToPolls = new HashSet<>();
 
 	@Override
 	public boolean equals(Object o) {
