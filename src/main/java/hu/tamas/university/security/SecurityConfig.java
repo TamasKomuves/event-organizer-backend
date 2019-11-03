@@ -56,8 +56,7 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
-		http
-				.addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
+		http.addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
 				.sessionManagement()
 				.sessionCreationPolicy(STATELESS)
 				.and()
@@ -75,7 +74,7 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.csrf().disable()
 				.formLogin().disable()
 				.httpBasic().disable()
-				.logout().disable();
+				.logout().invalidateHttpSession(true);
 	}
 
 	@Bean

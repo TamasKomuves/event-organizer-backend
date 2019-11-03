@@ -1,6 +1,5 @@
 package hu.tamas.university.security;
 
-import hu.tamas.university.security.UserAuthenticationService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
@@ -20,21 +19,23 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 final class TokenAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
-  @NonNull
-  UserAuthenticationService userAuthenticationService;
+	@NonNull
+	UserAuthenticationService userAuthenticationService;
 
-  @Override
-  protected void additionalAuthenticationChecks(final UserDetails d, final UsernamePasswordAuthenticationToken auth) {
-    // Nothing to do
-  }
+	@Override
+	protected void additionalAuthenticationChecks(final UserDetails d, final UsernamePasswordAuthenticationToken auth) {
+		// Nothing to do
+	}
 
-  @Override
-  protected UserDetails retrieveUser(final String username, final UsernamePasswordAuthenticationToken authentication) {
-    final Object token = authentication.getCredentials();
-    return Optional
-            .ofNullable(token)
-            .map(String::valueOf)
-            .flatMap(userAuthenticationService::findByToken)
-            .orElseThrow(() -> new UsernameNotFoundException("Cannot find user with authentication token=" + token));
-  }
+	@Override
+	protected UserDetails retrieveUser(final String username,
+			final UsernamePasswordAuthenticationToken authentication) {
+		final Object token = authentication.getCredentials();
+		return Optional
+				.ofNullable(token)
+				.map(String::valueOf)
+				.flatMap(userAuthenticationService::findByToken)
+				.orElseThrow(
+						() -> new UsernameNotFoundException("Cannot find user with authentication token=" + token));
+	}
 }
