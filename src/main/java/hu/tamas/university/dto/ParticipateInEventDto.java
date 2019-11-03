@@ -1,8 +1,6 @@
 package hu.tamas.university.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.ParticipateInEvent;
-import hu.tamas.university.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,13 +8,10 @@ import lombok.Setter;
 @Setter
 public class ParticipateInEventDto {
 
-	@JsonProperty("id")
 	private int id;
 
-	@JsonProperty("eventId")
 	private int eventId;
 
-	@JsonProperty("userEmail")
 	private String userEmail;
 
 	public static ParticipateInEventDto fromEntity(ParticipateInEvent participateInEvent) {

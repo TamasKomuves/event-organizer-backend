@@ -12,21 +12,17 @@ import java.sql.Timestamp;
 @Setter
 public class ChatMessageDto {
 
-	@JsonProperty("id")
 	private int id;
 
-	@JsonProperty("date")
 	private Timestamp date;
 
 	@NotNull
-	@JsonProperty("text")
 	private String text;
 
 	@JsonProperty
 	private boolean isCurrentUserSent;
 
 	@NotNull
-	@JsonProperty("partnerEmail")
 	private String partnerEmail;
 
 	public static ChatMessageDto fromEntity(ChatMessage chatMessage, String currentUserEmail) {

@@ -1,6 +1,5 @@
 package hu.tamas.university.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.PollAnswer;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,14 +10,11 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class PollAnswerDto {
 
-	@JsonProperty("id")
 	private int id;
 
-	@JsonProperty("pollQuestionId")
 	private int pollQuestionId;
 
 	@NotNull
-	@JsonProperty("text")
 	private String text;
 
 	public static PollAnswerDto fromEntity(PollAnswer pollAnswer) {

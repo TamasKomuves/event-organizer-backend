@@ -1,6 +1,5 @@
 package hu.tamas.university.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.Comment;
 import hu.tamas.university.entity.LikesComment;
 import hu.tamas.university.entity.User;
@@ -11,13 +10,10 @@ import lombok.Setter;
 @Setter
 public class LikesCommentDto {
 
-	@JsonProperty("id")
 	private int id;
 
-	@JsonProperty("user")
 	private User user;
 
-	@JsonProperty("comment")
 	private Comment comment;
 
 	public static LikesCommentDto fromEntity(LikesComment likesComment) {

@@ -10,10 +10,7 @@ import hu.tamas.university.security.UserAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,7 +69,7 @@ public class UserController {
 		return "{\"result\":\"" + result + "\"}";
 	}
 
-	@GetMapping(value = "/delete/{email}")
+	@DeleteMapping(value = "/delete/{email}")
 	@ResponseBody
 	public String deleteUser(@PathVariable String email) {
 		String result;
