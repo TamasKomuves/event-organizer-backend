@@ -1,12 +1,14 @@
 package hu.tamas.university.security;
 
 import com.google.common.collect.ImmutableMap;
+import hu.tamas.university.dto.PasswordChangeDto;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -26,9 +28,7 @@ final class TokenAuthenticationService implements UserAuthenticationService {
 
 	@Override
 	public Optional<String> login(final String email, final String password) {
-		return userRepository
-				.findByEmail(email)
-				.filter(user -> passwordEncoder.matches(password, user.getPassword()))
+		return getMatchingUser(email, password)
 				.map(user -> tokenService.expiring(ImmutableMap.of("username", email)));
 	}
 
@@ -43,5 +43,29 @@ final class TokenAuthenticationService implements UserAuthenticationService {
 	@Override
 	public void logout(final User user) {
 		// Nothing to do
+	}
+
+	@Override
+	public void changePassword(PasswordChangeDto passwordChangeDto, String loggedInUserEmail) {
+		if (!Objects.equals(passwordChangeDto.getPassword(), passwordChangeDto.getPasswordAgain())) {
+			throw new RuntimeException("Not matching passwords");
+		}
+
+		final Optional<User> optionalUser = getMatchingUser(loggedInUserEmail, passwordChangeDto.getOldPassword());
+		if (!optionalUser.isPresent()) {
+			throw new RuntimeException("invalid login and/or password");
+		}
+
+		final String encodedPassword = passwordEncoder.encode(passwordChangeDto.getPassword());
+		final User user = optionalUser.get();
+		user.setPassword(encodedPassword);
+
+		userRepository.saveAndFlush(user);
+	}
+
+	private Optional<User> getMatchingUser(String email, String password) {
+		return userRepository
+				.findByEmail(email)
+				.filter(user -> passwordEncoder.matches(password, user.getPassword()));
 	}
 }

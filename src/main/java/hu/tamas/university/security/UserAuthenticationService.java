@@ -1,5 +1,6 @@
 package hu.tamas.university.security;
 
+import hu.tamas.university.dto.PasswordChangeDto;
 import hu.tamas.university.entity.User;
 
 import java.util.Optional;
@@ -29,4 +30,6 @@ public interface UserAuthenticationService {
 	 * @param user the user to logout
 	 */
 	void logout(User user);
+
+	void changePassword(PasswordChangeDto passwordChangeDto, String loggedInUserEmail);
 }

@@ -1,5 +1,6 @@
 package hu.tamas.university.controller;
 
+import hu.tamas.university.dto.PasswordChangeDto;
 import hu.tamas.university.dto.UserDto;
 import hu.tamas.university.entity.Invitation;
 import hu.tamas.university.entity.User;
@@ -12,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,5 +93,13 @@ public class UserController {
 		List<User> users = userRepository.findAll();
 
 		return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
+	}
+
+	@PutMapping(value = "/change-password")
+	@ResponseBody
+	public String changePassword(@RequestBody @Valid PasswordChangeDto passwordChangeDto,
+			@AuthenticationPrincipal User user) {
+		userAuthenticationService.changePassword(passwordChangeDto, user.getEmail());
+		return "{\"result\":\"success\"}";
 	}
 }
