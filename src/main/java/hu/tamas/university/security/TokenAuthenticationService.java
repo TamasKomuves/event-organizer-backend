@@ -4,9 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -14,18 +14,21 @@ final class TokenAuthenticationService implements UserAuthenticationService {
 
 	private final TokenService tokenService;
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Autowired
-	TokenAuthenticationService(TokenService tokenService, UserRepository userRepository) {
+	TokenAuthenticationService(TokenService tokenService, UserRepository userRepository,
+			PasswordEncoder passwordEncoder) {
 		this.tokenService = tokenService;
 		this.userRepository = userRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override
 	public Optional<String> login(final String email, final String password) {
 		return userRepository
 				.findByEmail(email)
-				.filter(user -> Objects.equals(password, user.getPassword()))
+				.filter(user -> passwordEncoder.matches(password, user.getPassword()))
 				.map(user -> tokenService.expiring(ImmutableMap.of("username", email)));
 	}
 

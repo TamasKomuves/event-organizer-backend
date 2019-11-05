@@ -35,6 +35,16 @@ public class Address {
 	@OneToOne(mappedBy = "address")
 	private Event event;
 
+	public Address() {
+	}
+
+	public Address(String country, String city, String street, String streetNumber) {
+		this.country = country;
+		this.city = city;
+		this.street = street;
+		this.streetNumber = streetNumber;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

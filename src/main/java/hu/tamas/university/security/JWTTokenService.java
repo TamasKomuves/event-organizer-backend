@@ -1,6 +1,5 @@
 package hu.tamas.university.security;
 
-import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
 import hu.tamas.university.security.date.DateService;
 import io.jsonwebtoken.*;
@@ -12,12 +11,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static io.jsonwebtoken.impl.TextCodec.BASE64;
 import static java.util.Objects.requireNonNull;
 import static lombok.AccessLevel.PRIVATE;
-import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
 
 @Service
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -33,7 +32,7 @@ final class JWTTokenService implements Clock, TokenService {
 	private String secretKey;
 
 	JWTTokenService(final DateService dates, @Value("${jwt.issuer:octoperf}") final String issuer,
-			@Value("${jwt.expiration-sec:86400}") final int expirationSec,
+			@Value("${jwt.expiration-sec:54000}") final int expirationSec,
 			@Value("${jwt.clock-skew-sec:300}") final int clockSkewSec,
 			@Value("${jwt.secret:secret}") final String secret) {
 		super();
@@ -42,11 +41,6 @@ final class JWTTokenService implements Clock, TokenService {
 		this.expirationSec = expirationSec;
 		this.clockSkewSec = clockSkewSec;
 		this.secretKey = BASE64.encode(requireNonNull(secret));
-	}
-
-	@Override
-	public String permanent(final Map<String, String> attributes) {
-		return newToken(attributes, 0);
 	}
 
 	@Override
@@ -84,19 +78,6 @@ final class JWTTokenService implements Clock, TokenService {
 				.setAllowedClockSkewSeconds(clockSkewSec)
 				.setSigningKey(secretKey);
 		return parseClaims(() -> parser.parseClaimsJws(token).getBody());
-	}
-
-	@Override
-	public Map<String, String> untrusted(final String token) {
-		final JwtParser parser = Jwts
-				.parser()
-				.requireIssuer(issuer)
-				.setClock(this)
-				.setAllowedClockSkewSeconds(clockSkewSec);
-
-		// See: https://github.com/jwtk/jjwt/issues/135
-		final String withoutSignature = substringBeforeLast(token, DOT) + DOT;
-		return parseClaims(() -> parser.parseClaimsJwt(withoutSignature).getBody());
 	}
 
 	private static Map<String, String> parseClaims(final Supplier<Claims> toClaims) {

@@ -61,6 +61,18 @@ public class User implements UserDetails {
 	@OneToMany(mappedBy = "receiver", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<ChatMessage> receivedChatMessages = new HashSet<>();
 
+	public User() {
+	}
+
+	public User(String email, String password, String firstName, String lastName,
+			Address address) {
+		this.email = email;
+		this.password = password;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.address = address;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
