@@ -41,11 +41,6 @@ final class TokenAuthenticationService implements UserAuthenticationService {
 	}
 
 	@Override
-	public void logout(final User user) {
-		// Nothing to do
-	}
-
-	@Override
 	public void changePassword(PasswordChangeDto passwordChangeDto, String loggedInUserEmail) {
 		if (!Objects.equals(passwordChangeDto.getPassword(), passwordChangeDto.getPasswordAgain())) {
 			throw new RuntimeException("Not matching passwords");

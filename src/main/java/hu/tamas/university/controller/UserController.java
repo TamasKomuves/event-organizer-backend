@@ -41,13 +41,6 @@ public class UserController {
 		return UserDto.fromEntity(user);
 	}
 
-	@GetMapping("/logout")
-	@ResponseBody
-	public String logout(@AuthenticationPrincipal final User user) {
-		userAuthenticationService.logout(user);
-		return "\"result\":\"success\"";
-	}
-
 	@GetMapping("/{email}")
 	@ResponseBody
 	public UserDto getUserByEmail(@PathVariable String email) {
@@ -81,7 +74,6 @@ public class UserController {
 		invitationRepository.deleteAll(invitationList);
 		userRepository.delete(user);
 		addressRepository.delete(user.getAddress());
-		userAuthenticationService.logout(user);
 		result = "success";
 
 		return "{\"result\":\"" + result + "\"}";

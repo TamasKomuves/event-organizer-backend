@@ -24,12 +24,5 @@ public interface UserAuthenticationService {
 	 */
 	Optional<User> findByToken(String token);
 
-	/**
-	 * Logs out the given input {@code user}.
-	 *
-	 * @param user the user to logout
-	 */
-	void logout(User user);
-
 	void changePassword(PasswordChangeDto passwordChangeDto, String loggedInUserEmail);
 }
