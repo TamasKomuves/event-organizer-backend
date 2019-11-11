@@ -22,4 +22,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 	@Modifying
 	@Transactional
 	int deleteByEventId(int eventId);
+
+	@Modifying
+	@Transactional
+	@Query("UPDATE Post SET poster_email = NULL WHERE poster_email = :userEmail")
+	int updateByUserEmail(@Param("userEmail") String userEmail);
 }

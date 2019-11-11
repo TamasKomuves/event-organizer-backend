@@ -2,17 +2,18 @@ package hu.tamas.university.controller;
 
 import hu.tamas.university.dto.PasswordChangeDto;
 import hu.tamas.university.dto.UserDto;
-import hu.tamas.university.entity.Invitation;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.AddressRepository;
 import hu.tamas.university.repository.InvitationRepository;
 import hu.tamas.university.repository.UserRepository;
 import hu.tamas.university.security.UserAuthenticationService;
+import hu.tamas.university.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,18 +22,17 @@ import java.util.stream.Collectors;
 @RequestMapping("/users")
 public class UserController {
 
-	private final AddressRepository addressRepository;
 	private final UserRepository userRepository;
-	private final InvitationRepository invitationRepository;
 	private final UserAuthenticationService userAuthenticationService;
+	private final UserService userService;
 
 	@Autowired
 	public UserController(AddressRepository addressRepository, UserRepository userRepository,
-			InvitationRepository invitationRepository, UserAuthenticationService userAuthenticationService) {
-		this.addressRepository = addressRepository;
+			InvitationRepository invitationRepository, UserAuthenticationService userAuthenticationService,
+			UserService userService) {
 		this.userRepository = userRepository;
-		this.invitationRepository = invitationRepository;
 		this.userAuthenticationService = userAuthenticationService;
+		this.userService = userService;
 	}
 
 	@GetMapping("/current")
@@ -64,17 +64,11 @@ public class UserController {
 		return "{\"result\":\"" + result + "\"}";
 	}
 
-	@DeleteMapping(value = "/delete/{email}")
+	@Transactional
+	@DeleteMapping(value = "/delete")
 	@ResponseBody
-	public String deleteUser(@PathVariable String email) {
-		String result;
-		User user = userRepository.findByEmail(email).get();
-
-		List<Invitation> invitationList = invitationRepository.findByUser(user);
-		invitationRepository.deleteAll(invitationList);
-		userRepository.delete(user);
-		addressRepository.delete(user.getAddress());
-		result = "success";
+	public String deleteUser(@AuthenticationPrincipal User user) {
+		final String result = userService.deleteUser(user.getEmail());
 
 		return "{\"result\":\"" + result + "\"}";
 	}

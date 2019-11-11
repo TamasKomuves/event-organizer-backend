@@ -103,7 +103,7 @@ public class EventController {
 
 		event.addParticipant(creator);
 
-		eventRepository.saveAndFlush(event);
+		eventTypeRepository.saveAndFlush(eventType);
 
 		return "{\"result\":\"success\"}";
 	}

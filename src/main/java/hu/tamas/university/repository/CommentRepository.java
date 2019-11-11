@@ -20,4 +20,9 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 	@Modifying
 	@Transactional
 	int deleteByPostIdIn(List<Integer> postIds);
+
+	@Modifying
+	@Transactional
+	@Query("UPDATE Comment SET commenter_email = NULL where commenter_email = :userEmail")
+	int updateByUserEmail(@Param("userEmail") String userEmail);
 }

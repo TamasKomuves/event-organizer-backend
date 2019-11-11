@@ -25,4 +25,8 @@ public interface InvitationRepository extends JpaRepository<Invitation, Integer>
 	@Modifying
 	@Transactional
 	int deleteByEventId(int eventId);
+
+	@Modifying
+	@Transactional
+	int deleteByUserEmail(String userEmail);
 }

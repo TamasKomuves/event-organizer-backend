@@ -19,4 +19,8 @@ public interface LikesCommentRepository extends JpaRepository<LikesComment, Inte
 	@Modifying
 	@Transactional
 	int deleteByCommentIdIn(List<Integer> commentIds);
+
+	@Modifying
+	@Transactional
+	int deleteByUserEmail(String userEmail);
 }

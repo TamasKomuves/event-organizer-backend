@@ -17,4 +17,8 @@ public interface AnswersToPollRepository extends JpaRepository<AnswersToPoll, In
 	@Modifying
 	@Transactional
 	int deleteByPollAnswerIdIn(List<Integer> pollAnswerIds);
+
+	@Modifying
+	@Transactional
+	int deleteByUserEmail(String userEmail);
 }
