@@ -34,11 +34,9 @@ public class EventCreatorDto {
 	private Timestamp eventDate;
 
 	@NotNull
-	private int addressId;
-
-	@NotNull
 	private String eventType;
 
+	@NotNull
 	private AddressDto address;
 
 	public static Event fromDto(EventCreatorDto eventCreatorDto, Address address, EventType eventType, User user) {

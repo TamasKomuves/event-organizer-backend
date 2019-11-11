@@ -97,7 +97,7 @@ public class EventController {
 		final String eventTypeLowerCase = eventCreatorDto.getEventType().toLowerCase();
 		final EventType eventType = eventTypeRepository.findByType(eventTypeLowerCase)
 				.orElse(new EventType(eventTypeLowerCase));
-		final Address address = addressRepository.findAddressById(eventCreatorDto.getAddressId());
+		final Address address = AddressDto.fromDto(eventCreatorDto.getAddress());
 		final User creator = userRepository.findByEmail(user.getEmail()).get();
 		final Event event = EventCreatorDto.fromDto(eventCreatorDto, address, eventType, creator);
 
