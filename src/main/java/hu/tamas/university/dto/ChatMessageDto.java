@@ -1,6 +1,5 @@
 package hu.tamas.university.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import hu.tamas.university.entity.ChatMessage;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,21 +18,20 @@ public class ChatMessageDto {
 	@NotNull
 	private String text;
 
-	@JsonProperty
-	private boolean isCurrentUserSent;
+	@NotNull
+	private String receiverEmail;
 
 	@NotNull
-	private String partnerEmail;
+	private String senderEmail;
 
-	public static ChatMessageDto fromEntity(ChatMessage chatMessage, String currentUserEmail) {
-		ChatMessageDto chatMessageDto = new ChatMessageDto();
+	public static ChatMessageDto fromEntity(ChatMessage chatMessage) {
+		final ChatMessageDto chatMessageDto = new ChatMessageDto();
 
 		chatMessageDto.setId(chatMessage.getId());
 		chatMessageDto.setText(chatMessage.getText());
 		chatMessageDto.setDate(chatMessage.getDate());
-		boolean isCurrentUserSent = currentUserEmail.equals(chatMessage.getSender().getEmail());
-		chatMessageDto.setCurrentUserSent(isCurrentUserSent);
-		chatMessageDto.setPartnerEmail(getPartnerEmail(chatMessage, currentUserEmail));
+		chatMessageDto.setSenderEmail(chatMessage.getSender().getEmail());
+		chatMessageDto.setReceiverEmail(chatMessage.getReceiver().getEmail());
 
 		return chatMessageDto;
 	}
