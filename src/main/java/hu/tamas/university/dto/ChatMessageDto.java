@@ -21,7 +21,6 @@ public class ChatMessageDto {
 	@NotNull
 	private String receiverEmail;
 
-	@NotNull
 	private String senderEmail;
 
 	public static ChatMessageDto fromEntity(ChatMessage chatMessage) {
