@@ -38,6 +38,9 @@ public class Invitation {
 	@Column(name = "is_user_requested")
 	private int userRequested;
 
+	@Column(name = "is_already_seen")
+	private int isAlreadySeen;
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

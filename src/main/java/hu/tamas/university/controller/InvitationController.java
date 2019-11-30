@@ -11,6 +11,7 @@ import hu.tamas.university.repository.InvitationRepository;
 import hu.tamas.university.repository.ParticipateInEventRepository;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,7 +81,8 @@ public class InvitationController {
 
 	private boolean isAlreadyParticipateInEvent(InvitationDto invitationDto) {
 		return participateInEventRepository
-				.findByEventIdAndUserEmail(invitationDto.getEventId(), invitationDto.getUserEmail()).isPresent();
+				.findByEventIdAndUserEmail(invitationDto.getEventId(), invitationDto.getUserEmail())
+				.isPresent();
 	}
 
 	private boolean isAlreadyInvited(Event event, User user) {
@@ -89,12 +91,13 @@ public class InvitationController {
 	}
 
 	private Invitation createInvitation(Event event, User user, int isUserRequested) {
-		Invitation invitation = new Invitation();
+		final Invitation invitation = new Invitation();
 		invitation.setEvent(event);
 		invitation.setUser(user);
 		invitation.setUserRequested(isUserRequested);
 		invitation.setAccepted(0);
 		invitation.setSentDate(new Timestamp(System.currentTimeMillis()));
+		invitation.setIsAlreadySeen(0);
 		return invitation;
 	}
 
@@ -145,5 +148,11 @@ public class InvitationController {
 	public String deleteInvitation(@PathVariable int id) {
 		invitationRepository.deleteById(id);
 		return "{\"result\":\"success\"}";
+	}
+
+	@GetMapping("/not-seen")
+	@ResponseBody
+	public Long countNotSeenMessages(@AuthenticationPrincipal User user) {
+		return invitationRepository.countByUserEmailAndIsAlreadySeen(user.getEmail(), 0);
 	}
 }

@@ -5,8 +5,6 @@ import hu.tamas.university.entity.Invitation;
 import hu.tamas.university.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -18,9 +16,9 @@ public interface InvitationRepository extends JpaRepository<Invitation, Integer>
 
 	Optional<List<Invitation>> findByEventId(int eventId);
 
-	List<Invitation> findByUser(User user);
-
 	List<Invitation> findByEventAndUser(Event event, User user);
+
+	Long countByUserEmailAndIsAlreadySeen(String userEmail, int IsAlreadySeen);
 
 	@Modifying
 	@Transactional
