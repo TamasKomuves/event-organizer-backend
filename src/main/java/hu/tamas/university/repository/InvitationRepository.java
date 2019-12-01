@@ -3,6 +3,7 @@ package hu.tamas.university.repository;
 import hu.tamas.university.entity.Invitation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -25,4 +26,9 @@ public interface InvitationRepository extends JpaRepository<Invitation, Integer>
 	@Modifying
 	@Transactional
 	int deleteByUserEmail(String userEmail);
+
+	@Modifying
+	@Transactional
+	@Query("UPDATE Invitation SET is_already_seen = 1 WHERE user_email = :userEmail AND is_already_seen = 0")
+	int updateAllToAlreadySeenByUserEmail(String userEmail);
 }

@@ -73,19 +73,29 @@ public class WebSocketController {
 	@MessageMapping("/send/invitation")
 	public InvitationDto sendInvitation(final String messageString) throws IOException {
 		final InvitationDto invitationDto = objectMapper.readValue(messageString, InvitationDto.class);
-
 		final Invitation invitation = invitationRepository.findInvitationById(invitationDto.getId());
-
 		final InvitationDto invitationToReturn = InvitationDto.fromEntity(invitation);
+		final Long notSeenInvitationCounter = invitationRepository
+				.countByUserEmailAndIsAlreadySeen(invitationDto.getUserEmail(), 0);
 
 		this.simpMessagingTemplate
-				.convertAndSend("/socket-publisher/invitations" + invitationDto.getUserEmail(),
+				.convertAndSend("/socket-publisher/new-invitations/" + invitationDto.getUserEmail(),
 						invitationToReturn);
 		this.simpMessagingTemplate
-				.convertAndSend("/socket-publisher/invitation-counter" + invitationDto.getUserEmail(),
-						invitationToReturn);
+				.convertAndSend("/socket-publisher/invitation-counter/" + invitationDto.getUserEmail(),
+						notSeenInvitationCounter);
 
 		return invitationToReturn;
+	}
+
+	@MessageMapping("/send/invitation/update-counter")
+	public Long updateInvitationCounter(final String userEmail) {
+		final Long notSeenInvitationCounter = invitationRepository
+				.countByUserEmailAndIsAlreadySeen(userEmail, 0);
+		this.simpMessagingTemplate
+				.convertAndSend("/socket-publisher/invitation-counter/" + userEmail,
+						notSeenInvitationCounter);
+		return notSeenInvitationCounter;
 	}
 
 	private String calculateTopicName(String senderEmail, String receiverEmail) {

@@ -154,4 +154,11 @@ public class InvitationController {
 	public Long countNotSeenMessages(@AuthenticationPrincipal User user) {
 		return invitationRepository.countByUserEmailAndIsAlreadySeen(user.getEmail(), 0);
 	}
+
+	@PutMapping("/mark-all-as-seen")
+	@ResponseBody
+	public String markAllAsSeen(@AuthenticationPrincipal User user) {
+		invitationRepository.updateAllToAlreadySeenByUserEmail(user.getEmail());
+		return "{\"result\":\"success\"}";
+	}
 }
