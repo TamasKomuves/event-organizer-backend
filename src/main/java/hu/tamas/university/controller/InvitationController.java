@@ -48,26 +48,25 @@ public class InvitationController {
 
 	@PostMapping("/create")
 	@ResponseBody
-	public String createInvitation(@RequestBody @Valid InvitationDto invitationDto) {
+	public InvitationDto createInvitation(@RequestBody @Valid InvitationDto invitationDto) {
 		final Event event = eventRepository.findEventById(invitationDto.getEventId());
+		final User user = userRepository.findByEmail(invitationDto.getUserEmail()).get();
 
 		if (!isEventHasMorePlace(event)) {
-			return "{\"result\":\"no more place\"}";
+			throw new RuntimeException("No more place");
 		}
 
 		if (isAlreadyParticipateInEvent(invitationDto)) {
-			return "{\"result\":\"already participate\"}";
+			throw new RuntimeException("Already participate");
 		}
 
-		final User user = userRepository.findByEmail(invitationDto.getUserEmail()).get();
-		if (isAlreadyInvited(event, user)) {
-			return "{\"result\":\"already invited\"}";
+		if (isAlreadyInvited(invitationDto)) {
+			throw new RuntimeException("Already invited");
 		}
 
 		final Invitation invitation = createInvitation(event, user, invitationDto.getUserRequested());
-		invitationRepository.save(invitation);
 
-		return "{\"result\":\"success\"}";
+		return InvitationDto.fromEntity(invitationRepository.save(invitation));
 	}
 
 	private boolean isEventHasMorePlace(Event event) {
@@ -85,9 +84,10 @@ public class InvitationController {
 				.isPresent();
 	}
 
-	private boolean isAlreadyInvited(Event event, User user) {
-		return invitationRepository.findByEventAndUser(event, user).stream()
-				.anyMatch(invitation -> invitation.getDecisionDate() != null);
+	private boolean isAlreadyInvited(final InvitationDto invitationDto) {
+		return invitationRepository
+				.findByEventIdAndUserEmailAndDecisionDateIsNull(invitationDto.getEventId(),
+						invitationDto.getUserEmail()).isPresent();
 	}
 
 	private Invitation createInvitation(Event event, User user, int isUserRequested) {
@@ -125,10 +125,9 @@ public class InvitationController {
 	@GetMapping("/is-invited/{eventId}/{userEmail}")
 	@ResponseBody
 	public String isAlreadyInvited(@PathVariable int eventId, @PathVariable String userEmail) {
-		boolean isAlreadySent = invitationRepository.findAll().stream()
-				.anyMatch(invitation -> invitation.getEvent().getId() == eventId &&
-						invitation.getUser() != null && invitation.getUser().getEmail().equals(userEmail)
-						&& invitation.getDecisionDate() == null);
+		boolean isAlreadySent = invitationRepository
+				.findByEventIdAndUserEmailAndDecisionDateIsNull(eventId, userEmail)
+				.isPresent();
 
 		return "{\"result\":\"" + isAlreadySent + "\"}";
 	}
