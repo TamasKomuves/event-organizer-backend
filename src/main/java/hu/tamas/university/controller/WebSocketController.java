@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.tamas.university.dto.ChatMessageDto;
 import hu.tamas.university.dto.InvitationDto;
 import hu.tamas.university.entity.ChatMessage;
-import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.Invitation;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.ChatMessageRepository;
@@ -61,9 +60,11 @@ public class WebSocketController {
 		final ChatMessage createdChatMessage = chatMessageRepository.save(chatMessage);
 		final ChatMessageDto chatMessageDtoToReturn = ChatMessageDto.fromEntity(createdChatMessage);
 
-		this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + calculateTopicName(chatMessageDto),
+		final String receiverEmail = chatMessageDto.getReceiverEmail();
+		this.simpMessagingTemplate.convertAndSend(
+				"/socket-publisher/" + calculateTopicName(userEmail, receiverEmail),
 				chatMessageDtoToReturn);
-		this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + chatMessageDto.getReceiverEmail(),
+		this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + receiverEmail,
 				chatMessageDtoToReturn);
 
 		return chatMessageDtoToReturn;
@@ -73,34 +74,21 @@ public class WebSocketController {
 	public InvitationDto sendInvitation(final String messageString) throws IOException {
 		final InvitationDto invitationDto = objectMapper.readValue(messageString, InvitationDto.class);
 
-		final Event event = eventRepository.findEventById(invitationDto.getEventId());
-		final User user = userRepository.findByEmail(invitationDto.getUserEmail()).get();
+		final Invitation invitation = invitationRepository.findInvitationById(invitationDto.getId());
 
-		final Invitation invitation = new Invitation();
-		invitation.setEvent(event);
-		invitation.setUser(user);
-		invitation.setUserRequested(invitationDto.getUserRequested());
-		invitation.setAccepted(0);
-		invitation.setSentDate(new Timestamp(System.currentTimeMillis()));
-		invitation.setIsAlreadySeen(0);
-
-		final InvitationDto savedInvitationDto =
-				InvitationDto.fromEntity(invitationRepository.save(invitation));
+		final InvitationDto invitationToReturn = InvitationDto.fromEntity(invitation);
 
 		this.simpMessagingTemplate
 				.convertAndSend("/socket-publisher/invitations" + invitationDto.getUserEmail(),
-						savedInvitationDto);
+						invitationToReturn);
 		this.simpMessagingTemplate
 				.convertAndSend("/socket-publisher/invitation-counter" + invitationDto.getUserEmail(),
-						savedInvitationDto);
+						invitationToReturn);
 
-		return savedInvitationDto;
+		return invitationToReturn;
 	}
 
-	private String calculateTopicName(ChatMessageDto chatMessageDto) {
-		final String senderEmail = chatMessageDto.getSenderEmail();
-		final String receiverEmail = chatMessageDto.getReceiverEmail();
-
+	private String calculateTopicName(String senderEmail, String receiverEmail) {
 		return senderEmail.compareTo(receiverEmail) > 0 ? receiverEmail + "-" + senderEmail :
 				senderEmail + "-" + receiverEmail;
 	}
