@@ -37,7 +37,7 @@ public class PollAnswer {
 		if (!(o instanceof PollAnswer)) {
 			return false;
 		}
-		return id == ((PollAnswer) o).id;
+		return id == ((PollAnswer) o).id && text.equals(((PollAnswer) o).text);
 	}
 
 	@Override
