@@ -5,14 +5,10 @@ import hu.tamas.university.dto.ChatMessageDto;
 import hu.tamas.university.entity.ChatMessage;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.ChatMessageRepository;
-import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.List;
@@ -24,13 +20,10 @@ import java.util.stream.Collectors;
 public class ChatMessageController {
 
 	private final ChatMessageRepository chatMessageRepository;
-	private final UserRepository userRepository;
 
 	@Autowired
-	public ChatMessageController(ChatMessageRepository chatMessageRepository,
-			UserRepository userRepository) {
+	public ChatMessageController(ChatMessageRepository chatMessageRepository) {
 		this.chatMessageRepository = chatMessageRepository;
-		this.userRepository = userRepository;
 	}
 
 	@GetMapping("/all-messages/{userEmail}")
@@ -66,6 +59,21 @@ public class ChatMessageController {
 		}
 
 		return map.values().stream().map(ChatMessageDto::fromEntity).collect(Collectors.toList());
+	}
+
+	@GetMapping("/not-seen")
+	@ResponseBody
+	public int notSeenChatMessageCount(@AuthenticationPrincipal final User user) {
+		return chatMessageRepository.countByReceiverEmailAndIsAlreadySeenGroupBySenderEmail(user.getEmail())
+				.size();
+	}
+
+	@PutMapping("/mark-all-as-seen/{partnerEmail}")
+	@ResponseBody
+	public String markAllAsSeenWithPartner(@PathVariable final String partnerEmail,
+			@AuthenticationPrincipal final User user) {
+		chatMessageRepository.updateWithPartnerToAlreadySeenByUserEmail(user.getEmail(), partnerEmail);
+		return "{\"result\":\"success\"}";
 	}
 
 	private String getPartnerEmail(ChatMessage chatMessage, String currentUserEmail) {

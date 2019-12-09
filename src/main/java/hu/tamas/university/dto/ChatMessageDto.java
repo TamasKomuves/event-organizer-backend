@@ -23,6 +23,8 @@ public class ChatMessageDto {
 
 	private String senderEmail;
 
+	private int isAlreadySeen;
+
 	public static ChatMessageDto fromEntity(ChatMessage chatMessage) {
 		final ChatMessageDto chatMessageDto = new ChatMessageDto();
 
@@ -31,6 +33,7 @@ public class ChatMessageDto {
 		chatMessageDto.setDate(chatMessage.getDate());
 		chatMessageDto.setSenderEmail(chatMessage.getSender().getEmail());
 		chatMessageDto.setReceiverEmail(chatMessage.getReceiver().getEmail());
+		chatMessageDto.setIsAlreadySeen(chatMessage.getIsAlreadySeen());
 
 		return chatMessageDto;
 	}

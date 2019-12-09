@@ -33,6 +33,9 @@ public class ChatMessage {
 	@Column(name = "text")
 	private String text;
 
+	@Column(name = "is_already_seen")
+	private int isAlreadySeen;
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

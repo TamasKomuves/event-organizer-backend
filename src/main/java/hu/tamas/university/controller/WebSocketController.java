@@ -7,7 +7,6 @@ import hu.tamas.university.entity.ChatMessage;
 import hu.tamas.university.entity.Invitation;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.ChatMessageRepository;
-import hu.tamas.university.repository.EventRepository;
 import hu.tamas.university.repository.InvitationRepository;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.messaging.Message;
@@ -28,26 +27,23 @@ public class WebSocketController {
 	private final UserRepository userRepository;
 	private final ChatMessageRepository chatMessageRepository;
 	private final InvitationRepository invitationRepository;
-	private final EventRepository eventRepository;
 
 	public WebSocketController(SimpMessagingTemplate simpMessagingTemplate, ObjectMapper objectMapper,
 			UserRepository userRepository, ChatMessageRepository chatMessageRepository,
-			InvitationRepository invitationRepository,
-			EventRepository eventRepository) {
+			InvitationRepository invitationRepository) {
 		this.simpMessagingTemplate = simpMessagingTemplate;
 		this.objectMapper = objectMapper;
 		this.userRepository = userRepository;
 		this.chatMessageRepository = chatMessageRepository;
 		this.invitationRepository = invitationRepository;
-		this.eventRepository = eventRepository;
 	}
 
 	@MessageMapping("/send/message")
 	public ChatMessageDto sendMessageToUser(final String messageString,
 			@Payload Message message) throws IOException {
 		final ChatMessageDto chatMessageDto = objectMapper.readValue(messageString, ChatMessageDto.class);
-		final String userEmail =
-				((UsernamePasswordAuthenticationToken) message.getHeaders().get("simpUser")).getName();
+		final String userEmail = ((UsernamePasswordAuthenticationToken) message.getHeaders().get("simpUser"))
+				.getName();
 		final User receiver = userRepository.findByEmail(chatMessageDto.getReceiverEmail()).get();
 		final User sender = userRepository.findByEmail(userEmail).get();
 
@@ -56,18 +52,36 @@ public class WebSocketController {
 		chatMessage.setReceiver(receiver);
 		chatMessage.setText(chatMessageDto.getText());
 		chatMessage.setDate(new Timestamp(System.currentTimeMillis()));
+		chatMessage.setIsAlreadySeen(0);
 
 		final ChatMessage createdChatMessage = chatMessageRepository.save(chatMessage);
 		final ChatMessageDto chatMessageDtoToReturn = ChatMessageDto.fromEntity(createdChatMessage);
 
 		final String receiverEmail = chatMessageDto.getReceiverEmail();
+		final long messageCounter = chatMessageRepository
+				.countByReceiverEmailAndIsAlreadySeenGroupBySenderEmail(receiverEmail).size();
+
 		this.simpMessagingTemplate.convertAndSend(
 				"/socket-publisher/" + calculateTopicName(userEmail, receiverEmail),
 				chatMessageDtoToReturn);
-		this.simpMessagingTemplate.convertAndSend("/socket-publisher/" + receiverEmail,
+		this.simpMessagingTemplate.convertAndSend("/socket-publisher/chat-message/" + receiverEmail,
 				chatMessageDtoToReturn);
+		this.simpMessagingTemplate
+				.convertAndSend("/socket-publisher/chat-message/counter/" + receiverEmail,
+						messageCounter);
 
 		return chatMessageDtoToReturn;
+	}
+
+	@MessageMapping("/send/chat-message/update-counter")
+	public Long updateChatMessageCounter(@Payload Message message) {
+		final String userEmail = ((UsernamePasswordAuthenticationToken) message.getHeaders().get("simpUser"))
+				.getName();
+		final long messageCounter = chatMessageRepository
+				.countByReceiverEmailAndIsAlreadySeenGroupBySenderEmail(userEmail).size();
+		this.simpMessagingTemplate
+				.convertAndSend("/socket-publisher/chat-message/counter/" + userEmail, messageCounter);
+		return messageCounter;
 	}
 
 	@MessageMapping("/send/invitation")
