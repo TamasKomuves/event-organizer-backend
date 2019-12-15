@@ -52,7 +52,7 @@ public class User implements UserDetails {
 	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<LikesPost> likesPosts = new HashSet<>();
 
-	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<AnswersToPoll> answersToPolls = new HashSet<>();
 
 	@OneToMany(mappedBy = "sender", cascade = {CascadeType.PERSIST, CascadeType.MERGE})

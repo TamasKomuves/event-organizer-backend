@@ -26,7 +26,7 @@ public class PollAnswer {
 	@Column(name = "text")
 	private String text;
 
-	@OneToMany(mappedBy = "pollAnswer", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(mappedBy = "pollAnswer", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<AnswersToPoll> answersToPolls = new HashSet<>();
 
 	@Override
