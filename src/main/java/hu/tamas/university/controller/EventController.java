@@ -93,17 +93,23 @@ public class EventController {
 
 	@PostMapping("/create")
 	@ResponseBody
-	public String createEvent(@RequestBody @Valid EventCreatorDto eventCreatorDto, @AuthenticationPrincipal User user) {
+	public String createEvent(@RequestBody @Valid EventCreatorDto eventCreatorDto,
+			@AuthenticationPrincipal User user) {
 		final String eventTypeLowerCase = eventCreatorDto.getEventType().toLowerCase();
-		final EventType eventType = eventTypeRepository.findByType(eventTypeLowerCase)
-				.orElse(new EventType(eventTypeLowerCase));
+		final Optional<EventType> eventTypeOptional = eventTypeRepository.findByType(eventTypeLowerCase);
+		final EventType eventType = eventTypeOptional.orElse(new EventType(eventTypeLowerCase));
+
+		if (!eventTypeOptional.isPresent()) {
+			eventTypeRepository.saveAndFlush(eventType);
+		}
+
 		final Address address = AddressDto.fromDto(eventCreatorDto.getAddress());
 		final User creator = userRepository.findByEmail(user.getEmail()).get();
 		final Event event = EventCreatorDto.fromDto(eventCreatorDto, address, eventType, creator);
 
 		event.addParticipant(creator);
 
-		eventTypeRepository.saveAndFlush(eventType);
+		eventTypeRepository.flush();
 
 		return "{\"result\":\"success\"}";
 	}

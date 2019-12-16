@@ -40,14 +40,14 @@ public class EventCreatorDto {
 	private AddressDto address;
 
 	public static Event fromDto(EventCreatorDto eventCreatorDto, Address address, EventType eventType, User user) {
-		Event event = new Event();
-
+		final Event event = new Event();
 		event.setName(eventCreatorDto.getName());
 		event.setDescription(eventCreatorDto.getDescription());
 		event.setMaxParticipant(eventCreatorDto.getMaxParticipant());
 		event.setVisibility(eventCreatorDto.getVisibility());
 		event.setTotalCost(eventCreatorDto.getTotalCost());
 		event.setEventDate(eventCreatorDto.getEventDate());
+
 		event.setAddress(address);
 		eventType.addEvent(event);
 		user.addOrganizedEvent(event);
