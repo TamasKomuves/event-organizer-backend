@@ -24,7 +24,6 @@ public class EventController {
 
 	private final EventRepository eventRepository;
 	private final EventTypeRepository eventTypeRepository;
-	private final AddressRepository addressRepository;
 	private final UserRepository userRepository;
 	private final ParticipateInEventRepository participateInEventRepository;
 	private final InvitationRepository invitationRepository;
@@ -34,12 +33,11 @@ public class EventController {
 
 	@Autowired
 	public EventController(EventRepository eventRepository, EventTypeRepository eventTypeRepository,
-			AddressRepository addressRepository, UserRepository userRepository,
-			ParticipateInEventRepository participateInEventRepository, InvitationRepository invitationRepository,
-			PollQuestionRepository pollQuestionRepository, PostRepository postRepository, EventService eventService) {
+			UserRepository userRepository, EventService eventService, PostRepository postRepository,
+			InvitationRepository invitationRepository, PollQuestionRepository pollQuestionRepository,
+			ParticipateInEventRepository participateInEventRepository) {
 		this.eventRepository = eventRepository;
 		this.eventTypeRepository = eventTypeRepository;
-		this.addressRepository = addressRepository;
 		this.userRepository = userRepository;
 		this.participateInEventRepository = participateInEventRepository;
 		this.invitationRepository = invitationRepository;
@@ -50,9 +48,8 @@ public class EventController {
 
 	@GetMapping("/{id}")
 	@ResponseBody
-	public EventDto getEventById(@PathVariable int id, @AuthenticationPrincipal final User user) {
+	public EventDto getEventById(@PathVariable final int id) {
 		final Event event = eventRepository.findEventById(id);
-
 		return EventDto.fromEntity(event);
 	}
 
@@ -60,24 +57,23 @@ public class EventController {
 	@ResponseBody
 	public List<EventDto> getAllEvent(@AuthenticationPrincipal final User user) {
 		final List<Event> events = eventRepository.findAll();
-
 		return convertEventsToEventDtos(events, user);
 	}
 
-	private List<EventDto> convertEventsToEventDtos(List<Event> events, User user) {
+	private List<EventDto> convertEventsToEventDtos(final List<Event> events, final User user) {
 		return events.stream().filter(event -> isCurrentUserHasRightToGetEvent(event, user))
 				.map(EventDto::fromEntity).collect(Collectors.toList());
 	}
 
-	private boolean isCurrentUserHasRightToGetEvent(Event event, User user) {
+	private boolean isCurrentUserHasRightToGetEvent(final Event event, final User user) {
 		return !event.getVisibility().equals(PRIVATE_VISIBILITY) || isParticipate(user, event);
 	}
 
 	@GetMapping("/type/{type}")
 	@ResponseBody
-	public List<EventDto> getEventsByType(@AuthenticationPrincipal final User user, @PathVariable String type) {
+	public List<EventDto> getEventsByType(@AuthenticationPrincipal final User user,
+			@PathVariable final String type) {
 		final List<Event> events = eventRepository.findAllByEventTypeType(type);
-
 		return convertEventsToEventDtos(events, user);
 	}
 
@@ -87,14 +83,13 @@ public class EventController {
 		final Event event = eventRepository.findEventById(id);
 		final List<User> participants = event.getParticipateInEvents().stream()
 				.map(ParticipateInEvent::getUser).collect(Collectors.toList());
-
 		return participants.stream().map(UserDto::fromEntity).collect(Collectors.toList());
 	}
 
 	@PostMapping("/create")
 	@ResponseBody
-	public String createEvent(@RequestBody @Valid EventCreatorDto eventCreatorDto,
-			@AuthenticationPrincipal User user) {
+	public String createEvent(@RequestBody @Valid final EventCreatorDto eventCreatorDto,
+			@AuthenticationPrincipal final User user) {
 		final String eventTypeLowerCase = eventCreatorDto.getEventType().toLowerCase();
 		final Optional<EventType> eventTypeOptional = eventTypeRepository.findByType(eventTypeLowerCase);
 		final EventType eventType = eventTypeOptional.orElse(new EventType(eventTypeLowerCase));
@@ -116,13 +111,14 @@ public class EventController {
 
 	@GetMapping("/{eventId}/add-user/{userEmail}")
 	@ResponseBody
-	public String addUserToEvent(@PathVariable int eventId, @PathVariable String userEmail) {
+	public String addUserToEvent(@PathVariable final int eventId, @PathVariable final String userEmail) {
 		final Event event = eventRepository.findEventById(eventId);
 		if (!isEventHasMorePlace(event)) {
 			return "{\"result\":\"no more place\"}";
 		}
 
-		final boolean isAlreadyParticipate = participateInEventRepository.findByEventIdAndUserEmail(eventId, userEmail)
+		final boolean isAlreadyParticipate = participateInEventRepository
+				.findByEventIdAndUserEmail(eventId, userEmail)
 				.isPresent();
 		if (isAlreadyParticipate) {
 			return "{\"result\":\"already added\"}";
@@ -136,31 +132,33 @@ public class EventController {
 		return "{\"result\":\"success\"}";
 	}
 
-	private boolean isParticipate(User user, Event event) {
-		final List<User> participants = event.getParticipateInEvents().stream().map(ParticipateInEvent::getUser)
+	private boolean isParticipate(final User user, final Event event) {
+		final List<User> participants = event.getParticipateInEvents().stream()
+				.map(ParticipateInEvent::getUser)
 				.collect(Collectors.toList());
 		return participants.stream().anyMatch(user1 -> user1.getEmail().equals(user.getEmail()));
 	}
 
-	private boolean isEventHasMorePlace(Event event) {
-		return event.getInvitations().size() + event.getParticipateInEvents().size() < event.getMaxParticipant();
+	private boolean isEventHasMorePlace(final Event event) {
+		return event.getInvitations().size() + event.getParticipateInEvents().size() < event
+				.getMaxParticipant();
 	}
 
 	@GetMapping("/{eventId}/has-more-place")
 	@ResponseBody
-	public String eventHasMorePlace(@PathVariable int eventId) {
-		Event event = eventRepository.findEventById(eventId);
-		boolean result = isEventHasMorePlace(event);
-
+	public String eventHasMorePlace(@PathVariable final int eventId) {
+		final Event event = eventRepository.findEventById(eventId);
+		final boolean result = isEventHasMorePlace(event);
 		return "{\"result\":\"" + result + "\"}";
 	}
 
 	@GetMapping("/{eventId}/is-participate/{userEmail}")
 	@ResponseBody
-	public String isUserParticipateInEvent(@PathVariable int eventId, @PathVariable String userEmail) {
-		final boolean isParticipate = participateInEventRepository.findByEventIdAndUserEmail(eventId, userEmail)
+	public String isUserParticipateInEvent(@PathVariable final int eventId,
+			@PathVariable final String userEmail) {
+		final boolean isParticipate = participateInEventRepository
+				.findByEventIdAndUserEmail(eventId, userEmail)
 				.isPresent();
-
 		return "{\"result\":\"" + isParticipate + "\"}";
 	}
 
@@ -168,37 +166,39 @@ public class EventController {
 	@ResponseBody
 	public String deleteEvent(@AuthenticationPrincipal final User user, @PathVariable int eventId) {
 		final String result = eventService.deleteEvent(eventId, user.getEmail());
-
 		return "{\"result\":\"" + result + "\"}";
 	}
 
 	@GetMapping("/{eventId}/invitation-offers")
 	@ResponseBody
-	public List<InvitationDto> getInvitationOffers(@PathVariable int eventId) {
-		final List<Invitation> invitations = invitationRepository.findByEventId(eventId).orElse(Lists.newArrayList());
+	public List<InvitationDto> getInvitationOffers(@PathVariable final int eventId) {
+		final List<Invitation> invitations = invitationRepository.findByEventId(eventId)
+				.orElse(Lists.newArrayList());
 		return invitations.stream().filter(this::isInvitationOffer).map(InvitationDto::fromEntity)
 				.collect(Collectors.toList());
 	}
 
-	private boolean isInvitationOffer(Invitation invitation) {
+	private boolean isInvitationOffer(final Invitation invitation) {
 		return invitation.getDecisionDate() == null && invitation.getUserRequested() == 0;
 	}
 
 	@GetMapping("/{eventId}/invitation-requests")
 	@ResponseBody
-	public List<InvitationDto> getInvitationRequests(@PathVariable int eventId) {
-		final List<Invitation> invitations = invitationRepository.findByEventId(eventId).orElse(Lists.newArrayList());
+	public List<InvitationDto> getInvitationRequests(@PathVariable final int eventId) {
+		final List<Invitation> invitations = invitationRepository.findByEventId(eventId)
+				.orElse(Lists.newArrayList());
 		return invitations.stream().filter(this::isInvitationRequest).map(InvitationDto::fromEntity)
 				.collect(Collectors.toList());
 	}
 
-	private boolean isInvitationRequest(Invitation invitation) {
+	private boolean isInvitationRequest(final Invitation invitation) {
 		return invitation.getDecisionDate() == null && invitation.getUserRequested() == 1;
 	}
 
 	@PutMapping("/update-info/{id}")
 	@ResponseBody
-	public String updateEventInfo(@PathVariable int id, @RequestBody EventCreatorDto eventCreatorDto) {
+	public String updateEventInfo(@PathVariable final int id,
+			@RequestBody final EventCreatorDto eventCreatorDto) {
 		final Event event = eventRepository.findEventById(id);
 
 		EventCreatorDto.updateInfoFromDto(event, eventCreatorDto);
@@ -220,12 +220,14 @@ public class EventController {
 		return "{\"result\":\"success\"}";
 	}
 
-	private boolean isNewMaxParticipantHigher(Event event, int eventId, int newMaxParticipant) {
+	private boolean isNewMaxParticipantHigher(final Event event, final int eventId,
+			final int newMaxParticipant) {
 		final Optional<List<Invitation>> invitations = invitationRepository.findByEventId(eventId);
 		long invitationCount = 0;
 
 		if (invitations.isPresent()) {
-			invitationCount = invitations.get().stream().filter(invitation -> invitation.getUserRequested() == 0)
+			invitationCount = invitations.get().stream()
+					.filter(invitation -> invitation.getUserRequested() == 0)
 					.count();
 		}
 
@@ -234,14 +236,14 @@ public class EventController {
 
 	@GetMapping("/{id}/polls")
 	@ResponseBody
-	public List<PollQuestionDto> getAllPolls(@PathVariable int id) {
+	public List<PollQuestionDto> getAllPolls(@PathVariable final int id) {
 		final List<PollQuestion> pollQuestions = pollQuestionRepository.findAllByEventId(id);
 		return pollQuestions.stream().map(PollQuestionDto::fromEntity).collect(Collectors.toList());
 	}
 
 	@GetMapping("/{id}/news")
 	@ResponseBody
-	public List<NewsDto> getAllNews(@PathVariable int id) {
+	public List<NewsDto> getAllNews(@PathVariable final int id) {
 		final List<PollQuestionDto> pollQuestionDtos = pollQuestionRepository.findAllByEventId(id).stream()
 				.map(PollQuestionDto::fromEntity).collect(Collectors.toList());
 		final List<NewsDto> newsDtos = postRepository.findAllByEventId(id).stream().map(PostDto::fromEntity)
