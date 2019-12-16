@@ -5,9 +5,10 @@ import hu.tamas.university.entity.Address;
 import hu.tamas.university.repository.AddressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/addresses")
@@ -23,26 +24,15 @@ public class AddressController {
 	@GetMapping("/{id}")
 	@ResponseBody
 	public AddressDto getAddressById(@PathVariable int id) {
-		Address tmpAddress = addressRepository.findAddressById(id);
-
+		final Address tmpAddress = addressRepository.findAddressById(id);
 		return AddressDto.fromEntity(tmpAddress);
-	}
-
-	@PostMapping("/create")
-	@ResponseBody
-	public String createAddress(@RequestBody @Valid AddressDto addressDto) {
-		Address address = AddressDto.fromDto(addressDto);
-		address = addressRepository.save(address);
-
-		return "{\"result\":\"success\", " + "\"addressId\":\"" + address.getId() + "\"}";
 	}
 
 	@GetMapping("/update/{addressId}/{country}/{city}/{street}/{streetNumber}")
 	@ResponseBody
 	public String updateAddress(@PathVariable int addressId, @PathVariable String country,
-	                                   @PathVariable String city,
-	                                   @PathVariable String street, @PathVariable String streetNumber) {
-		Address address = addressRepository.findAddressById(addressId);
+			@PathVariable String city, @PathVariable String street, @PathVariable String streetNumber) {
+		final Address address = addressRepository.findAddressById(addressId);
 
 		if (address == null) {
 			return "{\"result\":\"no such address\"}";
