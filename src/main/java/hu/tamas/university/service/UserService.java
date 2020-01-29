@@ -74,7 +74,7 @@ public class UserService {
 		likesPostRepository.deleteByUserEmail(userEmail);
 		answersToPollRepository.deleteByUserEmail(userEmail);
 		chatMessageRepository.deleteBySenderEmailOrReceiverEmail(userEmail, userEmail);
-		commentRepository.updateByUserEmail(userEmail);
+		commentRepository.updateByUserEmailSetCommenterEmailToNull(userEmail);
 		postRepository.updateByUserEmail(userEmail);
 
 		deleteEventsOrganizedByTheUser(userEmail);

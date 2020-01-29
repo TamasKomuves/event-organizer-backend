@@ -25,7 +25,8 @@ final class PublicUsersController {
 	private final PasswordEncoder passwordEncoder;
 
 	@Autowired
-	public PublicUsersController(UserAuthenticationService userAuthenticationService, UserRepository userRepository,
+	public PublicUsersController(UserAuthenticationService userAuthenticationService,
+			UserRepository userRepository,
 			PasswordEncoder passwordEncoder) {
 		this.userAuthenticationService = userAuthenticationService;
 		this.userRepository = userRepository;
@@ -42,7 +43,8 @@ final class PublicUsersController {
 				registrationDto.getStreet(), registrationDto.getStreetNumber());
 
 		final String encodedPassword = passwordEncoder.encode(registrationDto.getPassword());
-		final User user = new User(registrationDto.getEmail(), encodedPassword, registrationDto.getFirstname(),
+		final User user = new User(registrationDto.getEmail(), encodedPassword,
+				registrationDto.getFirstname(),
 				registrationDto.getLastname(), address);
 		userRepository.saveAndFlush(user);
 
@@ -52,7 +54,8 @@ final class PublicUsersController {
 	@PostMapping("/login")
 	@ResponseBody
 	public String login(@RequestBody @Valid UserLoginDto userLoginDto) {
-		String token = userAuthenticationService.login(userLoginDto.getEmail(), userLoginDto.getPassword())
+		final String token = userAuthenticationService
+				.login(userLoginDto.getEmail(), userLoginDto.getPassword())
 				.orElseThrow(() -> new RuntimeException("invalid login and/or password"));
 		return "{\"token\":\"" + token + "\"}";
 	}

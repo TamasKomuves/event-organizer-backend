@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import hu.tamas.university.security.date.DateService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.compression.GzipCompressionCodec;
-import lombok.experimental.FieldDefaults;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,20 +15,17 @@ import java.util.function.Supplier;
 import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 import static io.jsonwebtoken.impl.TextCodec.BASE64;
 import static java.util.Objects.requireNonNull;
-import static lombok.AccessLevel.PRIVATE;
 
 @Service
-@FieldDefaults(level = PRIVATE, makeFinal = true)
 final class JWTTokenService implements Clock, TokenService {
 
-	private static final String DOT = ".";
 	private static final GzipCompressionCodec COMPRESSION_CODEC = new GzipCompressionCodec();
 
-	private DateService dates;
-	private String issuer;
-	private int expirationSec;
-	private int clockSkewSec;
-	private String secretKey;
+	private final DateService dates;
+	private final String issuer;
+	private final int expirationSec;
+	private final int clockSkewSec;
+	private final String secretKey;
 
 	JWTTokenService(final DateService dates, @Value("${jwt.issuer:octoperf}") final String issuer,
 			@Value("${jwt.expiration-sec:54000}") final int expirationSec,

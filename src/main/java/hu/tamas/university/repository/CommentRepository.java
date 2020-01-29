@@ -14,15 +14,15 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
 	Comment findCommentById(int id);
 
+	@Modifying
+	@Transactional
+	int deleteByPostIdIn(List<Integer> postIds);
+
 	@Query("SELECT id FROM Comment WHERE post_id IN (:postIds)")
 	Optional<List<Integer>> findIdsByPostIds(@Param("postIds") List<Integer> postIds);
 
 	@Modifying
 	@Transactional
-	int deleteByPostIdIn(List<Integer> postIds);
-
-	@Modifying
-	@Transactional
 	@Query("UPDATE Comment SET commenter_email = NULL where commenter_email = :userEmail")
-	int updateByUserEmail(@Param("userEmail") String userEmail);
+	int updateByUserEmailSetCommenterEmailToNull(@Param("userEmail") String userEmail);
 }

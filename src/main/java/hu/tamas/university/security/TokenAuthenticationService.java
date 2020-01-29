@@ -58,7 +58,7 @@ final class TokenAuthenticationService implements UserAuthenticationService {
 		userRepository.saveAndFlush(user);
 	}
 
-	private Optional<User> getMatchingUser(String email, String password) {
+	private Optional<User> getMatchingUser(final String email, final String password) {
 		return userRepository
 				.findByEmail(email)
 				.filter(user -> passwordEncoder.matches(password, user.getPassword()));

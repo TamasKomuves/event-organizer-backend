@@ -124,7 +124,7 @@ public class EventController {
 			return "{\"result\":\"already added\"}";
 		}
 
-		final User user = userRepository.findByEmail(userEmail).orElse(null);
+		final User user = userRepository.findByEmail(userEmail).get();
 		event.addParticipant(user);
 
 		eventRepository.flush();
