@@ -21,4 +21,8 @@ public interface ParticipateInEventRepository extends JpaRepository<ParticipateI
 	@Modifying
 	@Transactional
 	int deleteByUserEmail(String userEmail);
+
+	@Modifying
+	@Transactional
+	int deleteByEventIdAndUserEmail(int eventId, String userEmail);
 }

@@ -253,4 +253,16 @@ public class EventController {
 
 		return newsDtos;
 	}
+
+	@DeleteMapping("/{id}/participants/{email}/delete")
+	@ResponseBody
+	public String removeParticipant(@PathVariable final int id, @PathVariable final String email,
+			@AuthenticationPrincipal final User user) {
+		final Event event = eventRepository.findEventById(id);
+		if (!user.getEmail().equals(event.getOrganizer().getEmail()) && !email.equals(user.getEmail())) {
+			throw new RuntimeException("no permission");
+		}
+		participateInEventRepository.deleteByEventIdAndUserEmail(id, email);
+		return "{\"result\":\"success\"}";
+	}
 }
