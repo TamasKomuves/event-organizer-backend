@@ -2,6 +2,7 @@ package hu.tamas.university.service;
 
 import com.google.common.collect.Lists;
 import hu.tamas.university.entity.Event;
+import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,12 +58,14 @@ public class EventService {
 			return "no such event";
 		}
 
-		if (!event.getOrganizer().getEmail().equals(loggedInUserEmail)) {
+		final User organizer = event.getOrganizer();
+		if (organizer == null || !organizer.getEmail().equals(loggedInUserEmail)) {
 			return "no permission";
 		}
 
 		final List<Integer> postIds = postRepository.findIdByEventId(eventId).orElse(Lists.newArrayList(-1));
-		final List<Integer> commentIds = commentRepository.findIdsByPostIds(postIds).orElse(Lists.newArrayList(-1));
+		final List<Integer> commentIds = commentRepository.findIdsByPostIds(postIds)
+				.orElse(Lists.newArrayList(-1));
 		final List<Integer> pollQuestionIds = pollQuestionRepository.findIdsByEventId(eventId)
 				.orElse(Lists.newArrayList(-1));
 		final List<Integer> pollAnswerIds = pollAnswerRepository.findIdByPollQuestionIds(pollQuestionIds)
@@ -81,7 +84,8 @@ public class EventService {
 	}
 
 	@Transactional
-	private void executeDeleteEventQueries(List<Integer> commentIds, List<Integer> postIds, List<Integer> pollAnswerIds,
+	private void executeDeleteEventQueries(List<Integer> commentIds, List<Integer> postIds,
+			List<Integer> pollAnswerIds,
 			List<Integer> pollQuestionIds, int eventId) {
 		likesCommentRepository.deleteByCommentIdIn(commentIds);
 		commentRepository.deleteByPostIdIn(postIds);

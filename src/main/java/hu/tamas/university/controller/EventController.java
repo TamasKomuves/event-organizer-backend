@@ -259,7 +259,9 @@ public class EventController {
 	public String removeParticipant(@PathVariable final int id, @PathVariable final String email,
 			@AuthenticationPrincipal final User user) {
 		final Event event = eventRepository.findEventById(id);
-		if (!user.getEmail().equals(event.getOrganizer().getEmail()) && !email.equals(user.getEmail())) {
+		final User organizer = event.getOrganizer();
+		if ((organizer == null || !user.getEmail().equals(organizer.getEmail())) && !email
+				.equals(user.getEmail())) {
 			throw new RuntimeException("no permission");
 		}
 		participateInEventRepository.deleteByEventIdAndUserEmail(id, email);

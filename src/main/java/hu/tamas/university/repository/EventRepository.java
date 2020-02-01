@@ -20,6 +20,6 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
 	@Modifying
 	@Transactional
-	@Query("UPDATE Event SET organizer_email = NULL where organizer_email = :userEmail")
-	int updateByUserEmail(@Param("userEmail") String userEmail);
+	@Query("UPDATE Event SET organizer_email = NULL where organizer_email = :organizerEmail")
+	int updateByOrganizerEmailOrganizerEmailToNull(@Param("organizerEmail") String organizerEmail);
 }

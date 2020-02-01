@@ -20,12 +20,13 @@ public class PostDto extends NewsDto {
 	@NotNull
 	private String text;
 
-	public static PostDto fromEntity(Post post) {
-		PostDto postDto = new PostDto();
+	public static PostDto fromEntity(final Post post) {
+		final PostDto postDto = new PostDto();
 		postDto.setId(post.getId());
-		if (post.getEvent() != null)
-			postDto.setEventId(post.getEvent().getId());
-		postDto.setPosterEmail(post.getPoster().getEmail());
+		postDto.setEventId(post.getEvent().getId());
+		if (post.getPoster() != null) {
+			postDto.setPosterEmail(post.getPoster().getEmail());
+		}
 		postDto.setDate(post.getPostDate());
 		postDto.setText(post.getText());
 		return postDto;

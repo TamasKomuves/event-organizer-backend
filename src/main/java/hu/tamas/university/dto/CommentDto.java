@@ -23,13 +23,15 @@ public class CommentDto {
 	@NotNull
 	private String text;
 
-	public static CommentDto fromEntity(Comment comment) {
-		CommentDto commentDto = new CommentDto();
+	public static CommentDto fromEntity(final Comment comment) {
+		final CommentDto commentDto = new CommentDto();
 		commentDto.setId(comment.getId());
-		if (comment.getCommenter() != null)
+		if (comment.getCommenter() != null) {
 			commentDto.setCommenterEmail(comment.getCommenter().getEmail());
-		if (comment.getPost() != null)
+		}
+		if (comment.getPost() != null) {
 			commentDto.setPostId(comment.getPost().getId());
+		}
 		commentDto.setCommentDate(comment.getCommentDate());
 		commentDto.setText(comment.getText());
 		return commentDto;
