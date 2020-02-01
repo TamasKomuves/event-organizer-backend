@@ -39,7 +39,7 @@ public class Post {
 	@OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Comment> comments = new HashSet<>();
 
-	@OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<LikesPost> likesPosts = new HashSet<>();
 
 	public void addComment(Comment comment) {

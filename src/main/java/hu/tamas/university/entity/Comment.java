@@ -36,7 +36,7 @@ public class Comment {
 	@Column(name = "text")
 	private String text;
 
-	@OneToMany(mappedBy = "comment", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
 	Set<LikesComment> likesComments = new HashSet<>();
 
 	public void addLiker(User user) {

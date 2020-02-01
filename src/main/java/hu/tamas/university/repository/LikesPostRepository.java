@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface LikesPostRepository extends JpaRepository<LikesPost, Integer> {
 
-	LikesPost findLikesPostById(int id);
-
 	@Modifying
 	@Transactional
 	int deleteByPostIdIn(List<Integer> postIds);

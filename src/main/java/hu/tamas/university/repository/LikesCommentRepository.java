@@ -10,8 +10,6 @@ import java.util.Optional;
 
 public interface LikesCommentRepository extends JpaRepository<LikesComment, Integer> {
 
-	LikesComment findLikesCommentById(int id);
-
 	Optional<List<LikesComment>> findByCommentId(int commentId);
 
 	Optional<LikesComment> findByCommentIdAndUserEmail(int commentId, String userEmail);

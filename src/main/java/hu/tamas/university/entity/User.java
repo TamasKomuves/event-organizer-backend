@@ -40,7 +40,7 @@ public class User implements UserDetails {
 	@OneToMany(mappedBy = "organizer", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<Event> organizedEvents = new HashSet<>();
 
-	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<LikesComment> likesComments = new HashSet<>();
 
 	@OneToMany(mappedBy = "commenter", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
