@@ -32,9 +32,6 @@ public class Event {
 	@Column(name = "visibility")
 	private String visibility;
 
-	@Column(name = "total_cost")
-	private int totalCost;
-
 	@Column(name = "event_date")
 	private Timestamp eventDate;
 

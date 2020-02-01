@@ -28,9 +28,6 @@ public class EventCreatorDto {
 	private String visibility;
 
 	@NotNull
-	private int totalCost;
-
-	@NotNull
 	private Timestamp eventDate;
 
 	@NotNull
@@ -45,7 +42,6 @@ public class EventCreatorDto {
 		event.setDescription(eventCreatorDto.getDescription());
 		event.setMaxParticipant(eventCreatorDto.getMaxParticipant());
 		event.setVisibility(eventCreatorDto.getVisibility());
-		event.setTotalCost(eventCreatorDto.getTotalCost());
 		event.setEventDate(eventCreatorDto.getEventDate());
 
 		event.setAddress(address);
@@ -59,7 +55,6 @@ public class EventCreatorDto {
 		event.setName(eventCreatorDto.getName());
 		event.setDescription(eventCreatorDto.getDescription());
 		event.setVisibility(eventCreatorDto.getVisibility());
-		event.setTotalCost(eventCreatorDto.getTotalCost());
 		event.setEventDate(eventCreatorDto.getEventDate());
 		AddressDto.updateFromDto(event.getAddress(), eventCreatorDto.getAddress());
 	}

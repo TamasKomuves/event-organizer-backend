@@ -21,8 +21,6 @@ public class EventDto {
 
 	private String visibility;
 
-	private int totalCost;
-
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Timestamp eventDate;
 
@@ -40,7 +38,6 @@ public class EventDto {
 		eventDto.setDescription(event.getDescription());
 		eventDto.setMaxParticipant(event.getMaxParticipant());
 		eventDto.setVisibility(event.getVisibility());
-		eventDto.setTotalCost(event.getTotalCost());
 		eventDto.setEventDate(event.getEventDate());
 		if (event.getAddress() != null)
 			eventDto.setAddressId(event.getAddress().getId());
