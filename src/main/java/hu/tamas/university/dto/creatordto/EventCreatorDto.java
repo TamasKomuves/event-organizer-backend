@@ -36,7 +36,8 @@ public class EventCreatorDto {
 	@NotNull
 	private AddressDto address;
 
-	public static Event fromDto(EventCreatorDto eventCreatorDto, Address address, EventType eventType, User user) {
+	public static Event fromDto(EventCreatorDto eventCreatorDto, Address address, EventType eventType,
+			User user) {
 		final Event event = new Event();
 		event.setName(eventCreatorDto.getName());
 		event.setDescription(eventCreatorDto.getDescription());
@@ -56,6 +57,7 @@ public class EventCreatorDto {
 		event.setDescription(eventCreatorDto.getDescription());
 		event.setVisibility(eventCreatorDto.getVisibility());
 		event.setEventDate(eventCreatorDto.getEventDate());
+		event.setMaxParticipant(eventCreatorDto.getMaxParticipant());
 		AddressDto.updateFromDto(event.getAddress(), eventCreatorDto.getAddress());
 	}
 }

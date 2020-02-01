@@ -201,12 +201,12 @@ public class EventController {
 			@RequestBody final EventCreatorDto eventCreatorDto) {
 		final Event event = eventRepository.findEventById(id);
 
-		EventCreatorDto.updateInfoFromDto(event, eventCreatorDto);
-
 		final int newMaxParticipant = eventCreatorDto.getMaxParticipant();
-		if (isNewMaxParticipantHigher(event, id, newMaxParticipant)) {
-			event.setMaxParticipant(newMaxParticipant);
+		if (!isNewMaxParticipantHighEnough(event, id, newMaxParticipant)) {
+			throw new RuntimeException("The new max participant is not high enough!");
 		}
+
+		EventCreatorDto.updateInfoFromDto(event, eventCreatorDto);
 
 		final String eventTypeLowerCase = eventCreatorDto.getEventType().toLowerCase();
 		final EventType eventType = eventTypeRepository.findByType(eventTypeLowerCase)
@@ -220,7 +220,7 @@ public class EventController {
 		return "{\"result\":\"success\"}";
 	}
 
-	private boolean isNewMaxParticipantHigher(final Event event, final int eventId,
+	private boolean isNewMaxParticipantHighEnough(final Event event, final int eventId,
 			final int newMaxParticipant) {
 		final Optional<List<Invitation>> invitations = invitationRepository.findByEventId(eventId);
 		long invitationCount = 0;
@@ -231,7 +231,7 @@ public class EventController {
 					.count();
 		}
 
-		return event.getParticipateInEvents().size() + invitationCount < newMaxParticipant;
+		return event.getParticipateInEvents().size() + invitationCount <= newMaxParticipant;
 	}
 
 	@GetMapping("/{id}/polls")
