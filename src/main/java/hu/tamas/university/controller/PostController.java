@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
@@ -91,6 +92,18 @@ public class PostController {
 
 		post.addLiker(liker);
 		postRepository.flush();
+
+		return "{\"result\":\"success\"}";
+	}
+
+	@DeleteMapping("{id}/remove-liker")
+	@ResponseBody
+	public String removeLiker(@PathVariable int id, @AuthenticationPrincipal User user) {
+		final Post post = postRepository.findById(id).get();
+		final User liker = userRepository.findByEmail(user.getEmail()).get();
+
+		post.removeLiker(liker);
+		postRepository.saveAndFlush(post);
 
 		return "{\"result\":\"success\"}";
 	}
