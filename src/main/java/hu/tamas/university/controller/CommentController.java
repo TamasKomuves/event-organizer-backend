@@ -60,7 +60,8 @@ public class CommentController {
 
 	@PostMapping("/create")
 	@ResponseBody
-	public String createComment(@RequestBody @Valid CommentDto commentDto, @AuthenticationPrincipal User user) {
+	public String createComment(@RequestBody @Valid CommentDto commentDto,
+			@AuthenticationPrincipal User user) {
 		final Post post = postRepository.findPostById(commentDto.getPostId());
 		final User commenter = userRepository.findByEmail(user.getEmail()).get();
 		final Comment comment = new Comment();
@@ -78,7 +79,8 @@ public class CommentController {
 	@GetMapping("/{id}/likers/{email}")
 	@ResponseBody
 	public String isLikedAlready(@PathVariable int id, @PathVariable String email) {
-		final Optional<LikesComment> likesComment = likesCommentRepository.findByCommentIdAndUserEmail(id, email);
+		final Optional<LikesComment> likesComment = likesCommentRepository
+				.findByCommentIdAndUserEmail(id, email);
 
 		return "{\"result\":\"" + likesComment.isPresent() + "\"}";
 	}
@@ -91,6 +93,18 @@ public class CommentController {
 
 		comment.addLiker(liker);
 		commentRepository.flush();
+
+		return "{\"result\":\"success\"}";
+	}
+
+	@DeleteMapping("{id}/remove-liker")
+	@ResponseBody
+	public String removeLiker(@PathVariable int id, @AuthenticationPrincipal User user) {
+		final Comment comment = commentRepository.findCommentById(id);
+		final User liker = userRepository.findByEmail(user.getEmail()).get();
+
+		comment.removeLiker(liker);
+		commentRepository.saveAndFlush(comment);
 
 		return "{\"result\":\"success\"}";
 	}
