@@ -103,13 +103,13 @@ public class InvitationController {
 
 	@GetMapping("/{id}/answer/{isAccepted}")
 	@ResponseBody
-	public String answerToInvitation(@PathVariable int id,
+	public InvitationDto answerToInvitation(@PathVariable int id,
 			@PathVariable int isAccepted) {
-		Invitation invitation = invitationRepository.findInvitationById(id);
+		final Invitation invitation = invitationRepository.findInvitationById(id);
 		invitation.setAccepted(isAccepted);
 		invitation.setDecisionDate(new Timestamp(System.currentTimeMillis()));
 
-		invitationRepository.save(invitation);
+		final Invitation invitationToReturn = invitationRepository.save(invitation);
 
 		if (isAccepted == 1) {
 			ParticipateInEvent participateInEvent = new ParticipateInEvent();
@@ -119,7 +119,7 @@ public class InvitationController {
 			participateInEventRepository.save(participateInEvent);
 		}
 
-		return "{\"result\":\"success\"}";
+		return InvitationDto.fromEntity(invitationToReturn);
 	}
 
 	@GetMapping("/is-invited/{eventId}/{userEmail}")
