@@ -1,5 +1,6 @@
 package hu.tamas.university.dto;
 
+import hu.tamas.university.entity.Address;
 import hu.tamas.university.entity.Event;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,8 +31,13 @@ public class EventDto {
 
 	private String organizerEmail;
 
+	private String country;
+
+	private String city;
+
 	public static EventDto fromEntity(Event event) {
-		EventDto eventDto = new EventDto();
+		final EventDto eventDto = new EventDto();
+		final Address address = event.getAddress();
 
 		eventDto.setId(event.getId());
 		eventDto.setName(event.getName());
@@ -39,12 +45,17 @@ public class EventDto {
 		eventDto.setMaxParticipant(event.getMaxParticipant());
 		eventDto.setVisibility(event.getVisibility());
 		eventDto.setEventDate(event.getEventDate());
-		if (event.getAddress() != null)
-			eventDto.setAddressId(event.getAddress().getId());
-		if (event.getEventType() != null)
+		if (address != null) {
+			eventDto.setAddressId(address.getId());
+			eventDto.setCountry(address.getCountry());
+			eventDto.setCity(address.getCity());
+		}
+		if (event.getEventType() != null) {
 			eventDto.setEventType(event.getEventType().getType());
-		if (event.getOrganizer() != null)
+		}
+		if (event.getOrganizer() != null) {
 			eventDto.setOrganizerEmail(event.getOrganizer().getEmail());
+		}
 
 		return eventDto;
 	}
