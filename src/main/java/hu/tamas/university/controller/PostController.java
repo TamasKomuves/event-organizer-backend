@@ -16,6 +16,8 @@ import java.util.List;
 @RequestMapping("/posts")
 public class PostController {
 
+	private final static String RESULT_SUCCESS = "{\"result\":\"success\"}";
+
 	private final PostService postService;
 
 	@Autowired
@@ -45,7 +47,7 @@ public class PostController {
 	@ResponseBody
 	public String savePost(@RequestBody PostDto postDto, @AuthenticationPrincipal User user) {
 		postService.savePost(postDto, user.getEmail());
-		return "{\"result\":\"success\"}";
+		return RESULT_SUCCESS;
 	}
 
 	@GetMapping("{id}/likers/{email}")
@@ -60,13 +62,20 @@ public class PostController {
 	public String addLiker(@PathVariable int id, @AuthenticationPrincipal User user) {
 		postService.addLiker(id, user.getEmail());
 
-		return "{\"result\":\"success\"}";
+		return RESULT_SUCCESS;
 	}
 
 	@DeleteMapping("{id}/remove-liker")
 	@ResponseBody
 	public String removeLiker(@PathVariable int id, @AuthenticationPrincipal User user) {
 		postService.removeLiker(id, user.getEmail());
-		return "{\"result\":\"success\"}";
+		return RESULT_SUCCESS;
+	}
+
+	@DeleteMapping("{id}/delete")
+	@ResponseBody
+	public String deletePost(@PathVariable int id, @AuthenticationPrincipal User user) {
+		postService.deletePost(id, user.getEmail());
+		return RESULT_SUCCESS;
 	}
 }

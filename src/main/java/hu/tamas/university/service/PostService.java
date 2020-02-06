@@ -7,12 +7,17 @@ import hu.tamas.university.entity.Event;
 import hu.tamas.university.entity.Post;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.EventRepository;
+import hu.tamas.university.repository.LikesPostRepository;
 import hu.tamas.university.repository.PostRepository;
 import hu.tamas.university.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -21,15 +26,23 @@ import java.util.stream.Collectors;
 public class PostService {
 
 	private final PostRepository postRepository;
+	private final LikesPostRepository likesPostRepository;
 	private final EventRepository eventRepository;
 	private final UserRepository userRepository;
+	private final CommentService commentService;
+	private final EntityManager entityManager;
 
 	@Autowired
 	public PostService(PostRepository postRepository,
-			EventRepository eventRepository, UserRepository userRepository) {
+			LikesPostRepository likesPostRepository,
+			EventRepository eventRepository, UserRepository userRepository,
+			CommentService commentService, EntityManagerFactory entityManagerFactory) {
 		this.postRepository = postRepository;
+		this.likesPostRepository = likesPostRepository;
 		this.eventRepository = eventRepository;
 		this.userRepository = userRepository;
+		this.commentService = commentService;
+		this.entityManager = entityManagerFactory.createEntityManager();
 	}
 
 	public PostDto getPostById(final int id) {
@@ -85,5 +98,50 @@ public class PostService {
 
 		post.removeLiker(liker);
 		postRepository.saveAndFlush(post);
+	}
+
+	public void deletePost(final int id, final String userEmail) {
+		if (!hasPermissionToDeletePost(id, userEmail)) {
+			throw new RuntimeException("no permission");
+		}
+
+		final EntityTransaction transaction = entityManager.getTransaction();
+		try {
+			transaction.begin();
+			commentService.deleteCommentsOfPosts(Collections.singletonList(id));
+			likesPostRepository.deleteByPostIdIn(Collections.singletonList(id));
+			postRepository.deleteById(id);
+		} catch (Exception e) {
+			transaction.rollback();
+			throw e;
+		}
+	}
+
+	public void deletePostsOfEvent(final int eventId) {
+		final List<Integer> postIds = postRepository.findIdByEventId(eventId).orElse(null);
+		if (postIds == null || postIds.isEmpty()) {
+			return;
+		}
+
+		final EntityTransaction transaction = entityManager.getTransaction();
+		try {
+			transaction.begin();
+			commentService.deleteCommentsOfPosts(postIds);
+			likesPostRepository.deleteByPostIdIn(postIds);
+			postRepository.deleteByEventId(eventId);
+		} catch (Exception e) {
+			transaction.rollback();
+			throw e;
+		}
+	}
+
+	private boolean hasPermissionToDeletePost(final int id, final String userEmail) {
+		final Post post = postRepository.findPostById(id);
+		final User poster = post.getPoster();
+		final User organizer = post.getEvent().getOrganizer();
+		final String posterEmail = poster == null ? null : poster.getEmail();
+		final String organizerEmail = organizer == null ? null : organizer.getEmail();
+
+		return userEmail.equals(posterEmail) || userEmail.equals(organizerEmail);
 	}
 }
