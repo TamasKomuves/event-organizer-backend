@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/comments")
 public class CommentController {
 
-	private final static String RESULT_SUCCESS = "{\"result\":\"success\"}";
+	private static final String RESULT_SUCCESS = "{\"result\":\"success\"}";
 
 	private final CommentService commentService;
 

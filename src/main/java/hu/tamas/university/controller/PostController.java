@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/posts")
 public class PostController {
 
-	private final static String RESULT_SUCCESS = "{\"result\":\"success\"}";
+	private static final String RESULT_SUCCESS = "{\"result\":\"success\"}";
 
 	private final PostService postService;
 
