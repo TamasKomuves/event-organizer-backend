@@ -7,6 +7,7 @@ import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.EventRepository;
 import hu.tamas.university.repository.PostRepository;
 import hu.tamas.university.repository.UserRepository;
+import hu.tamas.university.service.PostService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +42,8 @@ public class PostControllerTest {
 	private User user;
 	@Mock
 	private User poster;
+	@Mock
+	private PostService postService;
 
 	@Captor
 	private ArgumentCaptor<Post> postCaptor;
@@ -51,7 +54,7 @@ public class PostControllerTest {
 
 	@Before
 	public void setUp() {
-		postController = new PostController(postRepository, eventRepository, userRepository);
+		postController = new PostController(postService);
 	}
 
 	@Test
