@@ -33,10 +33,9 @@ public class PostService {
 	private final EntityManager entityManager;
 
 	@Autowired
-	public PostService(PostRepository postRepository,
-			LikesPostRepository likesPostRepository,
-			EventRepository eventRepository, UserRepository userRepository,
-			CommentService commentService, EntityManagerFactory entityManagerFactory) {
+	public PostService(PostRepository postRepository, LikesPostRepository likesPostRepository,
+			EventRepository eventRepository, UserRepository userRepository, CommentService commentService,
+			EntityManagerFactory entityManagerFactory) {
 		this.postRepository = postRepository;
 		this.likesPostRepository = likesPostRepository;
 		this.eventRepository = eventRepository;
@@ -111,6 +110,7 @@ public class PostService {
 			commentService.deleteCommentsOfPosts(Collections.singletonList(id));
 			likesPostRepository.deleteByPostIdIn(Collections.singletonList(id));
 			postRepository.deleteById(id);
+			transaction.commit();
 		} catch (Exception e) {
 			transaction.rollback();
 			throw e;
@@ -123,16 +123,9 @@ public class PostService {
 			return;
 		}
 
-		final EntityTransaction transaction = entityManager.getTransaction();
-		try {
-			transaction.begin();
-			commentService.deleteCommentsOfPosts(postIds);
-			likesPostRepository.deleteByPostIdIn(postIds);
-			postRepository.deleteByEventId(eventId);
-		} catch (Exception e) {
-			transaction.rollback();
-			throw e;
-		}
+		commentService.deleteCommentsOfPosts(postIds);
+		likesPostRepository.deleteByPostIdIn(postIds);
+		postRepository.deleteByEventId(eventId);
 	}
 
 	private boolean hasPermissionToDeletePost(final int id, final String userEmail) {

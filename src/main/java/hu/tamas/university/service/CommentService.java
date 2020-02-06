@@ -103,6 +103,7 @@ public class CommentService {
 			transaction.begin();
 			likesCommentRepository.deleteByCommentIdIn(Collections.singletonList(id));
 			commentRepository.deleteById(id);
+			transaction.commit();
 		} catch (Exception e) {
 			transaction.rollback();
 			throw e;
@@ -119,15 +120,8 @@ public class CommentService {
 			return;
 		}
 
-		final EntityTransaction transaction = entityManager.getTransaction();
-		try {
-			transaction.begin();
-			likesCommentRepository.deleteByCommentIdIn(commentIds);
-			commentRepository.deleteByPostIdIn(postIds);
-		} catch (Exception e) {
-			transaction.rollback();
-			throw e;
-		}
+		likesCommentRepository.deleteByCommentIdIn(commentIds);
+		commentRepository.deleteByPostIdIn(postIds);
 	}
 
 	private boolean hasPermissionToDeleteComment(final int id, final String userEmail) {
