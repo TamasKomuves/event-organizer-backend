@@ -1,111 +1,75 @@
 package hu.tamas.university.controller;
 
-import com.google.common.collect.Lists;
 import hu.tamas.university.dto.CommentDto;
 import hu.tamas.university.dto.UserDto;
-import hu.tamas.university.entity.Comment;
-import hu.tamas.university.entity.LikesComment;
-import hu.tamas.university.entity.Post;
 import hu.tamas.university.entity.User;
-import hu.tamas.university.repository.CommentRepository;
-import hu.tamas.university.repository.LikesCommentRepository;
-import hu.tamas.university.repository.PostRepository;
-import hu.tamas.university.repository.UserRepository;
+import hu.tamas.university.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/comments")
 public class CommentController {
 
-	private final CommentRepository commentRepository;
-	private final PostRepository postRepository;
-	private final UserRepository userRepository;
-	private final LikesCommentRepository likesCommentRepository;
+	private final static String RESULT_SUCCESS = "{\"result\":\"success\"}";
+
+	private final CommentService commentService;
 
 	@Autowired
-	public CommentController(CommentRepository commentRepository, PostRepository postRepository,
-			UserRepository userRepository, LikesCommentRepository likesCommentRepository) {
-		this.commentRepository = commentRepository;
-		this.postRepository = postRepository;
-		this.userRepository = userRepository;
-		this.likesCommentRepository = likesCommentRepository;
+	public CommentController(CommentService commentService) {
+		this.commentService = commentService;
 	}
 
 	@GetMapping("/{id}")
 	@ResponseBody
 	public CommentDto getCommentById(@PathVariable int id) {
-		final Comment comment = commentRepository.findCommentById(id);
-
-		return CommentDto.fromEntity(comment);
+		return commentService.getCommentById(id);
 	}
 
 	@GetMapping("/{id}/likers")
 	@ResponseBody
 	public List<UserDto> getLikers(@PathVariable int id) {
-		final List<LikesComment> likesComments = likesCommentRepository.findByCommentId(id)
-				.orElse(Lists.newArrayList());
-
-		return likesComments.stream().map(likesComment -> UserDto.fromEntity(likesComment.getUser()))
-				.collect(Collectors.toList());
+		return commentService.getLikers(id);
 	}
 
 	@PostMapping("/create")
 	@ResponseBody
 	public String createComment(@RequestBody @Valid CommentDto commentDto,
 			@AuthenticationPrincipal User user) {
-		final Post post = postRepository.findPostById(commentDto.getPostId());
-		final User commenter = userRepository.findByEmail(user.getEmail()).get();
-		final Comment comment = new Comment();
-
-		comment.setText(commentDto.getText());
-		comment.setCommentDate(new Timestamp(System.currentTimeMillis()));
-		post.addComment(comment);
-		commenter.addComment(comment);
-
-		commentRepository.saveAndFlush(comment);
-
-		return "{\"result\":\"success\"}";
+		commentService.createComment(commentDto, user.getEmail());
+		return RESULT_SUCCESS;
 	}
 
 	@GetMapping("/{id}/likers/{email}")
 	@ResponseBody
 	public String isLikedAlready(@PathVariable int id, @PathVariable String email) {
-		final Optional<LikesComment> likesComment = likesCommentRepository
-				.findByCommentIdAndUserEmail(id, email);
-
-		return "{\"result\":\"" + likesComment.isPresent() + "\"}";
+		final boolean isAlreadyLiked = commentService.isLikedAlready(id, email);
+		return "{\"result\":\"" + isAlreadyLiked + "\"}";
 	}
 
 	@GetMapping("/{id}/add-liker")
 	@ResponseBody
 	public String addLiker(@PathVariable int id, @AuthenticationPrincipal User user) {
-		final Comment comment = commentRepository.findCommentById(id);
-		final User liker = userRepository.findByEmail(user.getEmail()).get();
-
-		comment.addLiker(liker);
-		commentRepository.flush();
-
-		return "{\"result\":\"success\"}";
+		commentService.addLiker(id, user.getEmail());
+		return RESULT_SUCCESS;
 	}
 
 	@DeleteMapping("{id}/remove-liker")
 	@ResponseBody
 	public String removeLiker(@PathVariable int id, @AuthenticationPrincipal User user) {
-		final Comment comment = commentRepository.findCommentById(id);
-		final User liker = userRepository.findByEmail(user.getEmail()).get();
+		commentService.removeLiker(id, user.getEmail());
+		return RESULT_SUCCESS;
+	}
 
-		comment.removeLiker(liker);
-		commentRepository.saveAndFlush(comment);
-
-		return "{\"result\":\"success\"}";
+	@DeleteMapping("{id}/delete")
+	@ResponseBody
+	public String deleteComment(@PathVariable int id, @AuthenticationPrincipal User user) {
+		commentService.deleteComment(id, user.getEmail());
+		return RESULT_SUCCESS;
 	}
 }
