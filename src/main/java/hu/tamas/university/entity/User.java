@@ -27,6 +27,12 @@ public class User implements UserDetails {
 	@Column(name = "lastname")
 	private String lastName;
 
+	@Column(name = "is_activated")
+	private int isActivated;
+
+	@Column(name = "activation_token")
+	private String activationToken;
+
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "address_id", referencedColumnName = "id")
 	private Address address;
@@ -62,10 +68,12 @@ public class User implements UserDetails {
 	private Set<ChatMessage> receivedChatMessages = new HashSet<>();
 
 	public User() {
+		this.isActivated = 0;
 	}
 
 	public User(String email, String password, String firstName, String lastName,
 			Address address) {
+		this();
 		this.email = email;
 		this.password = password;
 		this.firstName = firstName;

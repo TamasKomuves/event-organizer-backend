@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	@Modifying
 	@Transactional
 	int deleteByEmail(String email);
+
+	Optional<User> findByActivationToken(String token);
 }
