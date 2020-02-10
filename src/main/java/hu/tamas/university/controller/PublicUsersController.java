@@ -71,13 +71,13 @@ final class PublicUsersController {
 	@ResponseBody
 	public String login(@RequestBody @Valid UserLoginDto userLoginDto) {
 		final String userEmail = userLoginDto.getEmail();
-		if (!isActivated(userEmail)) {
-			throw new RuntimeException("not activated");
-		}
-
 		final String token = userAuthenticationService
 				.login(userEmail, userLoginDto.getPassword())
 				.orElseThrow(() -> new RuntimeException("invalid login and/or password"));
+
+		if (!isActivated(userEmail)) {
+			throw new RuntimeException("not activated");
+		}
 
 		return "{\"token\":\"" + token + "\"}";
 	}
