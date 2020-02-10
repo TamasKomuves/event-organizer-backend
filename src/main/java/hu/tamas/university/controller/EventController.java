@@ -168,8 +168,8 @@ public class EventController {
 	@DeleteMapping("/delete/{eventId}")
 	@ResponseBody
 	public String deleteEvent(@AuthenticationPrincipal final User user, @PathVariable int eventId) {
-		final String result = eventService.deleteEvent(eventId, user.getEmail());
-		return "{\"result\":\"" + result + "\"}";
+		eventService.deleteEvent(eventId, user.getEmail());
+		return "{\"result\":\"success\"}";
 	}
 
 	@GetMapping("/{eventId}/invitation-offers")

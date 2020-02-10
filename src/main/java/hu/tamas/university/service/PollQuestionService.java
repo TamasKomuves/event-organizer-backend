@@ -94,6 +94,19 @@ public class PollQuestionService {
 		}
 	}
 
+	public void deletePollQuestionsOfEvent(final int eventId) {
+		final Optional<List<Integer>> pollQuestionIds = pollQuestionRepository.findIdsByEventId(eventId);
+		if (!pollQuestionIds.isPresent()) {
+			return;
+		}
+
+		final Optional<List<Integer>> pollAnswerIdsOptional = pollAnswerRepository
+				.findIdByPollQuestionIds(pollQuestionIds.get());
+		pollAnswerIdsOptional.ifPresent(answersToPollRepository::deleteByPollAnswerIdIn);
+		pollAnswerRepository.deleteByPollQuestionIdIn(pollQuestionIds.get());
+		pollQuestionRepository.deleteByEventId(eventId);
+	}
+
 	private boolean hasPermissionToDeletePollQuestion(final int id, final String userEmail) {
 		final PollQuestion pollQuestion = pollQuestionRepository.findPollQuestionById(id);
 		final User organizer = pollQuestion.getEvent().getOrganizer();
