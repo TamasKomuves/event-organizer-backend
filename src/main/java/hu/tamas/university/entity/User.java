@@ -67,6 +67,9 @@ public class User implements UserDetails {
 	@OneToMany(mappedBy = "receiver", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<ChatMessage> receivedChatMessages = new HashSet<>();
 
+	@OneToMany(mappedBy = "rater", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<EventRating> eventRatings = new HashSet<>();
+
 	public User() {
 		this.isActivated = 0;
 	}

@@ -59,6 +59,9 @@ public class Event {
 	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<PollQuestion> pollQuestions = new HashSet<>();
 
+	@OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<EventRating> eventRatings = new HashSet<>();
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {

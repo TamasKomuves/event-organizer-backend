@@ -16,10 +16,11 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
 	List<Event> findAllByEventTypeType(String type);
 
-	Optional<List<Event>> findByOrganizerEmail(String organizerEmail);
-
 	@Modifying
 	@Transactional
 	@Query("UPDATE Event SET organizer_email = NULL where organizer_email = :organizerEmail")
 	int updateByOrganizerEmailOrganizerEmailToNull(@Param("organizerEmail") String organizerEmail);
+
+	@Query("SELECT id FROM Event WHERE organizer_email = :organizerEmail")
+	List<Integer> findIdByOrganizerEmail(String organizerEmail);
 }

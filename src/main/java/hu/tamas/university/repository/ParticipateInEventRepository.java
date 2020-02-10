@@ -10,8 +10,6 @@ import java.util.Optional;
 
 public interface ParticipateInEventRepository extends JpaRepository<ParticipateInEvent, Integer> {
 
-	ParticipateInEvent findParticipateInEventById(int id);
-
 	Optional<List<ParticipateInEvent>> findByEventIdAndUserEmail(int eventId, String userEmail);
 
 	@Modifying

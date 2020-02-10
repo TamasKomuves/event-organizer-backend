@@ -1,7 +1,9 @@
 package hu.tamas.university.service;
 
 import com.google.common.collect.Lists;
+import hu.tamas.university.dto.OrganizerRatingDto;
 import hu.tamas.university.entity.Event;
+import hu.tamas.university.entity.EventRating;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,8 @@ public class EventService {
 	private final PostRepository postRepository;
 	private final ParticipateInEventRepository participateInEventRepository;
 	private final InvitationRepository invitationRepository;
+	private final EventRatingRepository eventRatingRepository;
+	private final UserRepository userRepository;
 	private final EntityManager entityManager;
 
 	@Autowired
@@ -36,7 +40,10 @@ public class EventService {
 			AnswersToPollRepository answersToPollRepository,
 			PollQuestionRepository pollQuestionRepository, PostRepository postRepository,
 			ParticipateInEventRepository participateInEventRepository,
-			InvitationRepository invitationRepository, EntityManagerFactory entityManagerFactory) {
+			InvitationRepository invitationRepository,
+			EventRatingRepository eventRatingRepository,
+			UserRepository userRepository,
+			EntityManagerFactory entityManagerFactory) {
 		this.eventRepository = eventRepository;
 		this.likesCommentRepository = likesCommentRepository;
 		this.commentRepository = commentRepository;
@@ -47,6 +54,8 @@ public class EventService {
 		this.postRepository = postRepository;
 		this.participateInEventRepository = participateInEventRepository;
 		this.invitationRepository = invitationRepository;
+		this.eventRatingRepository = eventRatingRepository;
+		this.userRepository = userRepository;
 		this.entityManager = entityManagerFactory.createEntityManager();
 	}
 
@@ -96,6 +105,62 @@ public class EventService {
 		pollQuestionRepository.deleteByEventId(eventId);
 		participateInEventRepository.deleteByEventId(eventId);
 		invitationRepository.deleteByEventId(eventId);
+		eventRatingRepository.deleteByEventId(eventId);
 		eventRepository.deleteById(eventId);
+	}
+
+	public double getRatingOfUser(final int eventId, final String userEmail) {
+		return eventRatingRepository //
+				.findByEventIdAndRaterEmail(eventId, userEmail) //
+				.orElseThrow(() -> new RuntimeException("no rating")) //
+				.getRating();
+	}
+
+	public void saveEventRating(final int eventId, final double rating,
+			String userEmail) {
+		final User user = userRepository.findByEmail(userEmail).get();
+		final Event event = eventRepository.findEventById(eventId);
+		final EventRating eventRating = eventRatingRepository //
+				.findByEventIdAndRaterEmail(eventId, userEmail) //
+				.orElse(new EventRating(user, event));
+		eventRating.setRating(rating);
+		eventRatingRepository.save(eventRating);
+	}
+
+	public void removeParticipant(final int id, final String email, final String currentUserEmail) {
+		final Event event = eventRepository.findEventById(id);
+		final User organizer = event.getOrganizer();
+		if ((organizer == null || !currentUserEmail.equals(organizer.getEmail())) && !email
+				.equals(currentUserEmail)) {
+			throw new RuntimeException("no permission");
+		}
+		participateInEventRepository.deleteByEventIdAndUserEmail(id, email);
+	}
+
+	public OrganizerRatingDto getOrganizerReputation(final int eventId) {
+		final Event event = eventRepository.findById(eventId).get();
+		final User organizer = event.getOrganizer();
+		if (organizer == null) {
+			return null;
+		}
+
+		final String organizerEmail = organizer.getEmail();
+		final List<Integer> eventIds = eventRepository.findIdByOrganizerEmail(organizerEmail);
+		if (eventIds.isEmpty()) {
+			return null;
+		}
+
+		final List<EventRating> eventRatings = eventRatingRepository.findByEventIdIn(eventIds);
+		final int numberOfRatings = eventRatings.size();
+		if (numberOfRatings == 0) {
+			return null;
+		}
+		double ratingSum = 0;
+
+		for (EventRating eventRating : eventRatings) {
+			ratingSum += eventRating.getRating();
+		}
+
+		return new OrganizerRatingDto(numberOfRatings, ratingSum / numberOfRatings);
 	}
 }

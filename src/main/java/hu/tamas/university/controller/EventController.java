@@ -30,12 +30,14 @@ public class EventController {
 	private final PollQuestionRepository pollQuestionRepository;
 	private final PostRepository postRepository;
 	private final EventService eventService;
+	private final EventRatingRepository eventRatingRepository;
 
 	@Autowired
 	public EventController(EventRepository eventRepository, EventTypeRepository eventTypeRepository,
 			UserRepository userRepository, EventService eventService, PostRepository postRepository,
 			InvitationRepository invitationRepository, PollQuestionRepository pollQuestionRepository,
-			ParticipateInEventRepository participateInEventRepository) {
+			ParticipateInEventRepository participateInEventRepository,
+			EventRatingRepository eventRatingRepository) {
 		this.eventRepository = eventRepository;
 		this.eventTypeRepository = eventTypeRepository;
 		this.userRepository = userRepository;
@@ -44,6 +46,7 @@ public class EventController {
 		this.pollQuestionRepository = pollQuestionRepository;
 		this.postRepository = postRepository;
 		this.eventService = eventService;
+		this.eventRatingRepository = eventRatingRepository;
 	}
 
 	@GetMapping("/{id}")
@@ -258,13 +261,27 @@ public class EventController {
 	@ResponseBody
 	public String removeParticipant(@PathVariable final int id, @PathVariable final String email,
 			@AuthenticationPrincipal final User user) {
-		final Event event = eventRepository.findEventById(id);
-		final User organizer = event.getOrganizer();
-		if ((organizer == null || !user.getEmail().equals(organizer.getEmail())) && !email
-				.equals(user.getEmail())) {
-			throw new RuntimeException("no permission");
-		}
-		participateInEventRepository.deleteByEventIdAndUserEmail(id, email);
+		eventService.removeParticipant(id, email, user.getEmail());
 		return "{\"result\":\"success\"}";
+	}
+
+	@GetMapping("/{eventId}/rating-of-user")
+	@ResponseBody
+	public double getRatingOfUser(@PathVariable int eventId, @AuthenticationPrincipal User user) {
+		return eventService.getRatingOfUser(eventId, user.getEmail());
+	}
+
+	@PostMapping("/{eventId}/rate-event/{rating}")
+	@ResponseBody
+	public String saveEventRating(@PathVariable int eventId, @PathVariable double rating,
+			@AuthenticationPrincipal User user) {
+		eventService.saveEventRating(eventId, rating, user.getEmail());
+		return "{\"result\":\"success\"}";
+	}
+
+	@GetMapping("/{eventId}/organizer-reputation")
+	@ResponseBody
+	public OrganizerRatingDto getOrganizerReputation(@PathVariable int eventId) {
+		return eventService.getOrganizerReputation(eventId);
 	}
 }
