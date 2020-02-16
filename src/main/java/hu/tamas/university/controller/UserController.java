@@ -3,8 +3,6 @@ package hu.tamas.university.controller;
 import hu.tamas.university.dto.PasswordChangeDto;
 import hu.tamas.university.dto.UserDto;
 import hu.tamas.university.entity.User;
-import hu.tamas.university.repository.AddressRepository;
-import hu.tamas.university.repository.InvitationRepository;
 import hu.tamas.university.repository.UserRepository;
 import hu.tamas.university.security.UserAuthenticationService;
 import hu.tamas.university.service.UserService;
@@ -27,8 +25,7 @@ public class UserController {
 	private final UserService userService;
 
 	@Autowired
-	public UserController(AddressRepository addressRepository, UserRepository userRepository,
-			InvitationRepository invitationRepository, UserAuthenticationService userAuthenticationService,
+	public UserController(UserRepository userRepository, UserAuthenticationService userAuthenticationService,
 			UserService userService) {
 		this.userRepository = userRepository;
 		this.userAuthenticationService = userAuthenticationService;
@@ -59,9 +56,8 @@ public class UserController {
 		user.setFirstName(firstname);
 		user.setLastName(lastname);
 		userRepository.save(user);
-		result = "success";
 
-		return "{\"result\":\"" + result + "\"}";
+		return "{\"result\":\"success\"}";
 	}
 
 	@Transactional

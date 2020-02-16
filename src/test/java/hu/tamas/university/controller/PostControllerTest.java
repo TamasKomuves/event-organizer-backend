@@ -1,22 +1,17 @@
 package hu.tamas.university.controller;
 
+import hu.tamas.university.dto.CommentDto;
 import hu.tamas.university.dto.PostDto;
-import hu.tamas.university.entity.Event;
-import hu.tamas.university.entity.Post;
+import hu.tamas.university.dto.UserDto;
 import hu.tamas.university.entity.User;
-import hu.tamas.university.repository.EventRepository;
-import hu.tamas.university.repository.PostRepository;
-import hu.tamas.university.repository.UserRepository;
 import hu.tamas.university.service.PostService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Optional;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -25,58 +20,103 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class PostControllerTest {
 
-	private static final String USER_EMAIL = "user@gmail.com";
-	private static final String POST_TEXT = "text";
-	private static final int EVENT_ID = 40;
-	private static final String SUCCESS_RESPONSE_TEXT = "{\"result\":\"success\"}";
+	private static final int POST_ID = 43;
+	private static final String RESULT_SUCCESS = "{\"result\":\"success\"}";
+	private static final String CURRENT_USER_EMAIL = "current@gmail.com";
 
-	@Mock
-	private PostRepository postRepository;
-	@Mock
-	private EventRepository eventRepository;
-	@Mock
-	private UserRepository userRepository;
-	@Mock
-	private Event event;
-	@Mock
-	private User user;
-	@Mock
-	private User poster;
 	@Mock
 	private PostService postService;
-
-	@Captor
-	private ArgumentCaptor<Post> postCaptor;
-
+	@Mock
 	private PostDto postDto;
+	@Mock
+	private User currentUser;
+	@Mock
+	private List<CommentDto> commentDtoList;
+	@Mock
+	private List<UserDto> likers;
 
 	private PostController postController;
 
 	@Before
 	public void setUp() {
+		when(currentUser.getEmail()).thenReturn(CURRENT_USER_EMAIL);
 		postController = new PostController(postService);
 	}
 
 	@Test
-	public void testSavePost() {
-		initPostDto();
-		when(user.getEmail()).thenReturn(USER_EMAIL);
-		when(eventRepository.findEventById(EVENT_ID)).thenReturn(event);
-		when(userRepository.findByEmail(USER_EMAIL)).thenReturn(Optional.of(poster));
+	public void testGetPostById() {
+		when(postService.getPostById(POST_ID)).thenReturn(postDto);
 
-		final String result = postController.savePost(postDto, user);
+		final PostDto result = postController.getPostById(POST_ID);
 
-		verify(postRepository).saveAndFlush(postCaptor.capture());
-		final Post post = postCaptor.getValue();
-		verify(event).addPost(post);
-		verify(poster).addPost(post);
-		assertEquals(SUCCESS_RESPONSE_TEXT, result);
-		assertEquals(POST_TEXT, post.getText());
+		assertEquals(postDto, result);
 	}
 
-	private void initPostDto() {
-		postDto = new PostDto();
-		postDto.setEventId(EVENT_ID);
-		postDto.setText(POST_TEXT);
+	@Test
+	public void testGetAllComments() {
+		when(postService.getAllComments(POST_ID)).thenReturn(commentDtoList);
+
+		final List<CommentDto> result = postController.getAllComments(POST_ID);
+
+		assertEquals(commentDtoList, result);
+	}
+
+	@Test
+	public void testGetLikers() {
+		when(postService.getLikers(POST_ID)).thenReturn(likers);
+
+		final List<UserDto> result = postController.getLikers(POST_ID);
+
+		assertEquals(likers, result);
+	}
+
+	@Test
+	public void testSavePost() {
+		final String result = postController.savePost(postDto, currentUser);
+
+		assertEquals(RESULT_SUCCESS, result);
+		verify(postService).savePost(postDto, CURRENT_USER_EMAIL);
+	}
+
+	@Test
+	public void testIsLikedAlready_True() {
+		when(postService.isLikedAlready(POST_ID, CURRENT_USER_EMAIL)).thenReturn(true);
+
+		final String result = postController.isLikedAlready(POST_ID, CURRENT_USER_EMAIL);
+
+		assertEquals("{\"result\":\"true\"}", result);
+	}
+
+	@Test
+	public void testIsLikedAlready_False() {
+		when(postService.isLikedAlready(POST_ID, CURRENT_USER_EMAIL)).thenReturn(false);
+
+		final String result = postController.isLikedAlready(POST_ID, CURRENT_USER_EMAIL);
+
+		assertEquals("{\"result\":\"false\"}", result);
+	}
+
+	@Test
+	public void testAddLiker() {
+		final String result = postController.addLiker(POST_ID, currentUser);
+
+		assertEquals(RESULT_SUCCESS, result);
+		verify(postService).addLiker(POST_ID, CURRENT_USER_EMAIL);
+	}
+
+	@Test
+	public void testRemoveLiker() {
+		final String result = postController.removeLiker(POST_ID, currentUser);
+
+		assertEquals(RESULT_SUCCESS, result);
+		verify(postService).removeLiker(POST_ID, CURRENT_USER_EMAIL);
+	}
+
+	@Test
+	public void testDeletePost() {
+		final String result = postController.deletePost(POST_ID, currentUser);
+
+		assertEquals(RESULT_SUCCESS, result);
+		verify(postService).deletePost(POST_ID, CURRENT_USER_EMAIL);
 	}
 }
