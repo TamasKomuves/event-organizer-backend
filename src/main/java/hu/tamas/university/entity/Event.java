@@ -78,18 +78,18 @@ public class Event {
 		return Objects.hash(id);
 	}
 
-	public void addParticipant(User user) {
-		ParticipateInEvent participateInEvent = new ParticipateInEvent(this, user);
+	public void addParticipant(final User user) {
+		final ParticipateInEvent participateInEvent = new ParticipateInEvent(this, user);
 		participateInEvents.add(participateInEvent);
 		user.getParticipateInEvents().add(participateInEvent);
 	}
 
-	public void addPost(Post post) {
+	public void addPost(final Post post) {
 		posts.add(post);
 		post.setEvent(this);
 	}
 
-	public void addPollQuestion(PollQuestion pollQuestion) {
+	public void addPollQuestion(final PollQuestion pollQuestion) {
 		pollQuestions.add(pollQuestion);
 		pollQuestion.setEvent(this);
 	}

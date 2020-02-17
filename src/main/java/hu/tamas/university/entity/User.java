@@ -100,17 +100,17 @@ public class User implements UserDetails {
 		return Objects.hash(email);
 	}
 
-	public void addOrganizedEvent(Event event) {
+	public void addOrganizedEvent(final Event event) {
 		organizedEvents.add(event);
 		event.setOrganizer(this);
 	}
 
-	public void addComment(Comment comment) {
+	public void addComment(final Comment comment) {
 		comments.add(comment);
 		comment.setCommenter(this);
 	}
 
-	public void addPost(Post post) {
+	public void addPost(final Post post) {
 		posts.add(post);
 		post.setPoster(this);
 	}

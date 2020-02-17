@@ -37,16 +37,16 @@ public class Comment {
 	private String text;
 
 	@OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-	Set<LikesComment> likesComments = new HashSet<>();
+	private Set<LikesComment> likesComments = new HashSet<>();
 
-	public void addLiker(User user) {
-		LikesComment likesComment = new LikesComment(user, this);
+	public void addLiker(final User user) {
+		final LikesComment likesComment = new LikesComment(user, this);
 		likesComments.add(likesComment);
 		user.getLikesComments().add(likesComment);
 	}
 
-	public void removeLiker(User user) {
-		LikesComment likesComment = new LikesComment(user, this);
+	public void removeLiker(final User user) {
+		final LikesComment likesComment = new LikesComment(user, this);
 		likesComments.remove(likesComment);
 		user.getLikesComments().remove(likesComment);
 		likesComment.setUser(null);
