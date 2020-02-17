@@ -1,4 +1,4 @@
-package hu.tamas.university.security.date;
+package hu.tamas.university.config.security.date;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -11,11 +11,6 @@ final class JodaDateService implements DateService {
 
 	private final DateTimeZone timeZone;
 
-	/**
-	 * Force system-wide timezone to ensure consistent
-	 * dates over all servers, independently from the region
-	 * the server is running.
-	 */
 	JodaDateService(final DateTimeZone timeZone) {
 		super();
 		this.timeZone = checkNotNull(timeZone);

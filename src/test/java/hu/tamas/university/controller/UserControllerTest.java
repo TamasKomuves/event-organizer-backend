@@ -5,7 +5,7 @@ import hu.tamas.university.dto.PasswordChangeDto;
 import hu.tamas.university.dto.UserDto;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.UserRepository;
-import hu.tamas.university.security.UserAuthenticationService;
+import hu.tamas.university.service.security.UserAuthenticationService;
 import hu.tamas.university.service.UserService;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,8 +1,8 @@
-package hu.tamas.university.security;
+package hu.tamas.university.config.security;
 
+import hu.tamas.university.service.security.UserAuthenticationService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.experimental.FieldDefaults;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,19 +11,18 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-import static lombok.AccessLevel.PACKAGE;
-import static lombok.AccessLevel.PRIVATE;
+import static lombok.AccessLevel.PUBLIC;
 
 @Component
-@AllArgsConstructor(access = PACKAGE)
-@FieldDefaults(level = PRIVATE, makeFinal = true)
+@AllArgsConstructor(access = PUBLIC)
 final class TokenAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
 	@NonNull
-	UserAuthenticationService userAuthenticationService;
+	private final UserAuthenticationService userAuthenticationService;
 
 	@Override
-	protected void additionalAuthenticationChecks(final UserDetails d, final UsernamePasswordAuthenticationToken auth) {
+	protected void additionalAuthenticationChecks(final UserDetails d,
+			final UsernamePasswordAuthenticationToken auth) {
 		// Nothing to do
 	}
 
@@ -36,6 +35,7 @@ final class TokenAuthenticationProvider extends AbstractUserDetailsAuthenticatio
 				.map(String::valueOf)
 				.flatMap(userAuthenticationService::findByToken)
 				.orElseThrow(
-						() -> new UsernameNotFoundException("Cannot find user with authentication token=" + token));
+						() -> new UsernameNotFoundException(
+								"Cannot find user with authentication token=" + token));
 	}
 }

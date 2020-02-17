@@ -1,10 +1,10 @@
 package hu.tamas.university.controller;
 
-import hu.tamas.university.dto.RegistrationDto;
+import hu.tamas.university.dto.creatordto.RegistrationDto;
 import hu.tamas.university.dto.UserLoginDto;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.UserRepository;
-import hu.tamas.university.security.UserAuthenticationService;
+import hu.tamas.university.service.security.UserAuthenticationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package hu.tamas.university.security.date;
+package hu.tamas.university.config.security.date;
 
 import org.joda.time.DateTimeZone;
 import org.springframework.context.annotation.Bean;

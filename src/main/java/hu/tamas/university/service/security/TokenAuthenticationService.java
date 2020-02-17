@@ -1,4 +1,4 @@
-package hu.tamas.university.security;
+package hu.tamas.university.service.security;
 
 import com.google.common.collect.ImmutableMap;
 import hu.tamas.university.dto.PasswordChangeDto;

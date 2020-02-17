@@ -1,7 +1,7 @@
-package hu.tamas.university.security;
+package hu.tamas.university.service.security;
 
 import com.google.common.collect.ImmutableMap;
-import hu.tamas.university.security.date.DateService;
+import hu.tamas.university.config.security.date.DateService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.compression.GzipCompressionCodec;
 import org.joda.time.DateTime;

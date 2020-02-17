@@ -1,9 +1,9 @@
-package hu.tamas.university.dto;
+package hu.tamas.university.dto.creatordto;
 
-import javax.validation.constraints.NotNull;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter

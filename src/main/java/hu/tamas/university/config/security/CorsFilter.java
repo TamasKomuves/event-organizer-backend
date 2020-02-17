@@ -1,4 +1,4 @@
-package hu.tamas.university.security;
+package hu.tamas.university.config.security;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

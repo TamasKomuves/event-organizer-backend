@@ -1,4 +1,4 @@
-package hu.tamas.university.security;
+package hu.tamas.university.config.security;
 
 import lombok.experimental.FieldDefaults;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
