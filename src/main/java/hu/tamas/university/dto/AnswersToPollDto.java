@@ -19,8 +19,8 @@ public class AnswersToPollDto {
 	@NotNull
 	private int pollAnswerId;
 
-	public static AnswersToPollDto fromEntity(AnswersToPoll answersToPoll) {
-		AnswersToPollDto answersToPollDto = new AnswersToPollDto();
+	public static AnswersToPollDto fromEntity(final AnswersToPoll answersToPoll) {
+		final AnswersToPollDto answersToPollDto = new AnswersToPollDto();
 		answersToPollDto.setId(answersToPoll.getId());
 		answersToPollDto.setUserEmail(answersToPoll.getUser().getEmail());
 		answersToPollDto.setPollAnswerId(answersToPoll.getPollAnswer().getId());
@@ -28,7 +28,7 @@ public class AnswersToPollDto {
 		return answersToPollDto;
 	}
 
-	public static List<AnswersToPollDto> fromEntityList(List<AnswersToPoll> answersToPolls) {
+	public static List<AnswersToPollDto> fromEntityList(final List<AnswersToPoll> answersToPolls) {
 		return answersToPolls.stream().map(AnswersToPollDto::fromEntity).collect(Collectors.toList());
 	}
 }
