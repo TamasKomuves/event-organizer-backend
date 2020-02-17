@@ -50,7 +50,6 @@ public class UserController {
 	@ResponseBody
 	public String updateUser(@PathVariable String email, @PathVariable String firstname,
 			@PathVariable String lastname) {
-		String result;
 		User user = userRepository.findByEmail(email).get();
 
 		user.setFirstName(firstname);
@@ -72,7 +71,7 @@ public class UserController {
 	@GetMapping(value = "/all")
 	@ResponseBody
 	public List<UserDto> getAllUsers() {
-		List<User> users = userRepository.findAll();
+		final List<User> users = userRepository.findAll();
 
 		return users.stream().map(UserDto::fromEntity).collect(Collectors.toList());
 	}

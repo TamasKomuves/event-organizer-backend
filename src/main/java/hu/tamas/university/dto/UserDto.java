@@ -21,8 +21,9 @@ public class UserDto {
 		dto.setFirstName(user.getFirstName());
 		dto.setLastName(user.getLastName());
 		dto.setEmail(user.getEmail());
-		if (user.getAddress() != null)
+		if (user.getAddress() != null) {
 			dto.setAddressId(user.getAddress().getId());
+		}
 		return dto;
 	}
 }
