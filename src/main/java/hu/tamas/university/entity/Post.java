@@ -47,11 +47,6 @@ public class Post {
 		comment.setPost(this);
 	}
 
-	public void removeComment(Comment comment) {
-		comments.remove(comment);
-		comment.setPost(null);
-	}
-
 	public void addLiker(User user) {
 		LikesPost likesPost = new LikesPost(user, this);
 		likesPosts.add(likesPost);

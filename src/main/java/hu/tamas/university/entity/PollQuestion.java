@@ -53,9 +53,4 @@ public class PollQuestion {
 		pollAnswers.add(pollAnswer);
 		pollAnswer.setPollQuestion(this);
 	}
-
-	public void removePollAnswer(PollAnswer pollAnswer) {
-		pollAnswers.remove(pollAnswer);
-		pollAnswer.setPollQuestion(null);
-	}
 }

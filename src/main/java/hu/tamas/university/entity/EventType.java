@@ -48,9 +48,4 @@ public class EventType {
 		events.add(event);
 		event.setEventType(this);
 	}
-
-	public void removeEvent(Event event) {
-		events.remove(event);
-		event.setEventType(null);
-	}
 }

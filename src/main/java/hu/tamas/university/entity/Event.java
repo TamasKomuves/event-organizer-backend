@@ -84,41 +84,13 @@ public class Event {
 		user.getParticipateInEvents().add(participateInEvent);
 	}
 
-	public void removeParticipant(User user) {
-		ParticipateInEvent participateInEvent = new ParticipateInEvent(this, user);
-		participateInEvents.remove(participateInEvent);
-		user.getParticipateInEvents().remove(participateInEvent);
-		participateInEvent.setUser(null);
-		participateInEvent.setEvent(null);
-	}
-
 	public void addPost(Post post) {
 		posts.add(post);
 		post.setEvent(this);
 	}
 
-	public void removePost(Post post) {
-		posts.remove(post);
-		post.setEvent(null);
-	}
-
-	public void addInvitation(Invitation invitation) {
-		invitations.add(invitation);
-		invitation.setEvent(this);
-	}
-
-	public void removeInvitation(Invitation invitation) {
-		invitations.remove(invitation);
-		invitation.setEvent(null);
-	}
-
 	public void addPollQuestion(PollQuestion pollQuestion) {
 		pollQuestions.add(pollQuestion);
 		pollQuestion.setEvent(this);
-	}
-
-	public void removePollQuestion(PollQuestion pollQuestion) {
-		pollQuestions.remove(pollQuestion);
-		pollQuestion.setEvent(null);
 	}
 }

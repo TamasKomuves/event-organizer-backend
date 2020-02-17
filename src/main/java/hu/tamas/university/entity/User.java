@@ -100,52 +100,9 @@ public class User implements UserDetails {
 		return Objects.hash(email);
 	}
 
-	public void addEvent(Event event) {
-		ParticipateInEvent participateInEvent = new ParticipateInEvent(event, this);
-		participateInEvents.add(participateInEvent);
-		event.getParticipateInEvents().add(participateInEvent);
-	}
-
-	public void removeEvent(Event event) {
-		ParticipateInEvent participateInEvent = new ParticipateInEvent(event, this);
-		participateInEvents.remove(participateInEvent);
-		event.getParticipateInEvents().remove(participateInEvent);
-		participateInEvent.setUser(null);
-		participateInEvent.setEvent(null);
-	}
-
-	public void addLikedComment(Comment comment) {
-		LikesComment likesComment = new LikesComment(this, comment);
-		likesComments.add(likesComment);
-		comment.getLikesComments().add(likesComment);
-	}
-
-	public void removeLikedComment(Comment comment) {
-		LikesComment likesComment = new LikesComment(this, comment);
-		likesComments.remove(likesComment);
-		comment.getLikesComments().remove(likesComment);
-		likesComment.setComment(null);
-		likesComment.setUser(null);
-	}
-
-	public void addInvitation(Invitation invitation) {
-		invitations.add(invitation);
-		invitation.setUser(this);
-	}
-
-	public void removeInvitation(Invitation invitation) {
-		invitations.remove(invitation);
-		invitation.setUser(null);
-	}
-
 	public void addOrganizedEvent(Event event) {
 		organizedEvents.add(event);
 		event.setOrganizer(this);
-	}
-
-	public void removeOrganizedEvent(Event event) {
-		organizedEvents.remove(event);
-		event.setOrganizer(null);
 	}
 
 	public void addComment(Comment comment) {
@@ -153,57 +110,9 @@ public class User implements UserDetails {
 		comment.setCommenter(this);
 	}
 
-	public void removeComment(Comment comment) {
-		comments.remove(comment);
-		comment.setCommenter(null);
-	}
-
 	public void addPost(Post post) {
 		posts.add(post);
 		post.setPoster(this);
-	}
-
-	public void removePost(Post post) {
-		posts.remove(post);
-		post.setPoster(null);
-	}
-
-	public void addLikedPost(Post post) {
-		LikesPost likesPost = new LikesPost(this, post);
-		likesPosts.add(likesPost);
-		post.getLikesPosts().add(likesPost);
-	}
-
-	public void removeLikedPost(Post post) {
-		LikesPost likesPost = new LikesPost(this, post);
-		likesPosts.remove(likesPost);
-		post.getLikesPosts().remove(likesPost);
-		likesPost.setPost(null);
-		likesPost.setUser(null);
-	}
-
-	public void addAnswerToPoll(PollAnswer pollAnswer) {
-		AnswersToPoll answersToPoll = new AnswersToPoll(this, pollAnswer);
-		answersToPolls.add(answersToPoll);
-		pollAnswer.getAnswersToPolls().add(answersToPoll);
-	}
-
-	public void removeAnswerToPoll(PollAnswer pollAnswer) {
-		AnswersToPoll answersToPoll = new AnswersToPoll(this, pollAnswer);
-		answersToPolls.remove(answersToPoll);
-		pollAnswer.getAnswersToPolls().remove(answersToPoll);
-		answersToPoll.setPollAnswer(null);
-		answersToPoll.setUser(null);
-	}
-
-	private void removeSentChatMessage(ChatMessage chatMessage) {
-		sentChatMessages.remove(chatMessage);
-		chatMessage.setSender(null);
-	}
-
-	private void removeReceivedChatMessage(ChatMessage chatMessage) {
-		receivedChatMessages.remove(chatMessage);
-		chatMessage.setSender(null);
 	}
 
 	@Override
