@@ -51,9 +51,8 @@ final class PublicUsersController {
 				registrationDto.getFirstname(), registrationDto.getLastname(), address);
 		final String token = UUID.randomUUID().toString();
 		user.setActivationToken(token);
-		userRepository.saveAndFlush(user);
-
 		sendConfirmationEmail(registrationDto.getEmail(), token, request.getRequestURL().toString());
+		userRepository.saveAndFlush(user);
 
 		return "{\"result\":\"success\"}";
 	}
