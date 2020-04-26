@@ -1,12 +1,13 @@
 package hu.tamas.university.controller;
 
-import hu.tamas.university.dto.creatordto.RegistrationDto;
 import hu.tamas.university.dto.UserLoginDto;
+import hu.tamas.university.dto.creatordto.RegistrationDto;
 import hu.tamas.university.entity.Address;
 import hu.tamas.university.entity.User;
 import hu.tamas.university.repository.UserRepository;
 import hu.tamas.university.service.security.UserAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,9 @@ final class PublicUsersController {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JavaMailSender javaMailSender;
+
+	@Value("${spring.mail.username}")
+	private String senderEmail;
 
 	@Autowired
 	public PublicUsersController(UserAuthenticationService userAuthenticationService,
@@ -51,7 +55,15 @@ final class PublicUsersController {
 				registrationDto.getFirstname(), registrationDto.getLastname(), address);
 		final String token = UUID.randomUUID().toString();
 		user.setActivationToken(token);
-		sendConfirmationEmail(registrationDto.getEmail(), token, request.getRequestURL().toString());
+
+		try {
+			sendConfirmationEmail(registrationDto.getEmail(), token, request.getRequestURL().toString());
+		} catch (Exception e) {
+			user.setIsActivated(1);
+			userRepository.saveAndFlush(user);
+			return "{\"result\":\"email error\"}";
+		}
+
 		userRepository.saveAndFlush(user);
 
 		return "{\"result\":\"success\"}";
@@ -61,6 +73,7 @@ final class PublicUsersController {
 		final SimpleMailMessage msg = new SimpleMailMessage();
 		msg.setTo(userEmail);
 		msg.setSubject("Event organizer - registration confirmation");
+		msg.setFrom(senderEmail);
 		final String url = baseUrl + "/activate-user/" + token;
 		msg.setText("To finish your registration please click on the following link: " + url);
 		javaMailSender.send(msg);
